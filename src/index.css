@@ -6,6 +6,60 @@
 
 @layer base {
   :root {
+    /* Light theme */
+    --background: 40 25% 97%;
+    --foreground: 220 20% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 10%;
+    --primary: 38 75% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 40 20% 92%;
+    --secondary-foreground: 220 20% 15%;
+    --muted: 40 15% 90%;
+    --muted-foreground: 220 10% 40%;
+    --accent: 25 80% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 40 15% 85%;
+    --input: 40 15% 85%;
+    --ring: 38 75% 50%;
+    --radius: 0.75rem;
+
+    /* Brand Colors */
+    --gold: 38 75% 50%;
+    --gold-light: 40 80% 60%;
+    --gold-dark: 35 70% 35%;
+    --copper: 25 80% 45%;
+    --bronze: 30 60% 30%;
+    
+    /* Operator Colors */
+    --vivo: 330 85% 50%;
+    --tim: 195 100% 40%;
+    --claro: 20 90% 50%;
+    --brisanet: 48 100% 40%;
+    --algar: 145 70% 35%;
+    --unifique: 270 70% 55%;
+    
+    /* EV Colors */
+    --ev-green: 145 60% 40%;
+    --ev-charging: 38 75% 50%;
+    --ev-tesla: 0 75% 50%;
+    --ev-shell: 48 95% 45%;
+
+    --sidebar-background: 40 25% 97%;
+    --sidebar-foreground: 220 20% 10%;
+    --sidebar-primary: 38 75% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 40 20% 92%;
+    --sidebar-accent-foreground: 220 20% 15%;
+    --sidebar-border: 40 15% 85%;
+    --sidebar-ring: 38 75% 50%;
+  }
+
+  .dark {
     --background: 220 20% 6%;
     --foreground: 40 20% 95%;
     --card: 220 20% 8%;
@@ -25,7 +79,6 @@
     --border: 220 15% 18%;
     --input: 220 15% 18%;
     --ring: 38 75% 55%;
-    --radius: 0.75rem;
 
     /* Brand Colors */
     --gold: 38 75% 55%;
@@ -56,11 +109,6 @@
     --sidebar-accent-foreground: 40 20% 95%;
     --sidebar-border: 220 15% 18%;
     --sidebar-ring: 38 75% 55%;
-  }
-
-  .dark {
-    --background: 220 20% 6%;
-    --foreground: 40 20% 95%;
   }
 }
 
@@ -179,33 +227,33 @@
   }
 }
 
-/* Leaflet overrides */
-.leaflet-container {
+/* Leaflet overrides - Dark theme */
+.dark .leaflet-container {
   background: hsl(220 20% 6%) !important;
   font-family: 'Inter', sans-serif;
   border-radius: var(--radius);
 }
 
-.leaflet-control-zoom a {
+.dark .leaflet-control-zoom a {
   background: hsl(220 20% 10%) !important;
   color: hsl(40 20% 95%) !important;
   border-color: hsl(220 15% 18%) !important;
 }
 
-.leaflet-control-zoom a:hover {
+.dark .leaflet-control-zoom a:hover {
   background: hsl(220 20% 15%) !important;
 }
 
-.leaflet-control-attribution {
+.dark .leaflet-control-attribution {
   background: hsl(220 20% 8% / 0.9) !important;
   color: hsl(220 10% 55%) !important;
 }
 
-.leaflet-control-attribution a {
+.dark .leaflet-control-attribution a {
   color: hsl(38 75% 55%) !important;
 }
 
-.leaflet-popup-content-wrapper {
+.dark .leaflet-popup-content-wrapper {
   background: hsl(220 20% 10% / 0.95) !important;
   backdrop-filter: blur(12px);
   border: 1px solid hsl(220 15% 20%) !important;
@@ -213,32 +261,96 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
 }
 
-.leaflet-popup-content {
+.dark .leaflet-popup-content {
   margin: 0 !important;
   color: hsl(40 20% 95%) !important;
 }
 
-.leaflet-popup-tip {
+.dark .leaflet-popup-tip {
   background: hsl(220 20% 10% / 0.95) !important;
   border: 1px solid hsl(220 15% 20%) !important;
 }
 
-/* Scrollbar */
+/* Leaflet overrides - Light theme */
+.leaflet-container {
+  background: hsl(40 25% 97%) !important;
+  font-family: 'Inter', sans-serif;
+  border-radius: var(--radius);
+}
+
+.leaflet-control-zoom a {
+  background: hsl(0 0% 100%) !important;
+  color: hsl(220 20% 20%) !important;
+  border-color: hsl(40 15% 85%) !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: hsl(40 20% 95%) !important;
+}
+
+.leaflet-control-attribution {
+  background: hsl(0 0% 100% / 0.9) !important;
+  color: hsl(220 10% 40%) !important;
+}
+
+.leaflet-control-attribution a {
+  color: hsl(38 75% 50%) !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: hsl(0 0% 100% / 0.95) !important;
+  backdrop-filter: blur(12px);
+  border: 1px solid hsl(40 15% 85%) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  color: hsl(220 20% 10%) !important;
+}
+
+.leaflet-popup-tip {
+  background: hsl(0 0% 100% / 0.95) !important;
+  border: 1px solid hsl(40 15% 85%) !important;
+}
+
+/* Scrollbar - Dark */
+.dark ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: hsl(220 15% 12%);
+  border-radius: 3px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: hsl(220 10% 30%);
+  border-radius: 3px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: hsl(38 75% 55% / 0.5);
+}
+
+/* Scrollbar - Light */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(220 15% 12%);
+  background: hsl(40 15% 92%);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(220 10% 30%);
+  background: hsl(40 10% 75%);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(38 75% 55% / 0.5);
+  background: hsl(38 75% 50% / 0.5);
 }
