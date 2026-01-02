@@ -2,95 +2,78 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    --background: 222 47% 7%;
+    --background: 220 25% 5%;
     --foreground: 210 40% 98%;
 
-    --card: 222 47% 11%;
+    --card: 220 25% 8%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222 47% 11%;
+    --popover: 220 25% 8%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 252 100% 69%;
-    --primary-foreground: 222 47% 7%;
+    --primary: 180 100% 50%;
+    --primary-foreground: 220 25% 5%;
 
-    --secondary: 217 33% 17%;
+    --secondary: 220 25% 12%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 220 25% 15%;
+    --muted-foreground: 215 20% 60%;
 
-    --accent: 199 89% 48%;
-    --accent-foreground: 222 47% 7%;
+    --accent: 270 100% 65%;
+    --accent-foreground: 220 25% 5%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217 33% 20%;
-    --input: 217 33% 20%;
-    --ring: 252 100% 69%;
+    --border: 220 25% 18%;
+    --input: 220 25% 18%;
+    --ring: 180 100% 50%;
 
     --radius: 0.75rem;
 
-    /* Custom colors for operators */
-    --vivo: 330 100% 71%;
-    --tim: 199 89% 48%;
-    --claro: 15 100% 55%;
-    --brisanet: 45 100% 51%;
-    --algar: 142 76% 45%;
-    --unifique: 280 80% 65%;
+    /* Operator colors */
+    --vivo: 330 100% 65%;
+    --tim: 195 100% 50%;
+    --claro: 25 100% 55%;
+    --brisanet: 45 100% 50%;
+    --algar: 145 80% 45%;
+    --unifique: 280 80% 60%;
+
+    /* EV Station colors */
+    --ev-tesla: 0 85% 55%;
+    --ev-eletroposto: 145 80% 50%;
+    --ev-shell: 45 100% 50%;
+    --ev-other: 200 80% 55%;
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(252 100% 69%) 0%, hsl(280 100% 65%) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(222 47% 13%) 0%, hsl(222 47% 9%) 100%);
-    --gradient-glow: radial-gradient(ellipse at center, hsl(252 100% 69% / 0.15) 0%, transparent 70%);
+    --gradient-cyber: linear-gradient(135deg, hsl(180 100% 50%) 0%, hsl(270 100% 65%) 50%, hsl(330 100% 65%) 100%);
+    --gradient-neon: linear-gradient(180deg, hsl(180 100% 50% / 0.3) 0%, transparent 100%);
+    --gradient-card: linear-gradient(145deg, hsl(220 25% 10%) 0%, hsl(220 25% 6%) 100%);
+    --gradient-glow: radial-gradient(ellipse at center, hsl(180 100% 50% / 0.2) 0%, transparent 70%);
 
     /* Shadows */
-    --shadow-glow: 0 0 40px hsl(252 100% 69% / 0.2);
-    --shadow-card: 0 4px 24px hsl(0 0% 0% / 0.4);
+    --shadow-neon: 0 0 30px hsl(180 100% 50% / 0.4);
+    --shadow-card: 0 8px 32px hsl(0 0% 0% / 0.5);
+    --shadow-glow-purple: 0 0 40px hsl(270 100% 65% / 0.3);
 
-    --sidebar-background: 222 47% 9%;
+    --sidebar-background: 220 25% 6%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 252 100% 69%;
-    --sidebar-primary-foreground: 222 47% 7%;
-    --sidebar-accent: 217 33% 17%;
+    --sidebar-primary: 180 100% 50%;
+    --sidebar-primary-foreground: 220 25% 5%;
+    --sidebar-accent: 220 25% 15%;
     --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217 33% 20%;
-    --sidebar-ring: 252 100% 69%;
+    --sidebar-border: 220 25% 18%;
+    --sidebar-ring: 180 100% 50%;
   }
 
   .dark {
-    --background: 222 47% 7%;
+    --background: 220 25% 5%;
     --foreground: 210 40% 98%;
-    --card: 222 47% 11%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 11%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 252 100% 69%;
-    --primary-foreground: 222 47% 7%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 199 89% 48%;
-    --accent-foreground: 222 47% 7%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 20%;
-    --input: 217 33% 20%;
-    --ring: 252 100% 69%;
-    --sidebar-background: 222 47% 9%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 252 100% 69%;
-    --sidebar-primary-foreground: 222 47% 7%;
-    --sidebar-accent: 217 33% 17%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217 33% 20%;
-    --sidebar-ring: 252 100% 69%;
   }
 }
 
@@ -105,73 +88,105 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Orbitron', sans-serif;
   }
 }
 
 @layer utilities {
   .glass-card {
-    @apply bg-card/80 backdrop-blur-xl border border-border/50 rounded-xl;
+    @apply bg-card/90 backdrop-blur-xl border border-border/50 rounded-xl;
     box-shadow: var(--shadow-card);
   }
 
-  .glow-effect {
-    box-shadow: var(--shadow-glow);
+  .glass-card-hover {
+    @apply glass-card transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_hsl(180_100%_50%_/_0.2)];
   }
 
-  .gradient-text {
-    background: var(--gradient-primary);
+  .neon-glow {
+    box-shadow: var(--shadow-neon);
+  }
+
+  .neon-text {
+    text-shadow: 0 0 10px hsl(180 100% 50% / 0.8), 0 0 20px hsl(180 100% 50% / 0.5), 0 0 30px hsl(180 100% 50% / 0.3);
+  }
+
+  .gradient-text-cyber {
+    background: var(--gradient-cyber);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
-  .operator-vivo {
-    background-color: hsl(var(--vivo));
+  .scan-line {
+    background: linear-gradient(90deg, transparent 0%, hsl(180 100% 50% / 0.1) 50%, transparent 100%);
+    animation: scan 3s linear infinite;
   }
 
-  .operator-tim {
-    background-color: hsl(var(--tim));
+  .pulse-ring {
+    animation: pulse-ring 2s ease-out infinite;
   }
 
-  .operator-claro {
-    background-color: hsl(var(--claro));
+  .grid-pattern {
+    background-image: 
+      linear-gradient(hsl(180 100% 50% / 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(180 100% 50% / 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
   }
 
-  .operator-brisanet {
-    background-color: hsl(var(--brisanet));
-  }
+  .operator-vivo { background-color: hsl(var(--vivo)); }
+  .operator-tim { background-color: hsl(var(--tim)); }
+  .operator-claro { background-color: hsl(var(--claro)); }
+  .operator-brisanet { background-color: hsl(var(--brisanet)); }
+  .operator-algar { background-color: hsl(var(--algar)); }
+  .operator-unifique { background-color: hsl(var(--unifique)); }
 
-  .operator-algar {
-    background-color: hsl(var(--algar));
-  }
-
-  .operator-unifique {
-    background-color: hsl(var(--unifique));
-  }
+  .ev-tesla { background-color: hsl(var(--ev-tesla)); }
+  .ev-eletroposto { background-color: hsl(var(--ev-eletroposto)); }
+  .ev-shell { background-color: hsl(var(--ev-shell)); }
+  .ev-other { background-color: hsl(var(--ev-other)); }
 }
 
-/* Leaflet overrides for dark theme */
+@keyframes scan {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+/* Leaflet overrides */
 .leaflet-container {
-  background: hsl(222 47% 7%);
+  background: hsl(220 25% 5%);
   font-family: 'Inter', sans-serif;
 }
 
 .leaflet-control-zoom a {
-  background: hsl(222 47% 11%) !important;
+  background: hsl(220 25% 10%) !important;
   color: hsl(210 40% 98%) !important;
-  border-color: hsl(217 33% 20%) !important;
+  border-color: hsl(220 25% 18%) !important;
 }
 
 .leaflet-control-zoom a:hover {
-  background: hsl(217 33% 17%) !important;
+  background: hsl(220 25% 15%) !important;
 }
 
 .leaflet-control-attribution {
-  background: hsl(222 47% 11% / 0.8) !important;
-  color: hsl(215 20% 65%) !important;
+  background: hsl(220 25% 8% / 0.9) !important;
+  color: hsl(215 20% 60%) !important;
 }
 
 .leaflet-control-attribution a {
-  color: hsl(199 89% 48%) !important;
+  color: hsl(180 100% 50%) !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: hsl(220 25% 10%) !important;
+  border: 1px solid hsl(220 25% 20%) !important;
+  border-radius: 12px !important;
+}
+
+.leaflet-popup-tip {
+  background: hsl(220 25% 10%) !important;
 }
