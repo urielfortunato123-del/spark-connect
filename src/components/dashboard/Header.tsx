@@ -1,5 +1,6 @@
 import { Signal, Zap, Users, Brain, MapPin } from "lucide-react";
 import { useCountUp } from "@/hooks/useCountUp";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface HeaderProps {
   activeTab: "5g" | "ev" | "ai";
@@ -10,7 +11,7 @@ const Header = ({ activeTab, setActiveTab }: HeaderProps) => {
   return (
     <header className="glass-card px-4 md:px-6 py-4 md:py-5 animate-in">
       <div className="flex flex-col gap-4">
-        {/* Top Row: Logo + Quick Stats */}
+        {/* Top Row: Logo + Theme Toggle + Quick Stats */}
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-3 md:gap-4">
@@ -31,11 +32,17 @@ const Header = ({ activeTab, setActiveTab }: HeaderProps) => {
             </div>
           </div>
 
-          {/* Quick Stats - Hidden on mobile, compact on tablet */}
-          <div className="hidden md:flex items-center gap-2 lg:gap-3">
-            <AnimatedQuickStat icon={<Signal className="w-4 h-4" />} value={48247} label="Torres" delay={100} />
-            <AnimatedQuickStat icon={<Zap className="w-4 h-4" />} value={3850} label="Estações" delay={200} />
-            <AnimatedQuickStat icon={<Users className="w-4 h-4" />} value={75.8} label="Cobertura" suffix="%" decimals={1} delay={300} />
+          {/* Quick Stats + Theme Toggle */}
+          <div className="flex items-center gap-2 lg:gap-3">
+            {/* Quick Stats - Hidden on mobile */}
+            <div className="hidden md:flex items-center gap-2 lg:gap-3">
+              <AnimatedQuickStat icon={<Signal className="w-4 h-4" />} value={48247} label="Torres" delay={100} />
+              <AnimatedQuickStat icon={<Zap className="w-4 h-4" />} value={3850} label="Estações" delay={200} />
+              <AnimatedQuickStat icon={<Users className="w-4 h-4" />} value={75.8} label="Cobertura" suffix="%" decimals={1} delay={300} />
+            </div>
+            
+            {/* Theme Toggle */}
+            <ThemeToggle />
           </div>
         </div>
 
