@@ -27,21 +27,21 @@ const DistributionChart = ({ type }: DistributionChartProps) => {
   const title = type === "5g" ? "Distribuição por Operadora" : "Distribuição por Rede";
 
   return (
-    <div className="glass-card-hover p-5 animate-scale-in" style={{ animationDelay: "300ms" }}>
-      <div className="flex items-center gap-2 mb-4">
-        <PieChartIcon className="w-4 h-4 text-primary" />
-        <h3 className="text-sm font-display font-semibold">{title}</h3>
+    <div className="glass-card-hover p-3 md:p-5 animate-scale-in" style={{ animationDelay: "300ms" }}>
+      <div className="flex items-center gap-2 mb-3 md:mb-4">
+        <PieChartIcon className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
+        <h3 className="text-xs md:text-sm font-display font-semibold">{title}</h3>
       </div>
       
-      <div className="h-48 min-h-[192px]">
+      <div className="h-36 md:h-48 min-h-[144px] md:min-h-[192px]">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={data}
               cx="50%"
               cy="50%"
-              innerRadius={50}
-              outerRadius={80}
+              innerRadius={35}
+              outerRadius={55}
               paddingAngle={2}
               dataKey="value"
             >
@@ -55,6 +55,7 @@ const DistributionChart = ({ type }: DistributionChartProps) => {
                 border: "1px solid hsl(220, 15%, 20%)",
                 borderRadius: "8px",
                 color: "hsl(40, 20%, 95%)",
+                fontSize: "12px",
               }}
               formatter={(value: number) => [`${value.toLocaleString()}`, ""]}
             />
@@ -62,14 +63,14 @@ const DistributionChart = ({ type }: DistributionChartProps) => {
         </ResponsiveContainer>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 mt-4">
+      <div className="grid grid-cols-2 gap-1.5 md:gap-2 mt-3 md:mt-4">
         {data.map((item) => (
-          <div key={item.name} className="flex items-center gap-1.5">
+          <div key={item.name} className="flex items-center gap-1 md:gap-1.5">
             <span 
-              className="w-2.5 h-2.5 rounded-sm" 
+              className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-sm flex-shrink-0" 
               style={{ backgroundColor: item.color }}
             />
-            <span className="text-xs text-muted-foreground">{item.name}</span>
+            <span className="text-[10px] md:text-xs text-muted-foreground truncate">{item.name}</span>
           </div>
         ))}
       </div>

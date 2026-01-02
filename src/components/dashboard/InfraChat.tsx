@@ -144,16 +144,16 @@ const InfraChat = ({ onNavigateToStation, onShowStationsOnMap }: InfraChatProps)
   return (
     <div className="glass-card h-full flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b border-border/50">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-copper flex items-center justify-center shadow-lg">
-            <MessageSquare className="w-5 h-5 text-primary-foreground" />
+      <div className="p-3 md:p-4 border-b border-border/50">
+        <div className="flex items-center gap-2 md:gap-3">
+          <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-gradient-to-br from-primary to-copper flex items-center justify-center shadow-lg">
+            <MessageSquare className="w-4 h-4 md:w-5 md:h-5 text-primary-foreground" />
           </div>
           <div>
-            <h2 className="text-base font-display font-semibold gradient-text-gold">
+            <h2 className="text-sm md:text-base font-display font-semibold gradient-text-gold">
               Assistente InfraBrasil
             </h2>
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-[9px] md:text-[10px] text-muted-foreground">
               IA especializada em infraestrutura
             </p>
           </div>
@@ -161,19 +161,19 @@ const InfraChat = ({ onNavigateToStation, onShowStationsOnMap }: InfraChatProps)
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-        <div className="space-y-4">
+      <ScrollArea className="flex-1 p-3 md:p-4" ref={scrollRef}>
+        <div className="space-y-3 md:space-y-4">
           {messages.map((message) => (
-            <div key={message.id} className={`flex gap-3 ${message.role === "user" ? "flex-row-reverse" : ""}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+            <div key={message.id} className={`flex gap-2 md:gap-3 ${message.role === "user" ? "flex-row-reverse" : ""}`}>
+              <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                 message.role === "user" 
                   ? "bg-primary/20 text-primary" 
                   : "bg-accent/20 text-accent"
               }`}>
-                {message.role === "user" ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                {message.role === "user" ? <User className="w-3 h-3 md:w-4 md:h-4" /> : <Bot className="w-3 h-3 md:w-4 md:h-4" />}
               </div>
-              <div className={`flex flex-col gap-2 max-w-[85%] ${message.role === "user" ? "items-end" : "items-start"}`}>
-                <div className={`px-4 py-3 rounded-2xl text-sm ${
+              <div className={`flex flex-col gap-1.5 md:gap-2 max-w-[85%] ${message.role === "user" ? "items-end" : "items-start"}`}>
+                <div className={`px-3 md:px-4 py-2 md:py-3 rounded-2xl text-xs md:text-sm ${
                   message.role === "user"
                     ? "bg-primary text-primary-foreground rounded-br-sm"
                     : "bg-secondary/80 text-foreground rounded-bl-sm"
@@ -263,20 +263,21 @@ const InfraChat = ({ onNavigateToStation, onShowStationsOnMap }: InfraChatProps)
       )}
 
       {/* Input */}
-      <div className="p-4 border-t border-border/50">
+      <div className="p-3 md:p-4 border-t border-border/50">
         <div className="flex gap-2">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Pergunte sobre infraestrutura..."
-            className="flex-1 bg-secondary/50 border-border/50"
+            className="flex-1 bg-secondary/50 border-border/50 text-sm"
             disabled={isLoading}
           />
           <Button 
             onClick={() => sendMessage()} 
             disabled={!input.trim() || isLoading}
             className="bg-primary hover:bg-primary/90"
+            size="sm"
           >
             {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           </Button>

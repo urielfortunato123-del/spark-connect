@@ -56,13 +56,13 @@ const EvolutionChart = ({ type }: EvolutionChartProps) => {
   const color = type === "5g" ? "#00d4ff" : "hsl(145, 60%, 45%)";
 
   return (
-    <div className="glass-card-hover p-5 animate-scale-in" style={{ animationDelay: "400ms" }}>
-      <div className="flex items-center gap-2 mb-4">
-        <TrendingUp className="w-4 h-4 text-primary" />
-        <h3 className="text-sm font-display font-semibold">{title}</h3>
+    <div className="glass-card-hover p-3 md:p-5 animate-scale-in" style={{ animationDelay: "400ms" }}>
+      <div className="flex items-center gap-2 mb-3 md:mb-4">
+        <TrendingUp className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
+        <h3 className="text-xs md:text-sm font-display font-semibold">{title}</h3>
       </div>
       
-      <div className="h-48 min-h-[192px]">
+      <div className="h-36 md:h-48 min-h-[144px] md:min-h-[192px]">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data}>
             <CartesianGrid 
@@ -73,16 +73,18 @@ const EvolutionChart = ({ type }: EvolutionChartProps) => {
             <XAxis 
               dataKey="month" 
               stroke="hsl(215, 20%, 60%)"
-              fontSize={10}
+              fontSize={9}
               tickLine={false}
               axisLine={false}
+              interval="preserveStartEnd"
             />
             <YAxis 
               stroke="hsl(215, 20%, 60%)"
-              fontSize={10}
+              fontSize={9}
               tickLine={false}
               axisLine={false}
               tickFormatter={(value) => `${value / 1000}k`}
+              width={30}
             />
             <Tooltip 
               contentStyle={{
@@ -90,6 +92,7 @@ const EvolutionChart = ({ type }: EvolutionChartProps) => {
                 border: "1px solid hsl(220, 15%, 20%)",
                 borderRadius: "8px",
                 color: "hsl(40, 20%, 95%)",
+                fontSize: "12px",
               }}
               formatter={(value: number) => [`${value.toLocaleString()}`, ""]}
             />
@@ -98,8 +101,8 @@ const EvolutionChart = ({ type }: EvolutionChartProps) => {
               dataKey="value" 
               stroke={color}
               strokeWidth={2}
-              dot={{ fill: color, strokeWidth: 0, r: 3 }}
-              activeDot={{ r: 5, fill: color }}
+              dot={{ fill: color, strokeWidth: 0, r: 2 }}
+              activeDot={{ r: 4, fill: color }}
             />
           </LineChart>
         </ResponsiveContainer>

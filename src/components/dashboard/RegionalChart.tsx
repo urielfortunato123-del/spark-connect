@@ -52,20 +52,20 @@ const RegionalChart = ({ type }: RegionalChartProps) => {
   const title = type === "5g" ? "Cobertura 5G por Região" : "Estações EV por Região";
 
   return (
-    <div className="glass-card-hover p-5 animate-scale-in" style={{ animationDelay: "500ms" }}>
-      <div className="flex items-center gap-2 mb-4">
-        <Map className="w-4 h-4 text-accent" />
-        <h3 className="text-sm font-display font-semibold">{title}</h3>
+    <div className="glass-card-hover p-3 md:p-5 animate-scale-in" style={{ animationDelay: "500ms" }}>
+      <div className="flex items-center gap-2 mb-3 md:mb-4">
+        <Map className="w-3.5 h-3.5 md:w-4 md:h-4 text-accent" />
+        <h3 className="text-xs md:text-sm font-display font-semibold">{title}</h3>
       </div>
       
-      <div className="h-48 min-h-[192px]">
+      <div className="h-36 md:h-48 min-h-[144px] md:min-h-[192px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} layout="vertical">
             <XAxis 
               type="number" 
               domain={[0, 100]}
               stroke="hsl(215, 20%, 60%)"
-              fontSize={10}
+              fontSize={9}
               tickLine={false}
               axisLine={false}
               tickFormatter={(value) => `${value}%`}
@@ -74,10 +74,10 @@ const RegionalChart = ({ type }: RegionalChartProps) => {
               type="category" 
               dataKey="region" 
               stroke="hsl(215, 20%, 60%)"
-              fontSize={10}
+              fontSize={9}
               tickLine={false}
               axisLine={false}
-              width={70}
+              width={55}
             />
             <Tooltip 
               contentStyle={{
@@ -85,13 +85,14 @@ const RegionalChart = ({ type }: RegionalChartProps) => {
                 border: "1px solid hsl(220, 15%, 20%)",
                 borderRadius: "8px",
                 color: "hsl(40, 20%, 95%)",
+                fontSize: "12px",
               }}
               formatter={(value: number) => [`${value}%`, "Cobertura"]}
             />
             <Bar 
               dataKey="coverage" 
               radius={[0, 4, 4, 0]}
-              barSize={20}
+              barSize={16}
             >
               {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
