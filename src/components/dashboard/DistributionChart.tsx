@@ -1,20 +1,21 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { PieChart as PieChartIcon } from "lucide-react";
+import { PieChartIcon } from "lucide-react";
+import { operatorData, totalERBStats } from "@/data/erbData";
 
-const data5G = [
-  { name: "VIVO", value: 18000, color: "hsl(330, 100%, 65%)" },
-  { name: "TIM", value: 14600, color: "hsl(195, 100%, 50%)" },
-  { name: "CLARO", value: 13300, color: "hsl(25, 100%, 55%)" },
-  { name: "BRISANET", value: 1500, color: "hsl(45, 100%, 50%)" },
-  { name: "ALGAR", value: 547, color: "hsl(145, 80%, 45%)" },
-  { name: "UNIFIQUE", value: 300, color: "hsl(280, 80%, 60%)" },
-];
+// Data from Anatel Nov/2025
+const data5G = operatorData.map((op) => ({
+  name: op.operator,
+  value: op.erbs5G,
+  color: op.color,
+}));
 
 const dataEV = [
-  { name: "Eletroposto", value: 1500, color: "hsl(145, 80%, 50%)" },
-  { name: "Tesla", value: 850, color: "hsl(0, 85%, 55%)" },
-  { name: "Shell Recharge", value: 1200, color: "hsl(45, 100%, 50%)" },
-  { name: "Outros", value: 300, color: "hsl(200, 80%, 55%)" },
+  { name: "Shell Recharge", value: 15, color: "#ffcc00" },
+  { name: "Tesla", value: 4, color: "#ea384c" },
+  { name: "Raizen", value: 8, color: "#ff6600" },
+  { name: "Ipiranga", value: 6, color: "#ffd700" },
+  { name: "EDP", value: 10, color: "#00a3e0" },
+  { name: "Outros", value: 7, color: "#22c55e" },
 ];
 
 interface DistributionChartProps {
