@@ -1,20 +1,35 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { Map } from "lucide-react";
 
-const data = [
-  { region: "Sudeste", coverage: 92, color: "hsl(199, 89%, 48%)" },
-  { region: "Sul", coverage: 85, color: "hsl(252, 100%, 69%)" },
-  { region: "Nordeste", coverage: 72, color: "hsl(330, 100%, 71%)" },
-  { region: "Norte", coverage: 55, color: "hsl(142, 76%, 45%)" },
-  { region: "Centro-Oeste", coverage: 68, color: "hsl(45, 100%, 51%)" },
+const data5G = [
+  { region: "Sudeste", coverage: 92, color: "hsl(180, 100%, 50%)" },
+  { region: "Sul", coverage: 85, color: "hsl(270, 100%, 65%)" },
+  { region: "Nordeste", coverage: 72, color: "hsl(330, 100%, 65%)" },
+  { region: "Norte", coverage: 55, color: "hsl(145, 80%, 45%)" },
+  { region: "Centro-Oeste", coverage: 68, color: "hsl(45, 100%, 50%)" },
 ];
 
-const RegionalChart = () => {
+const dataEV = [
+  { region: "Sudeste", coverage: 78, color: "hsl(145, 80%, 50%)" },
+  { region: "Sul", coverage: 65, color: "hsl(0, 85%, 55%)" },
+  { region: "Nordeste", coverage: 35, color: "hsl(45, 100%, 50%)" },
+  { region: "Norte", coverage: 18, color: "hsl(200, 80%, 55%)" },
+  { region: "Centro-Oeste", coverage: 45, color: "hsl(270, 100%, 65%)" },
+];
+
+interface RegionalChartProps {
+  type: "5g" | "ev";
+}
+
+const RegionalChart = ({ type }: RegionalChartProps) => {
+  const data = type === "5g" ? data5G : dataEV;
+  const title = type === "5g" ? "Cobertura 5G por Região" : "Estações EV por Região";
+
   return (
-    <div className="glass-card p-5 animate-scale-in" style={{ animationDelay: "500ms" }}>
+    <div className="glass-card-hover p-5 animate-scale-in" style={{ animationDelay: "500ms" }}>
       <div className="flex items-center gap-2 mb-4">
-        <Map className="w-4 h-4 text-operator-vivo" />
-        <h3 className="text-sm font-semibold">Cobertura por Região</h3>
+        <Map className="w-4 h-4 text-accent" />
+        <h3 className="text-sm font-display font-semibold">{title}</h3>
       </div>
       
       <div className="h-48">
@@ -23,7 +38,7 @@ const RegionalChart = () => {
             <XAxis 
               type="number" 
               domain={[0, 100]}
-              stroke="hsl(215, 20%, 65%)"
+              stroke="hsl(215, 20%, 60%)"
               fontSize={10}
               tickLine={false}
               axisLine={false}
@@ -32,7 +47,7 @@ const RegionalChart = () => {
             <YAxis 
               type="category" 
               dataKey="region" 
-              stroke="hsl(215, 20%, 65%)"
+              stroke="hsl(215, 20%, 60%)"
               fontSize={10}
               tickLine={false}
               axisLine={false}
@@ -40,8 +55,8 @@ const RegionalChart = () => {
             />
             <Tooltip 
               contentStyle={{
-                backgroundColor: "hsl(222, 47%, 11%)",
-                border: "1px solid hsl(217, 33%, 20%)",
+                backgroundColor: "hsl(220, 25%, 10%)",
+                border: "1px solid hsl(220, 25%, 20%)",
                 borderRadius: "8px",
                 color: "hsl(210, 40%, 98%)",
               }}

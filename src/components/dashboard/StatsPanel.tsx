@@ -7,7 +7,7 @@ const StatsPanel = () => {
       <div className="flex items-center gap-2 mb-2">
         <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-          Estatísticas Gerais
+          Estatísticas 5G
         </h2>
       </div>
 

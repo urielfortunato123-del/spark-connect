@@ -1,21 +1,35 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { PieChart as PieChartIcon } from "lucide-react";
 
-const data = [
-  { name: "VIVO", value: 18000, color: "hsl(330, 100%, 71%)" },
-  { name: "TIM", value: 14600, color: "hsl(199, 89%, 48%)" },
-  { name: "CLARO", value: 13300, color: "hsl(15, 100%, 55%)" },
-  { name: "BRISANET", value: 1500, color: "hsl(45, 100%, 51%)" },
-  { name: "ALGAR", value: 547, color: "hsl(142, 76%, 45%)" },
-  { name: "UNIFIQUE", value: 300, color: "hsl(280, 80%, 65%)" },
+const data5G = [
+  { name: "VIVO", value: 18000, color: "hsl(330, 100%, 65%)" },
+  { name: "TIM", value: 14600, color: "hsl(195, 100%, 50%)" },
+  { name: "CLARO", value: 13300, color: "hsl(25, 100%, 55%)" },
+  { name: "BRISANET", value: 1500, color: "hsl(45, 100%, 50%)" },
+  { name: "ALGAR", value: 547, color: "hsl(145, 80%, 45%)" },
+  { name: "UNIFIQUE", value: 300, color: "hsl(280, 80%, 60%)" },
 ];
 
-const DistributionChart = () => {
+const dataEV = [
+  { name: "Eletroposto", value: 1500, color: "hsl(145, 80%, 50%)" },
+  { name: "Tesla", value: 850, color: "hsl(0, 85%, 55%)" },
+  { name: "Shell Recharge", value: 1200, color: "hsl(45, 100%, 50%)" },
+  { name: "Outros", value: 300, color: "hsl(200, 80%, 55%)" },
+];
+
+interface DistributionChartProps {
+  type: "5g" | "ev";
+}
+
+const DistributionChart = ({ type }: DistributionChartProps) => {
+  const data = type === "5g" ? data5G : dataEV;
+  const title = type === "5g" ? "Distribuição por Operadora" : "Distribuição por Rede";
+
   return (
-    <div className="glass-card p-5 animate-scale-in" style={{ animationDelay: "300ms" }}>
+    <div className="glass-card-hover p-5 animate-scale-in" style={{ animationDelay: "300ms" }}>
       <div className="flex items-center gap-2 mb-4">
         <PieChartIcon className="w-4 h-4 text-primary" />
-        <h3 className="text-sm font-semibold">Distribuição por Operadora</h3>
+        <h3 className="text-sm font-display font-semibold">{title}</h3>
       </div>
       
       <div className="h-48">
@@ -36,18 +50,18 @@ const DistributionChart = () => {
             </Pie>
             <Tooltip 
               contentStyle={{
-                backgroundColor: "hsl(222, 47%, 11%)",
-                border: "1px solid hsl(217, 33%, 20%)",
+                backgroundColor: "hsl(220, 25%, 10%)",
+                border: "1px solid hsl(220, 25%, 20%)",
                 borderRadius: "8px",
                 color: "hsl(210, 40%, 98%)",
               }}
-              formatter={(value: number) => [`${value.toLocaleString()} torres`, ""]}
+              formatter={(value: number) => [`${value.toLocaleString()}`, ""]}
             />
           </PieChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="grid grid-cols-3 gap-2 mt-4">
+      <div className="grid grid-cols-2 gap-2 mt-4">
         {data.map((item) => (
           <div key={item.name} className="flex items-center gap-1.5">
             <span 
