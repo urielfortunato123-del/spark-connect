@@ -50,10 +50,10 @@ const DistributionChart = ({ type }: DistributionChartProps) => {
             </Pie>
             <Tooltip 
               contentStyle={{
-                backgroundColor: "hsl(220, 25%, 10%)",
-                border: "1px solid hsl(220, 25%, 20%)",
+                backgroundColor: "hsl(220, 20%, 10%)",
+                border: "1px solid hsl(220, 15%, 20%)",
                 borderRadius: "8px",
-                color: "hsl(210, 40%, 98%)",
+                color: "hsl(40, 20%, 95%)",
               }}
               formatter={(value: number) => [`${value.toLocaleString()}`, ""]}
             />

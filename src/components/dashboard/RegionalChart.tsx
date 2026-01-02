@@ -2,11 +2,11 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 
 import { Map } from "lucide-react";
 
 const data5G = [
-  { region: "Sudeste", coverage: 92, color: "hsl(180, 100%, 50%)" },
-  { region: "Sul", coverage: 85, color: "hsl(270, 100%, 65%)" },
-  { region: "Nordeste", coverage: 72, color: "hsl(330, 100%, 65%)" },
-  { region: "Norte", coverage: 55, color: "hsl(145, 80%, 45%)" },
-  { region: "Centro-Oeste", coverage: 68, color: "hsl(45, 100%, 50%)" },
+  { region: "Sudeste", coverage: 92, color: "hsl(38, 75%, 55%)" },
+  { region: "Sul", coverage: 85, color: "hsl(40, 80%, 65%)" },
+  { region: "Nordeste", coverage: 72, color: "hsl(25, 80%, 50%)" },
+  { region: "Norte", coverage: 55, color: "hsl(145, 60%, 45%)" },
+  { region: "Centro-Oeste", coverage: 68, color: "hsl(195, 100%, 45%)" },
 ];
 
 const dataEV = [
@@ -55,10 +55,10 @@ const RegionalChart = ({ type }: RegionalChartProps) => {
             />
             <Tooltip 
               contentStyle={{
-                backgroundColor: "hsl(220, 25%, 10%)",
-                border: "1px solid hsl(220, 25%, 20%)",
+                backgroundColor: "hsl(220, 20%, 10%)",
+                border: "1px solid hsl(220, 15%, 20%)",
                 borderRadius: "8px",
-                color: "hsl(210, 40%, 98%)",
+                color: "hsl(40, 20%, 95%)",
               }}
               formatter={(value: number) => [`${value}%`, "Cobertura"]}
             />
