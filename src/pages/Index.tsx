@@ -8,6 +8,7 @@ import DistributionChart from "@/components/dashboard/DistributionChart";
 import EvolutionChart from "@/components/dashboard/EvolutionChart";
 import RegionalChart from "@/components/dashboard/RegionalChart";
 import EVStatsPanel from "@/components/dashboard/EVStatsPanel";
+import InfraChat from "@/components/dashboard/InfraChat";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<"5g" | "ev" | "ai">("5g");
@@ -15,8 +16,6 @@ const Index = () => {
   const [selectedOperators, setSelectedOperators] = useState([
     "VIVO", "TIM", "CLARO", "BRISANET", "ALGAR", "UNIFIQUE"
   ]);
-  const [showEVStations, setShowEVStations] = useState(true);
-  const [showTowers, setShowTowers] = useState(true);
   const [aiRecommendations, setAIRecommendations] = useState<any[]>([]);
 
   const toggleOperator = (operator: string) => {
@@ -30,10 +29,8 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background p-4 md:p-6 grid-pattern">
       <div className="max-w-[1800px] mx-auto space-y-4">
-        {/* Header */}
         <Header activeTab={activeTab} setActiveTab={setActiveTab} />
 
-        {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr_350px] gap-4">
           {/* Left Sidebar */}
           <div className="space-y-4">
@@ -50,11 +47,7 @@ const Index = () => {
             )}
             {activeTab === "ev" && <EVStatsPanel />}
             {activeTab === "ai" && (
-              <div className="glass-card p-4 text-center">
-                <p className="text-sm text-muted-foreground">
-                  Use o painel à direita para executar análises com IA
-                </p>
-              </div>
+              <AIAnalysisPanel onRecommendationsUpdate={setAIRecommendations} />
             )}
           </div>
 
@@ -63,13 +56,12 @@ const Index = () => {
             <div className="h-[500px] lg:h-[600px]">
               <InfrastructureMap 
                 selectedOperators={selectedOperators}
-                showEVStations={activeTab === "ev" || activeTab === "ai" ? showEVStations : false}
-                showTowers={activeTab === "5g" || activeTab === "ai" ? showTowers : false}
+                showEVStations={activeTab === "ev"}
+                showTowers={activeTab === "5g"}
                 aiRecommendations={aiRecommendations}
               />
             </div>
 
-            {/* Charts Row */}
             {(activeTab === "5g" || activeTab === "ev") && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <DistributionChart type={activeTab} />
@@ -79,9 +71,9 @@ const Index = () => {
             )}
           </div>
 
-          {/* Right Panel - AI Analysis */}
+          {/* Right Panel - Chat */}
           <div className="h-[500px] lg:h-[600px]">
-            <AIAnalysisPanel onRecommendationsUpdate={setAIRecommendations} />
+            <InfraChat />
           </div>
         </div>
       </div>

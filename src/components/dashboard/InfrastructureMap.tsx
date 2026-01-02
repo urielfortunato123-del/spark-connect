@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { evStationsData, operatorColors as evOperatorColors } from "@/data/evStations";
 
 interface Tower {
   id: string;
@@ -8,15 +9,6 @@ interface Tower {
   lng: number;
   operator: string;
   city: string;
-}
-
-interface EVStation {
-  id: string;
-  lat: number;
-  lng: number;
-  provider: string;
-  name: string;
-  chargers: number;
 }
 
 interface AIRecommendation {
@@ -53,18 +45,6 @@ const towers: Tower[] = [
   { id: "23", lat: -20.4697, lng: -54.6201, operator: "TIM", city: "Campo Grande" },
 ];
 
-// Sample EV stations
-const evStations: EVStation[] = [
-  { id: "ev1", lat: -23.5605, lng: -46.6553, provider: "Tesla", name: "Tesla Supercharger SP", chargers: 8 },
-  { id: "ev2", lat: -22.9168, lng: -43.1829, provider: "Eletroposto", name: "Eletroposto RJ Centro", chargers: 4 },
-  { id: "ev3", lat: -25.4384, lng: -49.2833, provider: "Shell Recharge", name: "Shell Curitiba", chargers: 6 },
-  { id: "ev4", lat: -19.9267, lng: -43.9445, provider: "Eletroposto", name: "BH Shopping", chargers: 4 },
-  { id: "ev5", lat: -30.0446, lng: -51.2277, provider: "Tesla", name: "Tesla Porto Alegre", chargers: 8 },
-  { id: "ev6", lat: -15.8042, lng: -47.8922, provider: "Shell Recharge", name: "Shell Brasília", chargers: 6 },
-  { id: "ev7", lat: -23.1896, lng: -45.8840, provider: "Eletroposto", name: "Rodovia Dutra KM 45", chargers: 10 },
-  { id: "ev8", lat: -22.4128, lng: -45.4520, provider: "Shell Recharge", name: "Rodovia Fernão Dias", chargers: 8 },
-];
-
 const operatorColors: Record<string, string> = {
   VIVO: "#ff4da6",
   TIM: "#00d4ff",
@@ -72,13 +52,6 @@ const operatorColors: Record<string, string> = {
   BRISANET: "#ffd000",
   ALGAR: "#00cc66",
   UNIFIQUE: "#a855f7",
-};
-
-const evColors: Record<string, string> = {
-  Tesla: "#ea384c",
-  Eletroposto: "#22c55e",
-  "Shell Recharge": "#eab308",
-  Other: "#3b82f6",
 };
 
 interface InfrastructureMapProps {
@@ -162,27 +135,33 @@ const InfrastructureMap = ({
       });
     }
 
-    // Add EV station markers
+    // Add EV station markers from real data
     if (showEVStations) {
-      evStations.forEach((station) => {
-        const color = evColors[station.provider] || evColors.Other;
+      evStationsData.forEach((station) => {
+        const color = evOperatorColors[station.operator] || "#22c55e";
         const marker = L.circleMarker([station.lat, station.lng], {
-          radius: 12,
+          radius: 10,
           fillColor: color,
           color: "#ffffff",
-          weight: 3,
+          weight: 2,
           opacity: 1,
           fillOpacity: 0.85,
         });
 
         marker.bindPopup(`
-          <div style="font-family: 'Inter', sans-serif; padding: 8px; min-width: 180px;">
+          <div style="font-family: 'Inter', sans-serif; padding: 8px; min-width: 200px;">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
               <span style="font-size: 18px;">⚡</span>
-              <strong style="color: #fff; font-size: 14px;">${station.name}</strong>
+              <strong style="color: #fff; font-size: 13px;">${station.name}</strong>
             </div>
-            <p style="color: #22c55e; margin: 0; font-size: 12px;">🔌 ${station.chargers} carregadores</p>
-            <p style="color: #94a3b8; margin: 4px 0 0; font-size: 11px;">${station.provider}</p>
+            <p style="color: #94a3b8; margin: 0; font-size: 11px;">📍 ${station.address}</p>
+            <p style="color: #94a3b8; margin: 4px 0; font-size: 11px;">${station.city} - ${station.state}</p>
+            <p style="color: #22c55e; margin: 4px 0; font-size: 12px;">🔌 ${station.chargers} carregadores • ${station.power}</p>
+            <p style="color: #60a5fa; margin: 4px 0 0; font-size: 11px;">${station.connectors.join(", ")}</p>
+            <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${station.lat},${station.lng}', '_blank')" 
+              style="margin-top: 8px; padding: 6px 12px; background: #22c55e; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 11px; width: 100%;">
+              🧭 Navegar até aqui
+            </button>
           </div>
         `);
 
