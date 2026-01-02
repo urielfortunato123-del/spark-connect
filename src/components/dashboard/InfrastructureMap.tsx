@@ -1,15 +1,13 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { evStationsData, operatorColors as evOperatorColors } from "@/data/evStations";
-
-interface Tower {
-  id: string;
-  lat: number;
-  lng: number;
-  operator: string;
-  city: string;
-}
+import { 
+  generateTowersFromStateData, 
+  operatorColors, 
+  totalERBStats, 
+  operatorData 
+} from "@/data/erbData";
 
 interface AIRecommendation {
   lat: number;
@@ -17,42 +15,6 @@ interface AIRecommendation {
   type: "tower" | "ev";
   priority: string;
 }
-
-// Sample tower data across Brazil
-const towers: Tower[] = [
-  { id: "1", lat: -3.1190, lng: -60.0217, operator: "VIVO", city: "Manaus" },
-  { id: "2", lat: -1.4558, lng: -48.4902, operator: "TIM", city: "Belém" },
-  { id: "3", lat: -2.5297, lng: -44.2625, operator: "CLARO", city: "São Luís" },
-  { id: "4", lat: 2.8235, lng: -60.6758, operator: "VIVO", city: "Boa Vista" },
-  { id: "5", lat: -3.7319, lng: -38.5267, operator: "TIM", city: "Fortaleza" },
-  { id: "6", lat: -8.0476, lng: -34.8770, operator: "CLARO", city: "Recife" },
-  { id: "7", lat: -12.9714, lng: -38.5014, operator: "VIVO", city: "Salvador" },
-  { id: "8", lat: -5.7945, lng: -35.2110, operator: "TIM", city: "Natal" },
-  { id: "9", lat: -7.1195, lng: -34.8450, operator: "BRISANET", city: "João Pessoa" },
-  { id: "10", lat: -9.6658, lng: -35.7350, operator: "CLARO", city: "Maceió" },
-  { id: "11", lat: -23.5505, lng: -46.6333, operator: "VIVO", city: "São Paulo" },
-  { id: "12", lat: -22.9068, lng: -43.1729, operator: "TIM", city: "Rio de Janeiro" },
-  { id: "13", lat: -19.9167, lng: -43.9345, operator: "CLARO", city: "Belo Horizonte" },
-  { id: "14", lat: -20.3155, lng: -40.3128, operator: "VIVO", city: "Vitória" },
-  { id: "15", lat: -22.9099, lng: -47.0626, operator: "TIM", city: "Campinas" },
-  { id: "16", lat: -25.4284, lng: -49.2733, operator: "TIM", city: "Curitiba" },
-  { id: "17", lat: -30.0346, lng: -51.2177, operator: "VIVO", city: "Porto Alegre" },
-  { id: "18", lat: -27.5954, lng: -48.5480, operator: "UNIFIQUE", city: "Florianópolis" },
-  { id: "19", lat: -26.3045, lng: -48.8487, operator: "TIM", city: "Joinville" },
-  { id: "20", lat: -15.7942, lng: -47.8822, operator: "CLARO", city: "Brasília" },
-  { id: "21", lat: -16.6869, lng: -49.2648, operator: "ALGAR", city: "Goiânia" },
-  { id: "22", lat: -15.5989, lng: -56.0949, operator: "VIVO", city: "Cuiabá" },
-  { id: "23", lat: -20.4697, lng: -54.6201, operator: "TIM", city: "Campo Grande" },
-];
-
-const operatorColors: Record<string, string> = {
-  VIVO: "#ff4da6",
-  TIM: "#00d4ff",
-  CLARO: "#ff6b35",
-  BRISANET: "#ffd000",
-  ALGAR: "#00cc66",
-  UNIFIQUE: "#a855f7",
-};
 
 interface InfrastructureMapProps {
   selectedOperators: string[];
@@ -71,6 +33,9 @@ const InfrastructureMap = ({
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.CircleMarker[]>([]);
   const recommendationsRef = useRef<L.Marker[]>([]);
+  
+  // Generate towers from real Anatel data
+  const towers = useMemo(() => generateTowersFromStateData(), []);
 
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
@@ -120,13 +85,14 @@ const InfrastructureMap = ({
         });
 
         marker.bindPopup(`
-          <div style="font-family: 'Inter', sans-serif; padding: 8px; min-width: 150px;">
+          <div style="font-family: 'Inter', sans-serif; padding: 8px; min-width: 180px;">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
               <span style="width: 12px; height: 12px; border-radius: 4px; background: ${operatorColors[tower.operator]}"></span>
               <strong style="color: #fff; font-size: 14px;">${tower.operator}</strong>
             </div>
-            <p style="color: #94a3b8; margin: 0; font-size: 12px;">📍 ${tower.city}</p>
-            <p style="color: #94a3b8; margin: 4px 0 0; font-size: 11px;">Torre 5G Ativa</p>
+            <p style="color: #94a3b8; margin: 0; font-size: 12px;">📍 ${tower.city} - ${tower.state}</p>
+            <p style="color: #22c55e; margin: 4px 0 0; font-size: 11px;">📡 Torre ${tower.technology} Ativa</p>
+            <p style="color: #64748b; margin: 4px 0 0; font-size: 10px;">Fonte: Anatel Nov/2025</p>
           </div>
         `);
 

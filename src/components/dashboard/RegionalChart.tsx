@@ -1,20 +1,46 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { Map } from "lucide-react";
+import { erbsByState, totalERBStats } from "@/data/erbData";
 
-const data5G = [
-  { region: "Sudeste", coverage: 92, color: "hsl(38, 75%, 55%)" },
-  { region: "Sul", coverage: 85, color: "hsl(40, 80%, 65%)" },
-  { region: "Nordeste", coverage: 72, color: "hsl(25, 80%, 50%)" },
-  { region: "Norte", coverage: 55, color: "hsl(145, 60%, 45%)" },
-  { region: "Centro-Oeste", coverage: 68, color: "hsl(195, 100%, 45%)" },
-];
+// Calculate regional totals from state data
+const getRegionalData = () => {
+  const regions: Record<string, { total: number; states: string[] }> = {
+    "Sudeste": { total: 0, states: ["SP", "RJ", "MG", "ES"] },
+    "Sul": { total: 0, states: ["PR", "SC", "RS"] },
+    "Nordeste": { total: 0, states: ["BA", "PE", "CE", "MA", "PB", "RN", "AL", "SE", "PI"] },
+    "Norte": { total: 0, states: ["AM", "PA", "RO", "AC", "AP", "RR", "TO"] },
+    "Centro-Oeste": { total: 0, states: ["GO", "MT", "MS", "DF"] },
+  };
+
+  erbsByState.forEach(state => {
+    Object.entries(regions).forEach(([region, data]) => {
+      if (data.states.includes(state.stateCode)) {
+        regions[region].total += state.total;
+      }
+    });
+  });
+
+  const maxTotal = Math.max(...Object.values(regions).map(r => r.total));
+  
+  return Object.entries(regions).map(([region, data]) => ({
+    region,
+    total: data.total,
+    coverage: Math.round((data.total / maxTotal) * 100),
+    color: region === "Sudeste" ? "#ff4da6" : 
+           region === "Sul" ? "#00d4ff" : 
+           region === "Nordeste" ? "#ff6b35" : 
+           region === "Norte" ? "#00cc66" : "#a855f7",
+  }));
+};
+
+const data5G = getRegionalData();
 
 const dataEV = [
-  { region: "Sudeste", coverage: 78, color: "hsl(145, 80%, 50%)" },
-  { region: "Sul", coverage: 65, color: "hsl(0, 85%, 55%)" },
-  { region: "Nordeste", coverage: 35, color: "hsl(45, 100%, 50%)" },
-  { region: "Norte", coverage: 18, color: "hsl(200, 80%, 55%)" },
-  { region: "Centro-Oeste", coverage: 45, color: "hsl(270, 100%, 65%)" },
+  { region: "Sudeste", coverage: 78, total: 35, color: "#22c55e" },
+  { region: "Sul", coverage: 65, total: 10, color: "#00d4ff" },
+  { region: "Nordeste", coverage: 15, total: 3, color: "#ff6b35" },
+  { region: "Norte", coverage: 8, total: 1, color: "#ffd000" },
+  { region: "Centro-Oeste", coverage: 20, total: 2, color: "#a855f7" },
 ];
 
 interface RegionalChartProps {
