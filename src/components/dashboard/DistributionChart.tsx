@@ -33,7 +33,7 @@ const DistributionChart = ({ type }: DistributionChartProps) => {
         <h3 className="text-sm font-display font-semibold">{title}</h3>
       </div>
       
-      <div className="h-48">
+      <div className="h-48 min-h-[192px]">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
