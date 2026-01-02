@@ -237,9 +237,9 @@ const InfrastructureMap = ({
           <div>
             <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2">Estações EV</p>
             <div className="grid grid-cols-2 gap-1">
-              {Object.entries(evColors).map(([provider, color]) => (
+              {["Tesla", "Shell Recharge", "Raizen", "Ipiranga", "EDP", "Petrobras"].map((provider) => (
                 <div key={provider} className="flex items-center gap-1.5 text-xs">
-                  <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
+                  <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: evOperatorColors[provider] || "#22c55e" }} />
                   <span className="text-muted-foreground">{provider}</span>
                 </div>
               ))}

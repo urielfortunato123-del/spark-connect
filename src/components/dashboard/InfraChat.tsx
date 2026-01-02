@@ -32,11 +32,12 @@ interface InfraChatProps {
 
 const suggestedQuestions = [
   "Quanto tempo leva para carregar um Tesla Model 3?",
+  "Meu sinal está ruim, uso Vivo no CEP 01310-100",
   "Onde posso encontrar postos de recarga na BR-116?",
   "Qual a diferença entre carregador AC e DC?",
-  "Como funciona a cobertura 5G no Brasil?",
-  "Quais são as melhores operadoras de fibra óptica?",
-  "Quanto custa instalar uma torre de telecomunicação?"
+  "Como melhorar o sinal do meu celular?",
+  "Configurações de APN da TIM",
+  "Meu 5G não funciona, o que fazer?"
 ];
 
 const InfraChat = ({ onNavigateToStation, onShowStationsOnMap }: InfraChatProps) => {
@@ -44,7 +45,7 @@ const InfraChat = ({ onNavigateToStation, onShowStationsOnMap }: InfraChatProps)
     {
       id: "welcome",
       role: "assistant",
-      content: "Olá! 👋 Sou o assistente de infraestrutura do InfraBrasil 2025. Posso ajudar com:\n\n• **Veículos Elétricos**: Tempo de carga, localização de postos, tipos de conectores\n• **Telecomunicações**: Cobertura 5G, fibra óptica, torres de celular\n• **Infraestrutura**: Custos, instalação, regulamentação\n\nFaça sua pergunta!",
+      content: "Olá! 👋 Sou o assistente de infraestrutura do InfraBrasil 2025. Posso ajudar com:\n\n• **Veículos Elétricos**: Tempo de carga, localização de postos, navegação até o local\n• **Sinal de Celular**: Diagnóstico por CEP, configurações de APN, dicas de melhoria\n• **Telecomunicações**: Cobertura 5G, fibra óptica, torres de celular\n• **Infraestrutura**: Custos, instalação, regulamentação\n\n💡 **Dica**: Informe seu CEP e operadora para análise de sinal!",
       timestamp: new Date()
     }
   ]);
