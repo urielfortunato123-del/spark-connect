@@ -3,10 +3,10 @@ import StatCard from "./StatCard";
 
 const EVStatsPanel = () => {
   return (
-    <div className="space-y-4 animate-slide-in-left">
-      <div className="flex items-center gap-2 mb-2">
-        <div className="w-2 h-2 rounded-full bg-ev-eletroposto animate-pulse" />
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+    <div className="space-y-3 animate-in">
+      <div className="flex items-center gap-2 mb-3">
+        <div className="w-1.5 h-1.5 rounded-full bg-ev-green" />
+        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
           Infraestrutura EV
         </h2>
       </div>
@@ -14,15 +14,15 @@ const EVStatsPanel = () => {
       <StatCard 
         icon={Zap}
         label="Total de Estações"
-        value="3.850"
-        colorClass="bg-gradient-to-br from-ev-eletroposto to-primary"
+        value={3850}
+        colorClass="bg-gradient-to-br from-ev-green to-primary"
         delay={100}
       />
       
       <StatCard 
         icon={Battery}
         label="Carregadores Ativos"
-        value="15.400"
+        value={15400}
         colorClass="bg-ev-shell"
         delay={200}
       />
@@ -30,7 +30,8 @@ const EVStatsPanel = () => {
       <StatCard 
         icon={MapPin}
         label="Estados Cobertos"
-        value="24 / 27"
+        value={24}
+        suffix=" de 27"
         colorClass="bg-ev-tesla"
         delay={300}
       />
@@ -38,15 +39,17 @@ const EVStatsPanel = () => {
       <StatCard 
         icon={Car}
         label="Veículos Registrados"
-        value="185.000"
-        colorClass="bg-ev-other"
+        value={185000}
+        colorClass="bg-primary"
         delay={400}
       />
 
       <StatCard 
         icon={TrendingUp}
         label="Crescimento 2025"
-        value="+42%"
+        value={42}
+        prefix="+"
+        suffix="%"
         colorClass="bg-accent"
         delay={500}
       />
@@ -54,7 +57,8 @@ const EVStatsPanel = () => {
       <StatCard 
         icon={Clock}
         label="Tempo Médio Recarga"
-        value="45 min"
+        value={45}
+        suffix=" min"
         colorClass="bg-operator-tim"
         delay={600}
       />

@@ -3,10 +3,10 @@ import StatCard from "./StatCard";
 
 const StatsPanel = () => {
   return (
-    <div className="space-y-4 animate-slide-in-left">
-      <div className="flex items-center gap-2 mb-2">
-        <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+    <div className="space-y-3 animate-in">
+      <div className="flex items-center gap-2 mb-3">
+        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
           Estatísticas 5G
         </h2>
       </div>
@@ -14,15 +14,16 @@ const StatsPanel = () => {
       <StatCard 
         icon={Radio}
         label="Total de Torres"
-        value="48.247"
-        colorClass="bg-gradient-to-br from-primary to-accent"
+        value={48247}
+        colorClass="bg-gradient-to-br from-primary to-copper"
         delay={100}
       />
       
       <StatCard 
         icon={MapPin}
         label="Municípios Cobertos"
-        value="1.395 / 5.570"
+        value={1395}
+        suffix=" de 5.570"
         colorClass="bg-operator-claro"
         delay={200}
       />
@@ -30,7 +31,10 @@ const StatsPanel = () => {
       <StatCard 
         icon={Users}
         label="População Coberta"
-        value="161.8M (75.8%)"
+        value={161.8}
+        suffix="M"
+        decimals={1}
+        subtitle="75.8% do total"
         colorClass="bg-operator-tim"
         delay={300}
       />
@@ -38,7 +42,8 @@ const StatsPanel = () => {
       <StatCard 
         icon={Gauge}
         label="Velocidade Média"
-        value="450 Mbps"
+        value={450}
+        suffix=" Mbps"
         colorClass="bg-operator-algar"
         delay={400}
       />

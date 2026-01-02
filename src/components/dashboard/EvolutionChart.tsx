@@ -38,7 +38,7 @@ interface EvolutionChartProps {
 const EvolutionChart = ({ type }: EvolutionChartProps) => {
   const data = type === "5g" ? data5G : dataEV;
   const title = type === "5g" ? "Evolução Torres 2025" : "Evolução Estações 2025";
-  const color = type === "5g" ? "hsl(180, 100%, 50%)" : "hsl(145, 80%, 50%)";
+  const color = type === "5g" ? "hsl(38, 75%, 55%)" : "hsl(145, 60%, 45%)";
 
   return (
     <div className="glass-card-hover p-5 animate-scale-in" style={{ animationDelay: "400ms" }}>
@@ -52,7 +52,7 @@ const EvolutionChart = ({ type }: EvolutionChartProps) => {
           <LineChart data={data}>
             <CartesianGrid 
               strokeDasharray="3 3" 
-              stroke="hsl(220, 25%, 18%)" 
+              stroke="hsl(220, 15%, 18%)" 
               vertical={false}
             />
             <XAxis 
@@ -71,10 +71,10 @@ const EvolutionChart = ({ type }: EvolutionChartProps) => {
             />
             <Tooltip 
               contentStyle={{
-                backgroundColor: "hsl(220, 25%, 10%)",
-                border: "1px solid hsl(220, 25%, 20%)",
+                backgroundColor: "hsl(220, 20%, 10%)",
+                border: "1px solid hsl(220, 15%, 20%)",
                 borderRadius: "8px",
-                color: "hsl(210, 40%, 98%)",
+                color: "hsl(40, 20%, 95%)",
               }}
               formatter={(value: number) => [`${value.toLocaleString()}`, ""]}
             />

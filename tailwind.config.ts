@@ -2,7 +2,12 @@ import type { Config } from "tailwindcss";
 
 export default {
   darkMode: ["class"],
-  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  content: [
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+  ],
   prefix: "",
   theme: {
     container: {
@@ -14,8 +19,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        display: ['Orbitron', 'sans-serif'],
+        sans: ["Inter", "system-ui", "sans-serif"],
+        display: ["Playfair Display", "Georgia", "serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -61,6 +66,13 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        gold: {
+          DEFAULT: "hsl(var(--gold))",
+          light: "hsl(var(--gold-light))",
+          dark: "hsl(var(--gold-dark))",
+        },
+        copper: "hsl(var(--copper))",
+        bronze: "hsl(var(--bronze))",
         operator: {
           vivo: "hsl(var(--vivo))",
           tim: "hsl(var(--tim))",
@@ -69,12 +81,10 @@ export default {
           algar: "hsl(var(--algar))",
           unifique: "hsl(var(--unifique))",
         },
-        ev: {
-          tesla: "hsl(var(--ev-tesla))",
-          eletroposto: "hsl(var(--ev-eletroposto))",
-          shell: "hsl(var(--ev-shell))",
-          other: "hsl(var(--ev-other))",
-        },
+        "ev-green": "hsl(var(--ev-green))",
+        "ev-charging": "hsl(var(--ev-charging))",
+        "ev-tesla": "hsl(var(--ev-tesla))",
+        "ev-shell": "hsl(var(--ev-shell))",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -90,17 +100,13 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        "pulse-glow": {
-          "0%, 100%": { opacity: "1", boxShadow: "0 0 20px hsl(180 100% 50% / 0.5)" },
-          "50%": { opacity: "0.7", boxShadow: "0 0 40px hsl(180 100% 50% / 0.8)" },
-        },
         "fade-in": {
-          from: { opacity: "0", transform: "translateY(10px)" },
-          to: { opacity: "1", transform: "translateY(0)" },
+          "0%": { opacity: "0", transform: "translateY(10px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
         },
         "scale-in": {
-          from: { opacity: "0", transform: "scale(0.95)" },
-          to: { opacity: "1", transform: "scale(1)" },
+          "0%": { opacity: "0", transform: "scale(0.95)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
         },
         "slide-in-left": {
           from: { opacity: "0", transform: "translateX(-20px)" },
@@ -110,25 +116,23 @@ export default {
           from: { opacity: "0", transform: "translateX(20px)" },
           to: { opacity: "1", transform: "translateX(0)" },
         },
-        "float": {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-10px)" },
-        },
-        "spin-slow": {
-          from: { transform: "rotate(0deg)" },
-          to: { transform: "rotate(360deg)" },
+        shimmer: {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
         "fade-in": "fade-in 0.5s ease-out forwards",
         "scale-in": "scale-in 0.3s ease-out forwards",
         "slide-in-left": "slide-in-left 0.4s ease-out forwards",
         "slide-in-right": "slide-in-right 0.4s ease-out forwards",
-        "float": "float 3s ease-in-out infinite",
-        "spin-slow": "spin-slow 8s linear infinite",
+        shimmer: "shimmer 2s linear infinite",
+      },
+      boxShadow: {
+        premium: "0 8px 32px -8px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset",
+        "gold-glow": "0 0 40px -10px hsl(38 75% 55% / 0.3)",
       },
     },
   },

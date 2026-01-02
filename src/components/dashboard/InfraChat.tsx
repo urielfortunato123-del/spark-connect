@@ -146,12 +146,11 @@ const InfraChat = ({ onNavigateToStation, onShowStationsOnMap }: InfraChatProps)
       {/* Header */}
       <div className="p-4 border-b border-border/50">
         <div className="flex items-center gap-3">
-          <div className="relative">
-            <div className="absolute inset-0 bg-accent/30 rounded-full blur-lg animate-pulse" />
-            <MessageSquare className="w-6 h-6 text-accent relative z-10" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-copper flex items-center justify-center shadow-lg">
+            <MessageSquare className="w-5 h-5 text-primary-foreground" />
           </div>
           <div>
-            <h2 className="text-base font-display font-bold gradient-text-cyber">
+            <h2 className="text-base font-display font-semibold gradient-text-gold">
               Assistente InfraBrasil
             </h2>
             <p className="text-[10px] text-muted-foreground">
