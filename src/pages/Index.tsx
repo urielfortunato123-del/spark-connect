@@ -68,7 +68,7 @@ const Index = () => {
               </div>
             )}
             
-            <div className="h-[350px] sm:h-[400px] md:h-[500px] lg:h-[600px] animate-in animate-in-delay-2">
+            <div className="h-[300px] sm:h-[350px] md:h-[450px] lg:h-[550px] animate-in animate-in-delay-2 relative">
               <InfrastructureMap 
                 selectedOperators={selectedOperators}
                 showEVStations={activeTab === "ev"}
@@ -87,7 +87,7 @@ const Index = () => {
           </div>
 
           {/* Right Panel - Chat */}
-          <div className="h-[400px] md:h-[500px] lg:h-[600px] animate-in animate-in-delay-3 order-3">
+          <div className="h-[350px] sm:h-[400px] md:h-[450px] lg:h-[550px] animate-in animate-in-delay-3 order-3">
             <InfraChat />
           </div>
         </div>

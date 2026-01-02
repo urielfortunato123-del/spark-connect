@@ -38,26 +38,57 @@ const InfrastructureMap = ({
   const towers = useMemo(() => generateTowersFromStateData(), []);
 
   useEffect(() => {
-    if (!mapRef.current || mapInstanceRef.current) return;
+    if (!mapRef.current) return;
+    
+    // Cleanup existing map if any
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.remove();
+      mapInstanceRef.current = null;
+    }
 
-    const map = L.map(mapRef.current, {
-      center: [-14.235, -51.9253],
-      zoom: 4,
-      zoomControl: true,
-      attributionControl: true,
-    });
+    // Wait for container to have dimensions
+    const container = mapRef.current;
+    if (container.offsetWidth === 0 || container.offsetHeight === 0) {
+      // Retry after a short delay if container isn't ready
+      const timeout = setTimeout(() => {
+        if (container.offsetWidth > 0 && container.offsetHeight > 0) {
+          initMap();
+        }
+      }, 100);
+      return () => clearTimeout(timeout);
+    }
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
-      subdomains: "abcd",
-      maxZoom: 19,
-    }).addTo(map);
+    initMap();
 
-    mapInstanceRef.current = map;
+    function initMap() {
+      if (!container || mapInstanceRef.current) return;
+
+      const map = L.map(container, {
+        center: [-14.235, -51.9253],
+        zoom: 4,
+        zoomControl: true,
+        attributionControl: true,
+      });
+
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+        subdomains: "abcd",
+        maxZoom: 19,
+      }).addTo(map);
+
+      mapInstanceRef.current = map;
+
+      // Force size recalculation after mount
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 200);
+    }
 
     return () => {
-      map.remove();
-      mapInstanceRef.current = null;
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
     };
   }, []);
 
@@ -175,8 +206,8 @@ const InfrastructureMap = ({
   }, [aiRecommendations]);
 
   return (
-    <div className="relative h-full w-full rounded-xl overflow-hidden border border-border/50">
-      <div ref={mapRef} className="h-full w-full" />
+    <div className="relative h-full w-full min-h-[300px] rounded-xl overflow-hidden border border-border/50">
+      <div ref={mapRef} className="absolute inset-0" style={{ minHeight: '300px' }} />
       
       {/* Legend */}
       <div className="absolute bottom-4 right-4 glass-card p-4 z-[1000] max-w-xs">
