@@ -1,4 +1,4 @@
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { AppSidebar } from './AppSidebar';
 import { AppHeader } from './AppHeader';
 
@@ -10,16 +10,25 @@ interface AppLayoutProps {
 
 export function AppLayout({ children, title, subtitle }: AppLayoutProps) {
   return (
-    <SidebarProvider defaultOpen={true}>
-      <div className="min-h-screen flex w-full">
+    <TooltipProvider>
+      <div className="min-h-screen flex w-full bg-background">
+        {/* Sidebar */}
         <AppSidebar />
-        <div className="flex-1 flex flex-col min-w-0">
-          <AppHeader title={title} subtitle={subtitle} />
-          <main className="flex-1 overflow-auto">
-            {children}
-          </main>
+
+        {/* Main Area */}
+        <div className="flex-1 flex flex-col p-4 min-w-0">
+          {/* Content Area with rounded border */}
+          <div className="flex-1 content-area flex flex-col overflow-hidden">
+            {/* Header inside content area */}
+            <AppHeader title={title} subtitle={subtitle} />
+
+            {/* Main Content */}
+            <main className="flex-1 overflow-auto px-6 pb-6">
+              {children}
+            </main>
+          </div>
         </div>
       </div>
-    </SidebarProvider>
+    </TooltipProvider>
   );
 }
