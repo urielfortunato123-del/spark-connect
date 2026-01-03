@@ -15,6 +15,8 @@ import ExportButton from "@/components/dashboard/ExportButton";
 import DataImportButton from "@/components/dashboard/DataImportButton";
 import VaziosPanel from "@/components/dashboard/VaziosPanel";
 import VazioInsightsPanel from "@/components/dashboard/VazioInsightsPanel";
+import { useEVStations } from "@/hooks/useInfrastructureData";
+import { useVaziosTerritoriais } from "@/hooks/useVaziosTerritoriais";
 import type { VazioTerritorial } from "@/hooks/useVaziosTerritoriais";
 
 const Index = () => {
@@ -27,6 +29,10 @@ const Index = () => {
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; name: string } | null>(null);
   const [selectedVazio, setSelectedVazio] = useState<VazioTerritorial | null>(null);
   const [mapNavigateTo, setMapNavigateTo] = useState<{ lat: number; lng: number; zoom: number } | null>(null);
+
+  // Data hooks for counts
+  const { data: evStations } = useEVStations("BR");
+  const { totalVazios } = useVaziosTerritoriais();
 
   const toggleOperator = (operator: string) => {
     setSelectedOperators((prev) =>
@@ -74,6 +80,8 @@ const Index = () => {
             <LocationSelector 
               onNavigate={handleMapNavigate} 
               variant={activeTab}
+              evCount={evStations?.length || 0}
+              vaziosCount={totalVazios}
             />
 
             {activeTab === "5g" && (

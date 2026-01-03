@@ -124,9 +124,11 @@ const statesWithCities: Record<string, { name: string; cities: { name: string; l
 interface LocationSelectorProps {
   onNavigate: (lat: number, lng: number, zoom: number) => void;
   variant?: "5g" | "ev" | "vazios" | "ai";
+  evCount?: number;
+  vaziosCount?: number;
 }
 
-const LocationSelector = ({ onNavigate, variant = "5g" }: LocationSelectorProps) => {
+const LocationSelector = ({ onNavigate, variant = "5g", evCount = 0, vaziosCount = 0 }: LocationSelectorProps) => {
   const [selectedState, setSelectedState] = useState<string>("");
   const [selectedCity, setSelectedCity] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -195,6 +197,19 @@ const LocationSelector = ({ onNavigate, variant = "5g" }: LocationSelectorProps)
     const city = stateData?.cities.find(c => c.name === selectedCity);
     return city?.erbs || null;
   }, [selectedState, selectedCity]);
+
+  // Get the count based on variant
+  const getMainCount = () => {
+    if (variant === "ev") return evCount;
+    if (variant === "vazios") return vaziosCount;
+    return currentCityErbs || currentStateErbs || totalERBStats.total;
+  };
+
+  const getSourceLabel = () => {
+    if (variant === "ev") return "Fonte: ABVE / ANEEL";
+    if (variant === "vazios") return "Fonte: Análise IBGE";
+    return "Fonte: Anatel";
+  };
 
   const getIcon = () => {
     switch (variant) {
@@ -313,11 +328,11 @@ const LocationSelector = ({ onNavigate, variant = "5g" }: LocationSelectorProps)
               {getCountLabel()}
             </p>
             <p className="text-lg font-bold text-foreground">
-              {(currentCityErbs || currentStateErbs || totalERBStats.total).toLocaleString("pt-BR")}
+              {getMainCount().toLocaleString("pt-BR")}
             </p>
           </div>
           <div className="text-right">
-            <p className="text-[10px] text-muted-foreground">Fonte: Anatel</p>
+            <p className="text-[10px] text-muted-foreground">{getSourceLabel()}</p>
             <p className="text-[10px] text-primary">{totalERBStats.lastUpdate}</p>
           </div>
         </div>
