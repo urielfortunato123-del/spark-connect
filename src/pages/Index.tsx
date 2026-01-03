@@ -9,6 +9,7 @@ import EvolutionChart from "@/components/dashboard/EvolutionChart";
 import RegionalChart from "@/components/dashboard/RegionalChart";
 import EVStatsPanel from "@/components/dashboard/EVStatsPanel";
 import InfraChat from "@/components/dashboard/InfraChat";
+import ExportButton from "@/components/dashboard/ExportButton";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<"5g" | "ev" | "ai">("5g");
@@ -46,9 +47,21 @@ const Index = () => {
                     toggleOperator={toggleOperator}
                   />
                 </div>
+                {/* Export Button */}
+                <div className="hidden md:flex justify-center">
+                  <ExportButton type="5g" selectedOperators={selectedOperators} />
+                </div>
               </>
             )}
-            {activeTab === "ev" && <EVStatsPanel />}
+            {activeTab === "ev" && (
+              <>
+                <EVStatsPanel />
+                {/* Export Button */}
+                <div className="hidden md:flex justify-center">
+                  <ExportButton type="ev" />
+                </div>
+              </>
+            )}
             {activeTab === "ai" && (
               <AIAnalysisPanel onRecommendationsUpdate={setAIRecommendations} />
             )}
@@ -72,8 +85,9 @@ const Index = () => {
               <InfrastructureMap 
                 selectedOperators={selectedOperators}
                 showEVStations={activeTab === "ev"}
-                showTowers={activeTab === "5g"}
+                showTowers={activeTab === "5g" || activeTab === "ai"}
                 aiRecommendations={aiRecommendations}
+                viewMode={activeView}
               />
             </div>
 
@@ -82,6 +96,13 @@ const Index = () => {
                 <DistributionChart type={activeTab} />
                 <EvolutionChart type={activeTab} />
                 <RegionalChart type={activeTab} />
+              </div>
+            )}
+
+            {/* Mobile Export Button */}
+            {(activeTab === "5g" || activeTab === "ev") && (
+              <div className="md:hidden flex justify-center">
+                <ExportButton type={activeTab} selectedOperators={activeTab === "5g" ? selectedOperators : undefined} />
               </div>
             )}
           </div>
@@ -96,7 +117,7 @@ const Index = () => {
         <div className="divider-gold mt-6 md:mt-8" />
         <footer className="text-center py-3 md:py-4">
           <p className="text-xs text-muted-foreground">
-            © 2025 InfraBrasil — Plataforma de Infraestrutura Nacional
+            © 2025 InfraBrasil — Plataforma Integrada de Infraestrutura Nacional
           </p>
         </footer>
       </div>

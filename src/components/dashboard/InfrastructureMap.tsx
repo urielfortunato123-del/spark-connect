@@ -1,13 +1,13 @@
-import { useEffect, useRef, useMemo } from "react";
+import { useEffect, useRef, useMemo, useCallback } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { evStationsData, operatorColors as evOperatorColors } from "@/data/evStations";
 import { 
   generateTowersFromStateData, 
   operatorColors, 
-  totalERBStats, 
-  operatorData 
+  erbsByState 
 } from "@/data/erbData";
+import MapSearch from "./MapSearch";
 
 interface AIRecommendation {
   lat: number;
@@ -21,21 +21,34 @@ interface InfrastructureMapProps {
   showEVStations: boolean;
   showTowers: boolean;
   aiRecommendations?: AIRecommendation[];
+  viewMode?: "markers" | "heat" | "clusters";
 }
 
 const InfrastructureMap = ({ 
   selectedOperators, 
   showEVStations, 
   showTowers,
-  aiRecommendations = []
+  aiRecommendations = [],
+  viewMode = "markers"
 }: InfrastructureMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.CircleMarker[]>([]);
   const recommendationsRef = useRef<L.Marker[]>([]);
+  const heatLayerRef = useRef<any>(null);
   
   // Generate towers from real Anatel data
   const towers = useMemo(() => generateTowersFromStateData(), []);
+
+  // Navigate to location from search
+  const handleLocationSelect = useCallback((lat: number, lng: number, zoom: number = 10) => {
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.flyTo([lat, lng], zoom, {
+        duration: 1.5,
+        easeLinearity: 0.25,
+      });
+    }
+  }, []);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -64,11 +77,18 @@ const InfrastructureMap = ({
         attributionControl: true,
       });
 
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
-        subdomains: "abcd",
-        maxZoom: 19,
-      }).addTo(map);
+      // Dynamic tile layer based on theme
+      const isDark = document.documentElement.classList.contains('dark');
+      L.tileLayer(
+        isDark 
+          ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+        {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+          subdomains: "abcd",
+          maxZoom: 19,
+        }
+      ).addTo(map);
 
       mapInstanceRef.current = map;
 
@@ -87,15 +107,69 @@ const InfrastructureMap = ({
     };
   }, []);
 
+  // Handle heatmap mode
   useEffect(() => {
     if (!mapInstanceRef.current) return;
+
+    // Remove existing heat layer
+    if (heatLayerRef.current) {
+      mapInstanceRef.current.removeLayer(heatLayerRef.current);
+      heatLayerRef.current = null;
+    }
+
+    if (viewMode === "heat" && showTowers) {
+      // Create heatmap data from state data for better visualization
+      const heatData: [number, number, number][] = erbsByState.map(state => [
+        state.lat,
+        state.lng,
+        state.total / 1000 // Normalize intensity
+      ]);
+
+      // Try to use Leaflet.heat if available
+      if ((L as any).heatLayer) {
+        heatLayerRef.current = (L as any).heatLayer(heatData, {
+          radius: 35,
+          blur: 25,
+          maxZoom: 10,
+          gradient: {
+            0.2: '#00ff00',
+            0.4: '#ffff00',
+            0.6: '#ffa500',
+            0.8: '#ff6600',
+            1.0: '#ff0000'
+          }
+        }).addTo(mapInstanceRef.current);
+      } else {
+        // Fallback: create circle markers with opacity based on density
+        erbsByState.forEach(state => {
+          const intensity = state.total / 25000; // Normalize
+          const radius = 20 + (intensity * 40);
+          const circle = L.circleMarker([state.lat, state.lng], {
+            radius: radius,
+            fillColor: `hsl(${(1 - intensity) * 120}, 80%, 50%)`,
+            color: "transparent",
+            fillOpacity: 0.6,
+          });
+          circle.bindTooltip(`${state.state}: ${state.total.toLocaleString("pt-BR")} torres`, {
+            permanent: false,
+            direction: "top"
+          });
+          circle.addTo(mapInstanceRef.current!);
+          markersRef.current.push(circle);
+        });
+      }
+    }
+  }, [viewMode, showTowers]);
+
+  useEffect(() => {
+    if (!mapInstanceRef.current || viewMode === "heat") return;
 
     // Clear existing markers
     markersRef.current.forEach((marker) => marker.remove());
     markersRef.current = [];
 
     // Add tower markers
-    if (showTowers) {
+    if (showTowers && viewMode === "markers") {
       const filteredTowers = towers.filter((tower) => 
         selectedOperators.includes(tower.operator)
       );
@@ -114,7 +188,7 @@ const InfrastructureMap = ({
           <div style="font-family: 'Inter', sans-serif; padding: 8px; min-width: 180px;">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
               <span style="width: 12px; height: 12px; border-radius: 4px; background: ${operatorColors[tower.operator]}"></span>
-              <strong style="color: #fff; font-size: 14px;">${tower.operator}</strong>
+              <strong style="font-size: 14px;">${tower.operator}</strong>
             </div>
             <p style="color: #94a3b8; margin: 0; font-size: 12px;">📍 ${tower.city} - ${tower.state}</p>
             <p style="color: #22c55e; margin: 4px 0 0; font-size: 11px;">📡 Torre ${tower.technology} Ativa</p>
@@ -144,7 +218,7 @@ const InfrastructureMap = ({
           <div style="font-family: 'Inter', sans-serif; padding: 8px; min-width: 200px;">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
               <span style="font-size: 18px;">⚡</span>
-              <strong style="color: #fff; font-size: 13px;">${station.name}</strong>
+              <strong style="font-size: 13px;">${station.name}</strong>
             </div>
             <p style="color: #94a3b8; margin: 0; font-size: 11px;">📍 ${station.address}</p>
             <p style="color: #94a3b8; margin: 4px 0; font-size: 11px;">${station.city} - ${station.state}</p>
@@ -161,7 +235,7 @@ const InfrastructureMap = ({
         markersRef.current.push(marker);
       });
     }
-  }, [selectedOperators, showEVStations, showTowers]);
+  }, [selectedOperators, showEVStations, showTowers, viewMode, towers]);
 
   // Handle AI recommendations
   useEffect(() => {
@@ -202,6 +276,14 @@ const InfrastructureMap = ({
 
   return (
     <div className="relative h-full w-full rounded-xl overflow-hidden border border-border/50">
+      {/* Search bar */}
+      <div className="absolute top-3 left-3 right-3 md:right-auto md:w-72 z-[1001]">
+        <MapSearch 
+          onLocationSelect={handleLocationSelect} 
+          showEV={showEVStations}
+        />
+      </div>
+
       <div ref={mapRef} className="h-full w-full" style={{ minHeight: '350px' }} />
       
       {/* Legend */}
@@ -211,7 +293,7 @@ const InfrastructureMap = ({
           <h3 className="text-sm font-display font-semibold">Legenda</h3>
         </div>
         
-        {showTowers && (
+        {showTowers && viewMode === "markers" && (
           <div className="mb-3">
             <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2">Torres 5G</p>
             <div className="grid grid-cols-2 gap-1">
@@ -221,6 +303,19 @@ const InfrastructureMap = ({
                   <span className="text-muted-foreground">{operator}</span>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {showTowers && viewMode === "heat" && (
+          <div className="mb-3">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2">Densidade</p>
+            <div className="flex items-center gap-1 text-xs">
+              <div className="h-2 w-full rounded bg-gradient-to-r from-green-500 via-yellow-500 to-red-500" />
+            </div>
+            <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+              <span>Baixa</span>
+              <span>Alta</span>
             </div>
           </div>
         )}
