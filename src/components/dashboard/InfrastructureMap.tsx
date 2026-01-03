@@ -11,6 +11,8 @@ import MapSearch from "./MapSearch";
 import { useInfrastructureStats } from "@/hooks/useInfrastructureData";
 import { useMunicipios, useVaziosTerritoriais } from "@/hooks/useVaziosTerritoriais";
 
+import type { VazioTerritorial } from "@/hooks/useVaziosTerritoriais";
+
 interface AIRecommendation {
   lat: number;
   lng: number;
@@ -27,6 +29,7 @@ interface InfrastructureMapProps {
   viewMode?: "markers" | "heat" | "clusters";
   countryFilter?: string;
   onMunicipioClick?: (lat: number, lng: number, nome: string) => void;
+  onVazioClick?: (vazio: VazioTerritorial) => void;
 }
 
 const InfrastructureMap = ({ 
@@ -38,6 +41,7 @@ const InfrastructureMap = ({
   viewMode = "markers",
   countryFilter = "all",
   onMunicipioClick,
+  onVazioClick,
 }: InfrastructureMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
@@ -416,7 +420,9 @@ const InfrastructureMap = ({
         `);
 
         marker.on('click', () => {
-          if (onMunicipioClick && vazio.municipio.latitude && vazio.municipio.longitude) {
+          if (onVazioClick) {
+            onVazioClick(vazio);
+          } else if (onMunicipioClick && vazio.municipio.latitude && vazio.municipio.longitude) {
             onMunicipioClick(vazio.municipio.latitude, vazio.municipio.longitude, vazio.municipio.nome);
           }
         });
