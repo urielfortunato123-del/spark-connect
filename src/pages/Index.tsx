@@ -33,7 +33,7 @@ const Index = () => {
 
         {/* Mobile: Stack layout, Desktop: Grid layout */}
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_340px] xl:grid-cols-[300px_1fr_380px] gap-4 lg:gap-5">
-          {/* Left Sidebar - Hidden on mobile, shown in collapsible on tablet+ */}
+          {/* Left Sidebar */}
           <div className="space-y-4 order-2 lg:order-1">
             {activeTab === "5g" && (
               <>
@@ -68,7 +68,7 @@ const Index = () => {
               </div>
             )}
             
-            <div className="h-[300px] sm:h-[350px] md:h-[450px] lg:h-[550px] animate-in animate-in-delay-2 relative">
+            <div className="h-[350px] sm:h-[400px] md:h-[500px] lg:h-[600px]">
               <InfrastructureMap 
                 selectedOperators={selectedOperators}
                 showEVStations={activeTab === "ev"}
@@ -87,7 +87,7 @@ const Index = () => {
           </div>
 
           {/* Right Panel - Chat */}
-          <div className="h-[350px] sm:h-[400px] md:h-[450px] lg:h-[550px] animate-in animate-in-delay-3 order-3">
+          <div className="h-[400px] sm:h-[450px] md:h-[500px] lg:h-[600px] order-3">
             <InfraChat />
           </div>
         </div>

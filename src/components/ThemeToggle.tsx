@@ -33,7 +33,7 @@ export function ThemeToggle() {
       title={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
     >
       {theme === "dark" ? (
-        <Sun className="h-4 w-4 text-gold-light transition-transform duration-300" />
+        <Sun className="h-4 w-4 text-amber-400 transition-transform duration-300" />
       ) : (
         <Moon className="h-4 w-4 text-primary transition-transform duration-300" />
       )}

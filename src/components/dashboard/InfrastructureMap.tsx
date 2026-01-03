@@ -46,22 +46,16 @@ const InfrastructureMap = ({
       mapInstanceRef.current = null;
     }
 
-    // Wait for container to have dimensions
     const container = mapRef.current;
-    if (container.offsetWidth === 0 || container.offsetHeight === 0) {
-      // Retry after a short delay if container isn't ready
-      const timeout = setTimeout(() => {
-        if (container.offsetWidth > 0 && container.offsetHeight > 0) {
-          initMap();
-        }
-      }, 100);
-      return () => clearTimeout(timeout);
-    }
-
-    initMap();
-
-    function initMap() {
+    
+    // Initialize map with a small delay to ensure container is ready
+    const initTimeout = setTimeout(() => {
       if (!container || mapInstanceRef.current) return;
+      
+      // Check dimensions
+      if (container.offsetWidth === 0 || container.offsetHeight === 0) {
+        return;
+      }
 
       const map = L.map(container, {
         center: [-14.235, -51.9253],
@@ -78,13 +72,14 @@ const InfrastructureMap = ({
 
       mapInstanceRef.current = map;
 
-      // Force size recalculation after mount
+      // Force size recalculation
       setTimeout(() => {
         map.invalidateSize();
-      }, 200);
-    }
+      }, 100);
+    }, 50);
 
     return () => {
+      clearTimeout(initTimeout);
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
@@ -206,8 +201,8 @@ const InfrastructureMap = ({
   }, [aiRecommendations]);
 
   return (
-    <div className="relative h-full w-full min-h-[300px] rounded-xl overflow-hidden border border-border/50">
-      <div ref={mapRef} className="absolute inset-0" style={{ minHeight: '300px' }} />
+    <div className="relative h-full w-full rounded-xl overflow-hidden border border-border/50">
+      <div ref={mapRef} className="h-full w-full" style={{ minHeight: '350px' }} />
       
       {/* Legend */}
       <div className="absolute bottom-4 right-4 glass-card p-4 z-[1000] max-w-xs">
