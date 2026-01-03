@@ -10,6 +10,8 @@ import RegionalChart from "@/components/dashboard/RegionalChart";
 import EVStatsPanel from "@/components/dashboard/EVStatsPanel";
 import InfraChat from "@/components/dashboard/InfraChat";
 import ExportButton from "@/components/dashboard/ExportButton";
+import CountryFilter from "@/components/dashboard/CountryFilter";
+import DataImportButton from "@/components/dashboard/DataImportButton";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<"5g" | "ev" | "ai">("5g");
@@ -18,6 +20,7 @@ const Index = () => {
     "VIVO", "TIM", "CLARO", "BRISANET", "ALGAR", "UNIFIQUE"
   ]);
   const [aiRecommendations, setAIRecommendations] = useState<any[]>([]);
+  const [countryFilter, setCountryFilter] = useState("all");
 
   const toggleOperator = (operator: string) => {
     setSelectedOperators((prev) =>
@@ -31,6 +34,15 @@ const Index = () => {
     <div className="min-h-screen bg-background p-3 md:p-6 grid-pattern">
       <div className="max-w-[1800px] mx-auto space-y-4 md:space-y-5">
         <Header activeTab={activeTab} setActiveTab={setActiveTab} />
+
+        {/* Global Controls */}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <CountryFilter value={countryFilter} onChange={setCountryFilter} />
+          <div className="flex items-center gap-2">
+            {activeTab === "5g" && <DataImportButton dataType="towers" />}
+            {activeTab === "ev" && <DataImportButton dataType="ev_stations" />}
+          </div>
+        </div>
 
         {/* Mobile: Stack layout, Desktop: Grid layout */}
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_340px] xl:grid-cols-[300px_1fr_380px] gap-4 lg:gap-5">
@@ -88,6 +100,7 @@ const Index = () => {
                 showTowers={activeTab === "5g" || activeTab === "ai"}
                 aiRecommendations={aiRecommendations}
                 viewMode={activeView}
+                countryFilter={countryFilter}
               />
             </div>
 
@@ -117,7 +130,7 @@ const Index = () => {
         <div className="divider-gold mt-6 md:mt-8" />
         <footer className="text-center py-3 md:py-4">
           <p className="text-xs text-muted-foreground">
-            © 2025 InfraBrasil — Plataforma Integrada de Infraestrutura Nacional
+            © 2025 InfraBrasil — Plataforma Integrada de Infraestrutura Global
           </p>
         </footer>
       </div>
