@@ -6,6 +6,7 @@ import InfrastructureMap from "@/components/dashboard/InfrastructureMap";
 import AIAnalysisPanel from "@/components/dashboard/AIAnalysisPanel";
 import DistributionChart from "@/components/dashboard/DistributionChart";
 import EvolutionChart from "@/components/dashboard/EvolutionChart";
+import OperatorEvolutionChart from "@/components/dashboard/OperatorEvolutionChart";
 import RegionalChart from "@/components/dashboard/RegionalChart";
 import EVStatsPanel from "@/components/dashboard/EVStatsPanel";
 import InfraChat from "@/components/dashboard/InfraChat";
@@ -128,11 +129,22 @@ const Index = () => {
               />
             </div>
 
-            {(activeTab === "5g" || activeTab === "ev") && (
+            {activeTab === "5g" && (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                  <DistributionChart type="5g" />
+                  <EvolutionChart type="5g" />
+                  <RegionalChart type="5g" />
+                </div>
+                <OperatorEvolutionChart />
+              </>
+            )}
+
+            {activeTab === "ev" && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-                <DistributionChart type={activeTab} />
-                <EvolutionChart type={activeTab} />
-                <RegionalChart type={activeTab} />
+                <DistributionChart type="ev" />
+                <EvolutionChart type="ev" />
+                <RegionalChart type="ev" />
               </div>
             )}
 
