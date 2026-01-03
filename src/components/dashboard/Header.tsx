@@ -24,7 +24,7 @@ const Header = ({ activeTab, setActiveTab }: HeaderProps) => {
             <div>
               <h1 className="text-xl md:text-2xl lg:text-3xl font-display font-bold tracking-tight">
                 <span className="gradient-text-gold">InfraBrasil</span>{" "}
-                <span className="text-muted-foreground text-sm md:text-base font-sans font-normal">2025</span>
+                <span className="text-muted-foreground text-sm md:text-base font-sans font-normal">2026</span>
               </h1>
               <p className="text-[10px] md:text-xs text-muted-foreground tracking-wide hidden sm:block">
                 Plataforma Integrada de Infraestrutura Nacional

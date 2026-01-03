@@ -154,7 +154,7 @@ const Index = () => {
         <div className="divider-gold mt-6 md:mt-8" />
         <footer className="text-center py-3 md:py-4">
           <p className="text-xs text-muted-foreground">
-            © 2025 InfraBrasil — Plataforma Integrada de Infraestrutura Nacional
+            © 2026 InfraBrasil — Plataforma Integrada de Infraestrutura Nacional
           </p>
         </footer>
       </div>
