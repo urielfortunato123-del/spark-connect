@@ -23,6 +23,12 @@ import Cenarios from "./pages/modules/Cenarios";
 import Relatorios from "./pages/modules/Relatorios";
 import Assistente from "./pages/modules/Assistente";
 
+// Em Desenvolvimento
+import Petroleo from "./pages/modules/Petroleo";
+import Mineracao from "./pages/modules/Mineracao";
+import Energia from "./pages/modules/Energia";
+import Saneamento from "./pages/modules/Saneamento";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -102,6 +108,40 @@ const App = () => (
                 element={
                   <ProtectedRoute requiredModule="ia_assistant">
                     <Assistente />
+                  </ProtectedRoute>
+                } 
+              />
+
+              {/* Módulos Em Desenvolvimento */}
+              <Route 
+                path="/petroleo" 
+                element={
+                  <ProtectedRoute>
+                    <Petroleo />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/mineracao" 
+                element={
+                  <ProtectedRoute>
+                    <Mineracao />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/energia" 
+                element={
+                  <ProtectedRoute>
+                    <Energia />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/saneamento" 
+                element={
+                  <ProtectedRoute>
+                    <Saneamento />
                   </ProtectedRoute>
                 } 
               />
