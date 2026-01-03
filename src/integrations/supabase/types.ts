@@ -103,6 +103,104 @@ export type Database = {
           },
         ]
       }
+      indicadores_energia: {
+        Row: {
+          created_at: string
+          distancia_km_mais_proximo: number | null
+          eletropostos_por_100k_hab: number | null
+          id: string
+          is_vazio_territorial: boolean
+          justificativa_vazio: string | null
+          municipio_id: string
+          populacao_ref: number
+          potencia_total_kw: number | null
+          qtd_eletropostos: number
+          status_cobertura: string
+          ultima_analise: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          distancia_km_mais_proximo?: number | null
+          eletropostos_por_100k_hab?: number | null
+          id?: string
+          is_vazio_territorial?: boolean
+          justificativa_vazio?: string | null
+          municipio_id: string
+          populacao_ref?: number
+          potencia_total_kw?: number | null
+          qtd_eletropostos?: number
+          status_cobertura?: string
+          ultima_analise?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          distancia_km_mais_proximo?: number | null
+          eletropostos_por_100k_hab?: number | null
+          id?: string
+          is_vazio_territorial?: boolean
+          justificativa_vazio?: string | null
+          municipio_id?: string
+          populacao_ref?: number
+          potencia_total_kw?: number | null
+          qtd_eletropostos?: number
+          status_cobertura?: string
+          ultima_analise?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "indicadores_energia_municipio_id_fkey"
+            columns: ["municipio_id"]
+            isOneToOne: true
+            referencedRelation: "municipios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      municipios: {
+        Row: {
+          area_km2: number | null
+          codigo_ibge: string
+          created_at: string
+          estado: string
+          id: string
+          latitude: number | null
+          longitude: number | null
+          nome: string
+          populacao: number
+          regiao: string
+          updated_at: string
+        }
+        Insert: {
+          area_km2?: number | null
+          codigo_ibge: string
+          created_at?: string
+          estado: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          nome: string
+          populacao?: number
+          regiao: string
+          updated_at?: string
+        }
+        Update: {
+          area_km2?: number | null
+          codigo_ibge?: string
+          created_at?: string
+          estado?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          nome?: string
+          populacao?: number
+          regiao?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       towers: {
         Row: {
           city: string | null
