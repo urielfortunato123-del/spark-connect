@@ -124,6 +124,7 @@ const Index = () => {
                 viewMode={activeView}
                 countryFilter="BR"
                 onMunicipioClick={handleMunicipioSelect}
+                onVazioClick={handleVazioSelect}
               />
             </div>
 
