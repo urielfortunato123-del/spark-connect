@@ -1,1 +1,4 @@
 project_id = "dpmagqnkobnejfkygome"
+
+[functions.fetch-ev-stations]
+verify_jwt = false
