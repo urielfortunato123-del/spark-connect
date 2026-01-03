@@ -45,7 +45,7 @@ const InfraChat = ({ onNavigateToStation, onShowStationsOnMap }: InfraChatProps)
     {
       id: "welcome",
       role: "assistant",
-      content: "Olá! 👋 Sou o assistente de infraestrutura do InfraBrasil 2025. Posso ajudar com:\n\n• **Veículos Elétricos**: Tempo de carga, localização de postos, navegação até o local\n• **Sinal de Celular**: Diagnóstico por CEP, configurações de APN, dicas de melhoria\n• **Telecomunicações**: Cobertura 5G, fibra óptica, torres de celular\n• **Infraestrutura**: Custos, instalação, regulamentação\n\n💡 **Dica**: Informe seu CEP e operadora para análise de sinal!",
+      content: "Olá! 👋 Sou o assistente de infraestrutura do InfraBrasil 2026. Posso ajudar com:\n\n• **Veículos Elétricos**: Tempo de carga, localização de postos, navegação até o local\n• **Sinal de Celular**: Diagnóstico por CEP, configurações de APN, dicas de melhoria\n• **Telecomunicações**: Cobertura 5G, fibra óptica, torres de celular\n• **Infraestrutura**: Custos, instalação, regulamentação\n\n💡 **Dica**: Informe seu CEP e operadora para análise de sinal!",
       timestamp: new Date()
     }
   ]);

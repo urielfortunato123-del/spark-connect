@@ -322,7 +322,7 @@ const VazioInsightsPanel = ({ vazio, onClose }: VazioInsightsPanelProps) => {
       {/* Footer */}
       <div className="p-3 border-t border-border/50 bg-muted/30">
         <p className="text-[10px] text-center text-muted-foreground">
-          Análise gerada por IA • InfraBrasil 2025
+          Análise gerada por IA • InfraBrasil 2026
         </p>
       </div>
     </div>

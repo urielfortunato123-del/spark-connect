@@ -96,7 +96,7 @@ serve(async (req) => {
 
     if (type === "chat") {
       // Chat mode - comprehensive infrastructure assistant with vazios context
-      systemPrompt = `Você é o assistente de infraestrutura InfraBrasil 2025, um especialista em:
+      systemPrompt = `Você é o assistente de infraestrutura InfraBrasil 2026, um especialista em:
 
 1. **Veículos Elétricos (EV)**:
    - Tempos de carregamento para diferentes modelos (Tesla, BYD, Volvo, BMW, Audi, Mercedes, Porsche, Hyundai, etc.)
