@@ -21,7 +21,7 @@ export interface IndicadorEnergia {
   eletropostos_por_100k_hab: number | null;
   populacao_ref: number;
   distancia_km_mais_proximo: number | null;
-  status_cobertura: 'adequada' | 'critica' | 'inexistente';
+  status_cobertura: 'adequada' | 'atencao' | 'critica' | 'inexistente';
   is_vazio_territorial: boolean;
   justificativa_vazio: string | null;
   ultima_analise: string | null;
@@ -31,25 +31,48 @@ export interface MunicipioComIndicadores extends Municipio {
   indicadores: IndicadorEnergia | null;
 }
 
+// Níveis de severidade do vazio energético
+export type NivelVazio = 'critico' | 'moderado' | 'adequado';
+
+export interface CriteriosAtivados {
+  densidadeZero: boolean;
+  densidadeBaixa: boolean;
+  distanciaCritica: boolean;      // > 60km
+  distanciaModerada: boolean;     // 30-60km
+  populacaoRelevante: boolean;    // >= 20.000
+}
+
 export interface VazioTerritorial {
   municipio: Municipio;
   indicadores: IndicadorEnergia;
-  score_criticidade: number; // 0-100
+  nivel: NivelVazio;
+  score_criticidade: number;
+  criterios: CriteriosAtivados;
+  justificativa: string;
 }
 
-// Parâmetros ajustáveis para análise de vazios
+// Parâmetros técnicos ajustáveis (conforme documento)
 export interface ParametrosVazio {
-  populacaoMinima: number;        // Mínimo de habitantes para considerar
-  eletropostosMinimo: number;     // Abaixo disso é crítico
-  distanciaMaximaKm: number;      // Distância máxima do mais próximo
-  eletropostosPor100kIdeal: number; // Meta de eletropostos por 100k hab
+  // Indicador 1: Densidade
+  densidadeAdequada: number;      // >= 1.0 eletropostos/100k hab
+  densidadeBaixa: number;         // 0.1 a 0.99
+
+  // Indicador 2: Distância
+  distanciaAdequada: number;      // <= 30 km
+  distanciaModerada: number;      // 30-60 km
+  distanciaCritica: number;       // > 60 km
+
+  // Indicador 3: População mínima relevante
+  populacaoMinima: number;        // >= 20.000 habitantes
 }
 
 export const PARAMETROS_PADRAO: ParametrosVazio = {
-  populacaoMinima: 50000,
-  eletropostosMinimo: 1,
-  distanciaMaximaKm: 100,
-  eletropostosPor100kIdeal: 5, // 5 eletropostos por 100k habitantes
+  densidadeAdequada: 1.0,
+  densidadeBaixa: 0.1,
+  distanciaAdequada: 30,
+  distanciaModerada: 60,
+  distanciaCritica: 60,
+  populacaoMinima: 20000,
 };
 
 // Buscar todos os municípios
@@ -99,128 +122,216 @@ export const useMunicipiosComIndicadores = () => {
   };
 };
 
+// Calcular densidade de eletropostos por 100k habitantes
+export function calcularDensidade(qtdEletropostos: number, populacao: number): number {
+  if (populacao === 0) return 0;
+  return (qtdEletropostos / populacao) * 100000;
+}
+
+// Avaliar critérios ativados para um município
+export function avaliarCriterios(
+  municipio: Municipio,
+  indicadores: IndicadorEnergia | null,
+  parametros: ParametrosVazio = PARAMETROS_PADRAO
+): CriteriosAtivados {
+  const densidade = indicadores?.eletropostos_por_100k_hab ?? 
+    calcularDensidade(indicadores?.qtd_eletropostos ?? 0, municipio.populacao);
+  
+  const distancia = indicadores?.distancia_km_mais_proximo ?? null;
+
+  return {
+    densidadeZero: densidade === 0,
+    densidadeBaixa: densidade > 0 && densidade < parametros.densidadeAdequada,
+    distanciaCritica: distancia !== null ? distancia > parametros.distanciaCritica : (indicadores?.qtd_eletropostos ?? 0) === 0,
+    distanciaModerada: distancia !== null ? (distancia > parametros.distanciaAdequada && distancia <= parametros.distanciaModerada) : false,
+    populacaoRelevante: municipio.populacao >= parametros.populacaoMinima,
+  };
+}
+
+// Classificar nível de vazio energético
+export function classificarNivelVazio(criterios: CriteriosAtivados): NivelVazio {
+  // 🔴 Vazio Crítico: densidade = 0 E distância > 60km
+  if (criterios.densidadeZero && criterios.distanciaCritica) {
+    return 'critico';
+  }
+
+  // 🟡 Vazio Moderado: densidade baixa OU distância entre 30-60km
+  if (criterios.densidadeBaixa || criterios.distanciaModerada) {
+    return 'moderado';
+  }
+
+  // 🟢 Cobertura Aceitável
+  return 'adequado';
+}
+
+// Classificar status de cobertura (para banco de dados)
+export function classificarCobertura(
+  densidade: number,
+  distancia: number | null,
+  parametros: ParametrosVazio = PARAMETROS_PADRAO
+): 'adequada' | 'atencao' | 'critica' | 'inexistente' {
+  if (densidade === 0) return 'inexistente';
+  
+  if (densidade >= parametros.densidadeAdequada && 
+      (distancia === null || distancia <= parametros.distanciaAdequada)) {
+    return 'adequada';
+  }
+  
+  if (densidade >= parametros.densidadeBaixa) {
+    return 'atencao';
+  }
+  
+  return 'critica';
+}
+
 // Calcular score de criticidade (0-100, maior = mais crítico)
 export function calcularScoreCriticidade(
   municipio: Municipio,
   indicadores: IndicadorEnergia | null,
+  criterios: CriteriosAtivados,
   parametros: ParametrosVazio = PARAMETROS_PADRAO
 ): number {
-  if (!indicadores) return 100; // Sem dados = máxima criticidade
+  if (!indicadores) return criterios.populacaoRelevante ? 100 : 50;
 
   let score = 0;
   
-  // Fator 1: Quantidade de eletropostos (40% do score)
-  if (indicadores.qtd_eletropostos === 0) {
+  // Fator 1: Densidade (40% do score)
+  if (criterios.densidadeZero) {
     score += 40;
-  } else if (indicadores.qtd_eletropostos < parametros.eletropostosMinimo) {
-    score += 30;
-  } else {
-    const ratio = indicadores.eletropostos_por_100k_hab || 0;
-    const deficit = Math.max(0, parametros.eletropostosPor100kIdeal - ratio) / parametros.eletropostosPor100kIdeal;
-    score += deficit * 40;
+  } else if (criterios.densidadeBaixa) {
+    const densidade = indicadores.eletropostos_por_100k_hab ?? 0;
+    const deficit = (parametros.densidadeAdequada - densidade) / parametros.densidadeAdequada;
+    score += Math.min(deficit * 40, 30);
   }
 
-  // Fator 2: População (30% do score) - mais população = mais crítico se não tem cobertura
-  const popNormalizada = Math.min(municipio.populacao / 1000000, 1); // Normalizar até 1M
-  if (indicadores.qtd_eletropostos === 0) {
-    score += popNormalizada * 30;
+  // Fator 2: Distância (35% do score)
+  if (criterios.distanciaCritica) {
+    score += 35;
+  } else if (criterios.distanciaModerada) {
+    score += 20;
   }
 
-  // Fator 3: Distância do mais próximo (30% do score)
-  if (indicadores.distancia_km_mais_proximo !== null) {
-    const distNormalizada = Math.min(indicadores.distancia_km_mais_proximo / parametros.distanciaMaximaKm, 1);
-    score += distNormalizada * 30;
-  } else if (indicadores.qtd_eletropostos === 0) {
-    score += 30; // Sem dados de distância e sem eletropostos = crítico
+  // Fator 3: População (25% do score) - amplifica criticidade
+  if (criterios.populacaoRelevante) {
+    const popNormalizada = Math.min(municipio.populacao / 500000, 1);
+    if (criterios.densidadeZero || criterios.distanciaCritica) {
+      score += popNormalizada * 25;
+    }
   }
 
   return Math.round(Math.min(score, 100));
 }
 
-// Classificar status de cobertura
-export function classificarCobertura(
+// Gerar justificativa técnica transparente
+export function gerarJustificativa(
   municipio: Municipio,
-  qtdEletropostos: number,
-  parametros: ParametrosVazio = PARAMETROS_PADRAO
-): 'adequada' | 'critica' | 'inexistente' {
-  if (qtdEletropostos === 0) return 'inexistente';
-  
-  const por100k = (qtdEletropostos / municipio.populacao) * 100000;
-  
-  if (por100k >= parametros.eletropostosPor100kIdeal * 0.5) {
-    return 'adequada';
-  }
-  return 'critica';
-}
-
-// Gerar justificativa de vazio
-export function gerarJustificativaVazio(
-  municipio: Municipio,
-  indicadores: IndicadorEnergia,
+  indicadores: IndicadorEnergia | null,
+  criterios: CriteriosAtivados,
+  nivel: NivelVazio,
   parametros: ParametrosVazio = PARAMETROS_PADRAO
 ): string {
   const razoes: string[] = [];
+  const densidade = indicadores?.eletropostos_por_100k_hab ?? 
+    calcularDensidade(indicadores?.qtd_eletropostos ?? 0, municipio.populacao);
+  const distancia = indicadores?.distancia_km_mais_proximo;
 
-  if (indicadores.qtd_eletropostos === 0) {
-    razoes.push('Nenhum eletroposto cadastrado');
-  } else if (indicadores.qtd_eletropostos < parametros.eletropostosMinimo) {
-    razoes.push(`Apenas ${indicadores.qtd_eletropostos} eletroposto(s)`);
+  if (nivel === 'critico') {
+    razoes.push('Classificado como Vazio Crítico');
+  } else if (nivel === 'moderado') {
+    razoes.push('Classificado como Vazio Moderado');
+  } else {
+    razoes.push('Cobertura Aceitável');
   }
 
-  if (municipio.populacao >= parametros.populacaoMinima) {
-    razoes.push(`População de ${municipio.populacao.toLocaleString('pt-BR')} habitantes`);
+  if (criterios.densidadeZero) {
+    razoes.push('ausência de eletropostos');
+  } else if (criterios.densidadeBaixa) {
+    razoes.push(`densidade baixa (${densidade.toFixed(2)}/100k hab, ideal ≥${parametros.densidadeAdequada})`);
   }
 
-  if (indicadores.distancia_km_mais_proximo && indicadores.distancia_km_mais_proximo > parametros.distanciaMaximaKm) {
-    razoes.push(`Distância de ${indicadores.distancia_km_mais_proximo.toFixed(0)}km do eletroposto mais próximo`);
+  if (criterios.distanciaCritica && distancia) {
+    razoes.push(`distância superior a ${parametros.distanciaCritica}km (${distancia.toFixed(0)}km)`);
+  } else if (criterios.distanciaModerada && distancia) {
+    razoes.push(`distância moderada de ${distancia.toFixed(0)}km`);
   }
 
-  return razoes.join('; ');
+  if (criterios.populacaoRelevante) {
+    razoes.push(`população de ${municipio.populacao.toLocaleString('pt-BR')} habitantes`);
+  }
+
+  return razoes.join(' por ') + '.';
 }
 
-// Hook para análise de vazios territoriais
+// Hook principal para análise de vazios territoriais
 export const useVaziosTerritoriais = (parametros: ParametrosVazio = PARAMETROS_PADRAO) => {
   const { data: municipiosComIndicadores, isLoading } = useMunicipiosComIndicadores();
 
-  const vazios: VazioTerritorial[] = [];
+  const vaziosCriticos: VazioTerritorial[] = [];
+  const vaziosModerados: VazioTerritorial[] = [];
   const adequados: MunicipioComIndicadores[] = [];
 
   municipiosComIndicadores?.forEach(mun => {
-    const score = calcularScoreCriticidade(mun, mun.indicadores, parametros);
+    const criterios = avaliarCriterios(mun, mun.indicadores, parametros);
+    const nivel = classificarNivelVazio(criterios);
     
-    // Considerar vazio se score > 50 e população relevante
-    if (score > 50 && mun.populacao >= parametros.populacaoMinima) {
-      vazios.push({
-        municipio: mun,
-        indicadores: mun.indicadores || {
-          id: '',
-          municipio_id: mun.id,
-          qtd_eletropostos: 0,
-          potencia_total_kw: null,
-          eletropostos_por_100k_hab: null,
-          populacao_ref: mun.populacao,
-          distancia_km_mais_proximo: null,
-          status_cobertura: 'inexistente',
-          is_vazio_territorial: true,
-          justificativa_vazio: 'Sem dados de cobertura',
-          ultima_analise: null,
-        },
-        score_criticidade: score,
-      });
+    // Só considera para ranking se tem população relevante
+    if (!criterios.populacaoRelevante) {
+      adequados.push(mun);
+      return;
+    }
+
+    const indicadores = mun.indicadores || {
+      id: '',
+      municipio_id: mun.id,
+      qtd_eletropostos: 0,
+      potencia_total_kw: null,
+      eletropostos_por_100k_hab: 0,
+      populacao_ref: mun.populacao,
+      distancia_km_mais_proximo: null,
+      status_cobertura: 'inexistente' as const,
+      is_vazio_territorial: true,
+      justificativa_vazio: null,
+      ultima_analise: null,
+    };
+
+    const score = calcularScoreCriticidade(mun, mun.indicadores, criterios, parametros);
+    const justificativa = gerarJustificativa(mun, mun.indicadores, criterios, nivel, parametros);
+
+    const vazio: VazioTerritorial = {
+      municipio: mun,
+      indicadores,
+      nivel,
+      score_criticidade: score,
+      criterios,
+      justificativa,
+    };
+
+    if (nivel === 'critico') {
+      vaziosCriticos.push(vazio);
+    } else if (nivel === 'moderado') {
+      vaziosModerados.push(vazio);
     } else {
       adequados.push(mun);
     }
   });
 
-  // Ordenar vazios por criticidade
-  vazios.sort((a, b) => b.score_criticidade - a.score_criticidade);
+  // Ordenar por criticidade
+  vaziosCriticos.sort((a, b) => b.score_criticidade - a.score_criticidade);
+  vaziosModerados.sort((a, b) => b.score_criticidade - a.score_criticidade);
+
+  const todosVazios = [...vaziosCriticos, ...vaziosModerados];
 
   return {
-    vazios,
+    vaziosCriticos,
+    vaziosModerados,
+    vazios: todosVazios,
     adequados,
     total: municipiosComIndicadores?.length || 0,
-    totalVazios: vazios.length,
+    totalVaziosCriticos: vaziosCriticos.length,
+    totalVaziosModerados: vaziosModerados.length,
+    totalVazios: todosVazios.length,
     isLoading,
+    parametros,
   };
 };
 
@@ -230,37 +341,44 @@ export const useRecalcularIndicadores = () => {
 
   return useMutation({
     mutationFn: async () => {
-      // Buscar municípios e eletropostos
       const { data: municipios } = await supabase.from('municipios').select('*');
       const { data: evStations } = await supabase.from('ev_stations').select('*').eq('country_code', 'BR');
 
       if (!municipios) return;
 
-      // Para cada município, calcular indicadores
       for (const mun of municipios) {
-        // Contar eletropostos no município (aproximação por cidade/estado)
         const estacoesMunicipio = evStations?.filter(
-          ev => ev.city?.toLowerCase() === mun.nome.toLowerCase() || 
+          ev => ev.city?.toLowerCase() === mun.nome.toLowerCase() && 
                 ev.state === mun.estado
         ) || [];
 
         const qtd = estacoesMunicipio.length;
-        const potencia = estacoesMunicipio.reduce((acc, ev) => acc + (ev.power_kw || 0), 0);
+        const potencia = estacoesMunicipio.reduce((acc, ev) => acc + (Number(ev.power_kw) || 0), 0);
+        const densidade = calcularDensidade(qtd, mun.populacao);
+        
+        const criterios = avaliarCriterios(mun as Municipio, {
+          qtd_eletropostos: qtd,
+          eletropostos_por_100k_hab: densidade,
+          distancia_km_mais_proximo: null,
+        } as IndicadorEnergia);
+        
+        const nivel = classificarNivelVazio(criterios);
+        const isVazio = nivel !== 'adequado' && mun.populacao >= PARAMETROS_PADRAO.populacaoMinima;
+        const status = classificarCobertura(densidade, null);
 
-        const status = classificarCobertura(mun as Municipio, qtd);
-        const isVazio = status === 'inexistente' && mun.populacao >= PARAMETROS_PADRAO.populacaoMinima;
-
-        // Upsert indicadores
         await supabase.from('indicadores_energia').upsert({
           municipio_id: mun.id,
           qtd_eletropostos: qtd,
           potencia_total_kw: potencia,
+          eletropostos_por_100k_hab: densidade,
           populacao_ref: mun.populacao,
           status_cobertura: status,
           is_vazio_territorial: isVazio,
-          justificativa_vazio: isVazio ? gerarJustificativaVazio(
+          justificativa_vazio: isVazio ? gerarJustificativa(
             mun as Municipio,
-            { qtd_eletropostos: qtd } as IndicadorEnergia
+            { qtd_eletropostos: qtd, eletropostos_por_100k_hab: densidade, distancia_km_mais_proximo: null } as IndicadorEnergia,
+            criterios,
+            nivel
           ) : null,
           ultima_analise: new Date().toISOString(),
         }, { onConflict: 'municipio_id' });
@@ -276,48 +394,59 @@ export const useRecalcularIndicadores = () => {
 export function simularImpactoEletroposto(
   municipio: Municipio,
   indicadoresAtuais: IndicadorEnergia | null,
-  qtdAdicionar: number = 1
+  qtdAdicionar: number = 1,
+  parametros: ParametrosVazio = PARAMETROS_PADRAO
 ): {
-  antes: { status: string; score: number };
-  depois: { status: string; score: number };
+  antes: { nivel: NivelVazio; status: string; score: number; densidade: number };
+  depois: { nivel: NivelVazio; status: string; score: number; densidade: number };
   impacto: {
     reducaoScore: number;
-    novoStatus: string;
+    novoNivel: NivelVazio;
     populacaoImpactada: number;
+    ganhoDensidade: number;
   };
 } {
   const qtdAtual = indicadoresAtuais?.qtd_eletropostos || 0;
   const qtdNova = qtdAtual + qtdAdicionar;
 
-  const statusAntes = classificarCobertura(municipio, qtdAtual);
-  const scoreAntes = calcularScoreCriticidade(municipio, indicadoresAtuais);
+  const densidadeAntes = calcularDensidade(qtdAtual, municipio.populacao);
+  const densidadeDepois = calcularDensidade(qtdNova, municipio.populacao);
+
+  const criteriosAntes = avaliarCriterios(municipio, indicadoresAtuais, parametros);
+  const nivelAntes = classificarNivelVazio(criteriosAntes);
+  const scoreAntes = calcularScoreCriticidade(municipio, indicadoresAtuais, criteriosAntes, parametros);
+  const statusAntes = classificarCobertura(densidadeAntes, indicadoresAtuais?.distancia_km_mais_proximo ?? null, parametros);
 
   const indicadoresSimulados: IndicadorEnergia = {
     ...indicadoresAtuais || {
       id: '',
       municipio_id: municipio.id,
       potencia_total_kw: null,
-      eletropostos_por_100k_hab: null,
       populacao_ref: municipio.populacao,
-      distancia_km_mais_proximo: null,
+      distancia_km_mais_proximo: 0, // Assumindo que novo eletroposto está no município
       is_vazio_territorial: false,
       justificativa_vazio: null,
       ultima_analise: null,
     },
     qtd_eletropostos: qtdNova,
-    status_cobertura: classificarCobertura(municipio, qtdNova),
+    eletropostos_por_100k_hab: densidadeDepois,
+    distancia_km_mais_proximo: 0, // Novo eletroposto no município
+    status_cobertura: classificarCobertura(densidadeDepois, 0, parametros),
   };
 
+  const criteriosDepois = avaliarCriterios(municipio, indicadoresSimulados, parametros);
+  const nivelDepois = classificarNivelVazio(criteriosDepois);
+  const scoreDepois = calcularScoreCriticidade(municipio, indicadoresSimulados, criteriosDepois, parametros);
   const statusDepois = indicadoresSimulados.status_cobertura;
-  const scoreDepois = calcularScoreCriticidade(municipio, indicadoresSimulados);
 
   return {
-    antes: { status: statusAntes, score: scoreAntes },
-    depois: { status: statusDepois, score: scoreDepois },
+    antes: { nivel: nivelAntes, status: statusAntes, score: scoreAntes, densidade: densidadeAntes },
+    depois: { nivel: nivelDepois, status: statusDepois, score: scoreDepois, densidade: densidadeDepois },
     impacto: {
       reducaoScore: scoreAntes - scoreDepois,
-      novoStatus: statusDepois,
+      novoNivel: nivelDepois,
       populacaoImpactada: municipio.populacao,
+      ganhoDensidade: densidadeDepois - densidadeAntes,
     },
   };
 }
