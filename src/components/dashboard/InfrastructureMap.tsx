@@ -7,7 +7,6 @@ import {
   operatorColors, 
   erbsByState 
 } from "@/data/erbData";
-import MapSearch from "./MapSearch";
 import StateCitySelector from "./StatesCitySelector";
 import { useInfrastructureStats } from "@/hooks/useInfrastructureData";
 import { useMunicipios, useVaziosTerritoriais } from "@/hooks/useVaziosTerritoriais";
@@ -562,27 +561,19 @@ const InfrastructureMap = ({
 
   return (
     <div className="relative h-full w-full rounded-xl overflow-hidden border border-border/50">
-      {/* State/City Selector - Conexis style */}
-      {showTowers && (
-        <StateCitySelector
-          onLocationSelect={handleStateCitySelect}
-          onClear={handleClearLocationFilter}
-          selectedState={locationFilter.state}
-          selectedCity={locationFilter.city}
-          filteredCount={locationFilter.erbCount}
-        />
-      )}
-
-      {/* Search bar - repositioned when selector is visible */}
-      <div className={`absolute z-[1001] ${showTowers ? 'top-3 right-3 w-56 hidden md:block' : 'top-3 left-3 right-3 md:right-auto md:w-72'}`}>
-        <MapSearch 
-          onLocationSelect={handleLocationSelect} 
-          showEV={showEVStations}
-        />
-      </div>
+      {/* State/City Selector - Conexis style - visible on all tabs */}
+      <StateCitySelector
+        onLocationSelect={handleStateCitySelect}
+        onClear={handleClearLocationFilter}
+        selectedState={locationFilter.state}
+        selectedCity={locationFilter.city}
+        filteredCount={locationFilter.erbCount}
+        showEV={showEVStations}
+        showVazios={showVazios}
+      />
 
       {/* Data source indicator */}
-      {hasDBData && !showTowers && (
+      {hasDBData && (
         <div className="absolute top-3 right-3 z-[1001] bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded-full border border-green-500/30">
           Dados em tempo real
         </div>

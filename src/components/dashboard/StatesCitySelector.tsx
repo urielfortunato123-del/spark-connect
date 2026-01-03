@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { MapPin, Building2, Radio, ChevronDown, X, Search } from "lucide-react";
+import { MapPin, Building2, Radio, ChevronDown, X, Search, Zap, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -237,6 +237,8 @@ interface StateCitySelectorProps {
   selectedState: string | null;
   selectedCity: string | null;
   filteredCount: number;
+  showEV?: boolean;
+  showVazios?: boolean;
 }
 
 const StateCitySelector = ({
@@ -245,6 +247,8 @@ const StateCitySelector = ({
   selectedState,
   selectedCity,
   filteredCount,
+  showEV = false,
+  showVazios = false,
 }: StateCitySelectorProps) => {
   const [internalState, setInternalState] = useState<string>(selectedState || "");
   const [internalCity, setInternalCity] = useState<string>(selectedCity || "");
@@ -324,8 +328,16 @@ const StateCitySelector = ({
       <div className="glass-card p-3 min-w-[280px] max-w-[320px]">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Radio className="w-4 h-4 text-primary" />
-            <span className="text-xs font-semibold text-foreground">Mapa de Antenas</span>
+            {showEV ? (
+              <Zap className="w-4 h-4 text-green-500" />
+            ) : showVazios ? (
+              <AlertTriangle className="w-4 h-4 text-amber-500" />
+            ) : (
+              <Radio className="w-4 h-4 text-primary" />
+            )}
+            <span className="text-xs font-semibold text-foreground">
+              {showEV ? "Mapa de Eletropostos" : showVazios ? "Vazios Territoriais" : "Mapa de Antenas"}
+            </span>
           </div>
           {(internalState || internalCity) && (
             <Button 
@@ -404,12 +416,17 @@ const StateCitySelector = ({
         )}
       </div>
 
-      {/* ERB Counter */}
+      {/* Counter */}
       <div className="glass-card p-3">
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
-              {internalCity ? "Antenas na cidade" : internalState ? "Antenas no estado" : "Total de Antenas"}
+              {showEV 
+                ? (internalCity ? "Estações na cidade" : internalState ? "Estações no estado" : "Total de Eletropostos")
+                : showVazios
+                ? (internalCity ? "Vazios na cidade" : internalState ? "Vazios no estado" : "Vazios Territoriais")
+                : (internalCity ? "Antenas na cidade" : internalState ? "Antenas no estado" : "Total de Antenas")
+              }
             </p>
             <p className="text-lg font-bold text-foreground">
               {(currentCityErbs || currentStateErbs || totalERBStats.total).toLocaleString("pt-BR")}
