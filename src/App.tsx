@@ -28,6 +28,7 @@ import Petroleo from "./pages/modules/Petroleo";
 import Mineracao from "./pages/modules/Mineracao";
 import Energia from "./pages/modules/Energia";
 import Saneamento from "./pages/modules/Saneamento";
+import Infraestrutura from "./pages/modules/Infraestrutura";
 
 const queryClient = new QueryClient();
 
@@ -142,6 +143,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Saneamento />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/infraestrutura" 
+                element={
+                  <ProtectedRoute>
+                    <Infraestrutura />
                   </ProtectedRoute>
                 } 
               />

@@ -17,6 +17,7 @@ import {
   Lightbulb,
   Droplets,
   Construction,
+  Building,
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
@@ -43,10 +44,11 @@ const mainNavItems: NavItem[] = [
 ];
 
 const devNavItems: NavItem[] = [
-  { title: 'Petróleo', url: '/petroleo', icon: Fuel, module: null, inDevelopment: true },
+  { title: 'Petróleo & Gás', url: '/petroleo', icon: Fuel, module: null, inDevelopment: true },
+  { title: 'Energia Elétrica', url: '/energia', icon: Lightbulb, module: null, inDevelopment: true },
   { title: 'Mineração', url: '/mineracao', icon: Mountain, module: null, inDevelopment: true },
-  { title: 'Energia', url: '/energia', icon: Lightbulb, module: null, inDevelopment: true },
   { title: 'Saneamento', url: '/saneamento', icon: Droplets, module: null, inDevelopment: true },
+  { title: 'Infraestrutura', url: '/infraestrutura', icon: Building, module: null, inDevelopment: true },
 ];
 
 export function AppSidebar() {
