@@ -1,4 +1,4 @@
-import { Radio, MapPin, Users, Gauge } from "lucide-react";
+import { Radio, MapPin, Users, Gauge, ExternalLink } from "lucide-react";
 import StatCard from "./StatCard";
 import { totalERBStats } from "@/data/erbData";
 
@@ -46,6 +46,17 @@ const StatsPanel = () => {
         colorClass="bg-operator-algar"
         delay={400}
       />
+
+      {/* Source attribution */}
+      <a 
+        href={totalERBStats.sourceUrl} 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="flex items-center gap-1.5 text-[10px] text-muted-foreground hover:text-primary transition-colors mt-2 pt-2 border-t border-border/30"
+      >
+        <ExternalLink className="w-3 h-3" />
+        <span>Fonte: {totalERBStats.source}</span>
+      </a>
     </div>
   );
 };
