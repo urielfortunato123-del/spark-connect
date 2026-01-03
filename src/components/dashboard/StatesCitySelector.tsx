@@ -323,7 +323,11 @@ const StateCitySelector = ({
   }, [internalState, internalCity]);
 
   return (
-    <div className="absolute top-3 left-3 z-[1000] flex flex-col gap-2">
+    <div
+      className="absolute top-3 left-3 z-[3000] flex flex-col gap-2 pointer-events-auto"
+      onPointerDownCapture={(e) => e.stopPropagation()}
+      onClick={(e) => e.stopPropagation()}
+    >
       {/* Main selector card */}
       <div className="glass-card p-3 min-w-[280px] max-w-[320px]">
         <div className="flex items-center justify-between mb-3">
