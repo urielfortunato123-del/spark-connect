@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, useCallback } from "react";
+import { useEffect, useRef, useMemo, useCallback, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { evStationsData, operatorColors as evOperatorColors } from "@/data/evStations";
@@ -8,6 +8,7 @@ import {
   erbsByState 
 } from "@/data/erbData";
 import MapSearch from "./MapSearch";
+import StateCitySelector from "./StatesCitySelector";
 import { useInfrastructureStats } from "@/hooks/useInfrastructureData";
 import { useMunicipios, useVaziosTerritoriais } from "@/hooks/useVaziosTerritoriais";
 
@@ -32,6 +33,15 @@ interface InfrastructureMapProps {
   onVazioClick?: (vazio: VazioTerritorial) => void;
 }
 
+interface LocationFilter {
+  state: string | null;
+  city: string | null;
+  lat: number | null;
+  lng: number | null;
+  zoom: number;
+  erbCount: number;
+}
+
 const InfrastructureMap = ({ 
   selectedOperators, 
   showEVStations, 
@@ -49,6 +59,16 @@ const InfrastructureMap = ({
   const vaziosMarkersRef = useRef<L.CircleMarker[]>([]);
   const recommendationsRef = useRef<L.Marker[]>([]);
   const heatLayerRef = useRef<any>(null);
+  
+  // Location filter state
+  const [locationFilter, setLocationFilter] = useState<LocationFilter>({
+    state: null,
+    city: null,
+    lat: null,
+    lng: null,
+    zoom: 4,
+    erbCount: 0,
+  });
   
   // Get data from database
   const { towers: dbTowers, evStations: dbEVStations, countries } = useInfrastructureStats(
@@ -68,6 +88,48 @@ const InfrastructureMap = ({
       mapInstanceRef.current.flyTo([lat, lng], zoom, {
         duration: 1.5,
         easeLinearity: 0.25,
+      });
+    }
+  }, []);
+
+  // Handle state/city selection for filtering
+  const handleStateCitySelect = useCallback((lat: number, lng: number, name: string, erbs: number) => {
+    // Determine zoom level based on whether it's a state or city selection
+    const isStateLevel = erbs > 2000;
+    const zoom = isStateLevel ? 7 : 12;
+    
+    setLocationFilter(prev => ({
+      ...prev,
+      lat,
+      lng,
+      zoom,
+      erbCount: erbs,
+      city: !isStateLevel ? name : null,
+      state: isStateLevel ? name : prev.state,
+    }));
+
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.flyTo([lat, lng], zoom, {
+        duration: 1.5,
+        easeLinearity: 0.25,
+      });
+    }
+  }, []);
+
+  // Clear location filter
+  const handleClearLocationFilter = useCallback(() => {
+    setLocationFilter({
+      state: null,
+      city: null,
+      lat: null,
+      lng: null,
+      zoom: 4,
+      erbCount: 0,
+    });
+
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.flyTo([-14.235, -51.9253], 4, {
+        duration: 1.5,
       });
     }
   }, []);
@@ -500,8 +562,19 @@ const InfrastructureMap = ({
 
   return (
     <div className="relative h-full w-full rounded-xl overflow-hidden border border-border/50">
-      {/* Search bar */}
-      <div className="absolute top-3 left-3 right-3 md:right-auto md:w-72 z-[1001]">
+      {/* State/City Selector - Conexis style */}
+      {showTowers && (
+        <StateCitySelector
+          onLocationSelect={handleStateCitySelect}
+          onClear={handleClearLocationFilter}
+          selectedState={locationFilter.state}
+          selectedCity={locationFilter.city}
+          filteredCount={locationFilter.erbCount}
+        />
+      )}
+
+      {/* Search bar - repositioned when selector is visible */}
+      <div className={`absolute z-[1001] ${showTowers ? 'top-3 right-3 w-56 hidden md:block' : 'top-3 left-3 right-3 md:right-auto md:w-72'}`}>
         <MapSearch 
           onLocationSelect={handleLocationSelect} 
           showEV={showEVStations}
@@ -509,7 +582,7 @@ const InfrastructureMap = ({
       </div>
 
       {/* Data source indicator */}
-      {hasDBData && (
+      {hasDBData && !showTowers && (
         <div className="absolute top-3 right-3 z-[1001] bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded-full border border-green-500/30">
           Dados em tempo real
         </div>
