@@ -361,7 +361,7 @@ const StateCitySelector = ({
             <SelectTrigger className="h-9 text-sm bg-background/50">
               <SelectValue placeholder="Selecione um estado" />
             </SelectTrigger>
-            <SelectContent className="max-h-[300px]">
+            <SelectContent className="max-h-[300px] z-[2000] bg-popover">
               {states.map((state) => (
                 <SelectItem key={state.code} value={state.code}>
                   <div className="flex items-center justify-between w-full gap-4">
@@ -399,7 +399,7 @@ const StateCitySelector = ({
               <SelectTrigger className="h-9 text-sm bg-background/50">
                 <SelectValue placeholder="Selecione uma cidade" />
               </SelectTrigger>
-              <SelectContent className="max-h-[250px]">
+              <SelectContent className="max-h-[250px] z-[2000] bg-popover">
                 {cities.map((city) => (
                   <SelectItem key={city.name} value={city.name}>
                     <div className="flex items-center justify-between w-full gap-4">
