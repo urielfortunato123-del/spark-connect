@@ -266,6 +266,32 @@ const DataImportButton = ({ dataType }: DataImportButtonProps) => {
     }
   };
 
+  const handleDownloadConexisData = async () => {
+    setIsUploading(true);
+    setResult(null);
+
+    try {
+      toast.info('Baixando dados da Conexis/Anatel...');
+      
+      // Try to fetch the ZIP file from Conexis
+      const zipUrl = 'https://conexis.org.br/wp-content/uploads/estados_mapa/ERBS.zip';
+      
+      // Since we can't directly fetch from Conexis due to CORS, we'll use the bundled file
+      // and show instructions for manual download
+      toast.info(
+        'Para dados atualizados, baixe diretamente: conexis.org.br/wp-content/uploads/estados_mapa/ERBS.zip',
+        { duration: 8000 }
+      );
+      
+      // Fallback to bundled file
+      await handleImportBundledFile();
+    } catch (e) {
+      toast.error('Erro ao baixar dados da Conexis');
+      console.error(e);
+      setIsUploading(false);
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -325,7 +351,7 @@ const DataImportButton = ({ dataType }: DataImportButtonProps) => {
                   <p className="text-sm text-muted-foreground">Clique para selecionar um arquivo (CSV ou XLSX)</p>
                 </div>
 
-                <div className="flex justify-center">
+                <div className="flex flex-col gap-2">
                   <Button
                     type="button"
                     variant="secondary"
@@ -334,8 +360,17 @@ const DataImportButton = ({ dataType }: DataImportButtonProps) => {
                     onClick={handleImportBundledFile}
                   >
                     <Download className="h-4 w-4" />
-                    Importar arquivo enviado (Nov/25)
+                    Importar arquivo local (Nov/25)
                   </Button>
+                  
+                  <a
+                    href="https://conexis.org.br/wp-content/uploads/estados_mapa/ERBS.zip"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-center text-primary hover:underline"
+                  >
+                    Baixar dados atualizados da Conexis/Anatel →
+                  </a>
                 </div>
               </div>
             )}
