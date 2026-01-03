@@ -125,11 +125,11 @@ const AnimatedQuickStat = ({ icon, value, label, suffix = "", decimals = 0, dela
   });
 
   return (
-    <div className="flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-1.5 md:py-2.5 bg-secondary/40 rounded-lg md:rounded-xl border border-border/30 hover:border-primary/30 transition-all duration-300">
+    <div className="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 bg-card/80 backdrop-blur-sm rounded-xl border border-border/40 hover:border-primary/40 transition-all duration-300 shadow-sm">
       <div className="text-primary">{icon}</div>
-      <div className="text-right">
-        <p className="text-xs md:text-sm font-semibold stat-value">{formattedValue}</p>
-        <p className="text-[8px] md:text-[10px] text-muted-foreground uppercase tracking-wider">{label}</p>
+      <div>
+        <p className="text-sm md:text-base font-bold stat-value leading-tight">{formattedValue}</p>
+        <p className="text-[9px] md:text-[10px] text-muted-foreground uppercase tracking-wider">{label}</p>
       </div>
     </div>
   );
