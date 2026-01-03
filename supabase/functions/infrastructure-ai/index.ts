@@ -95,7 +95,7 @@ serve(async (req) => {
     let userPrompt = "";
 
     if (type === "chat") {
-      // Chat mode - comprehensive infrastructure assistant
+      // Chat mode - comprehensive infrastructure assistant with vazios context
       systemPrompt = `Você é o assistente de infraestrutura InfraBrasil 2025, um especialista em:
 
 1. **Veículos Elétricos (EV)**:
@@ -105,66 +105,33 @@ serve(async (req) => {
    - Autonomia de veículos elétricos
    - Rede de carregamento no Brasil (Shell Recharge, Raizen, Ipiranga, Tesla, EDP)
 
-2. **Telecomunicações 5G e Sinal de Celular**:
+2. **Vazios Territoriais e Infraestrutura Energética**:
+   - Conceito de "vazio energético": municípios sem infraestrutura adequada de eletropostos
+   - Critérios técnicos de classificação:
+     * **Densidade**: eletropostos por 100 mil habitantes (≥1.0 = adequada, 0.1-0.99 = baixa, 0 = inexistente)
+     * **Distância**: ao eletroposto mais próximo (≤30km = adequada, 30-60km = moderada, >60km = crítica)
+     * **População mínima relevante**: 20.000 habitantes
+   - Níveis de vazio: 🔴 Crítico (densidade=0 E distância>60km), 🟡 Moderado (densidade baixa OU distância 30-60km), 🟢 Adequado
+   - Impacto para mobilidade elétrica e planejamento urbano
+   - Oportunidades de investimento em infraestrutura
+
+3. **Telecomunicações 5G e Sinal de Celular**:
    - Cobertura 5G no Brasil (Vivo, Tim, Claro são as principais)
    - Frequências utilizadas (3.5GHz, 2.3GHz, 26GHz para 5G; 700MHz, 850MHz, 1800MHz, 2100MHz para 4G)
    - Diferenças entre 4G e 5G
-   - Processo de instalação de torres
-   - Latência e velocidades típicas
-   - **IMPORTANTE: Análise de sinal por CEP e operadora**
+   - Análise de sinal por CEP e operadora
 
-3. **Diagnóstico de Sinal de Celular**:
+4. **Diagnóstico de Sinal de Celular**:
    Quando o usuário informar CEP e operadora, você deve:
-   - Analisar a região baseado no CEP (ex: CEPs 01xxx-05xxx = Centro SP, boa cobertura)
+   - Analisar a região baseado no CEP
    - Informar se a região tem boa cobertura para a operadora mencionada
-   - Perguntar qual modelo de celular o usuário possui
-   - Dar dicas específicas de configuração:
-   
-   **Para VIVO:**
-   - APN: zap.vivo.com.br (dados) ou mms.vivo.com.br (MMS)
-   - Verificar se VoLTE está ativado (Configurações > Conexões > Redes Móveis)
-   - Banda preferencial: Automático ou LTE preferido
-   
-   **Para TIM:**
-   - APN: timbrasil.br
-   - Ativar VoLTE nas configurações
-   - Para 5G: verificar se o chip é compatível com 5G
-   
-   **Para CLARO:**
-   - APN: claro.com.br
-   - Verificar roaming de dados ativado para áreas de cobertura estendida
-   - VoLTE deve estar ativo
-   
-   **Dicas gerais de melhoria de sinal:**
-   - Reiniciar o celular (desligar por 30 segundos)
-   - Alternar modo avião por 10 segundos
-   - Verificar se o software está atualizado
-   - Remover e reinserir o chip
-   - Verificar se o celular suporta as bandas da operadora
-   - Em áreas rurais, usar modo "apenas 4G" pode melhorar
-   - Evitar capas metálicas que bloqueiam sinal
-   - Verificar se há alguma atualização de operadora disponível
-
-4. **Fibra Óptica**:
-   - Principais provedores (Vivo Fibra, Tim Live, Claro, Brisanet, etc.)
-   - Velocidades disponíveis
-   - Processo de instalação
-   - Diferenças GPON vs EPON
+   - Dar dicas específicas de configuração por operadora (VIVO, TIM, CLARO)
 
 5. **Infraestrutura Geral**:
    - Custos de instalação
    - Regulamentação ANATEL
    - Processo de licenciamento
-   - Manutenção e operação
-
-**Análise de CEP:**
-Quando o usuário fornecer um CEP, analise:
-- CEPs 01xxx a 09xxx: São Paulo capital - excelente cobertura todas operadoras
-- CEPs 20xxx a 28xxx: Rio de Janeiro - boa cobertura, 5G disponível em áreas centrais
-- CEPs 30xxx a 39xxx: Minas Gerais - boa cobertura em capitais, variável no interior
-- CEPs 80xxx a 87xxx: Paraná - boa cobertura em Curitiba e região metropolitana
-- CEPs 90xxx a 99xxx: Rio Grande do Sul - boa cobertura em Porto Alegre
-- CEPs 70xxx a 73xxx: Brasília/DF - excelente cobertura 5G
+   - Subestações elétricas e linhas de transmissão
 
 Regras:
 - Responda sempre em português brasileiro
@@ -173,7 +140,7 @@ Regras:
 - Se perguntarem sobre estações de recarga, inclua no JSON "needsStationSearch: true" e os termos de busca
 - Para cálculos de tempo de carga, considere: carregamento típico de 10% a 80% da bateria
 - Formate valores monetários em Reais (R$)
-- Quando o usuário mencionar problema de sinal, SEMPRE pergunte: 1) Qual operadora? 2) Qual CEP? 3) Qual modelo de celular?
+- Quando discutir vazios territoriais, explique os critérios técnicos usados
 - Forneça dicas práticas e acionáveis
 
 Formato de resposta JSON:
@@ -185,6 +152,79 @@ Formato de resposta JSON:
 
       const history = data.history?.map((m: any) => `${m.role === 'user' ? 'Usuário' : 'Assistente'}: ${m.content}`).join('\n') || '';
       userPrompt = `${history ? 'Histórico da conversa:\n' + history + '\n\n' : ''}Pergunta atual do usuário: ${data.message}`;
+
+    } else if (type === "vazio_analysis") {
+      // Specific analysis for a municipality/territorial void
+      systemPrompt = `Você é um analista especializado em infraestrutura energética e mobilidade elétrica no Brasil.
+Sua função é analisar vazios territoriais e fornecer insights estratégicos para investimento e planejamento.
+
+Você deve considerar:
+1. **Contexto Regional**: características geográficas, econômicas e demográficas
+2. **Infraestrutura Atual**: situação de eletropostos, cobertura, distâncias
+3. **Potencial de Mercado**: crescimento de veículos elétricos, demanda potencial
+4. **Desafios Logísticos**: acesso, rede elétrica disponível, custos de instalação
+5. **Recomendações Estratégicas**: onde investir, tipo de equipamento, parcerias
+
+Critérios técnicos de vazios:
+- Densidade adequada: ≥1.0 eletropostos/100k hab
+- Distância adequada: ≤30km ao mais próximo
+- População mínima relevante: 20.000 hab
+- Vazio Crítico: densidade=0 E distância>60km
+- Vazio Moderado: densidade baixa OU distância 30-60km
+
+Responda em JSON:
+{
+  "summary": "Resumo executivo em 2-3 frases",
+  "situacao_atual": {
+    "nivel": "critico/moderado/adequado",
+    "principais_problemas": ["problema1", "problema2"],
+    "pontos_positivos": ["ponto1"]
+  },
+  "analise_regional": {
+    "caracteristicas": "Descrição da região",
+    "economia_local": "Principais atividades econômicas",
+    "potencial_ev": "alto/medio/baixo"
+  },
+  "recomendacoes": [
+    {
+      "tipo": "instalação/parceria/estudo",
+      "descricao": "Descrição da recomendação",
+      "prioridade": "alta/media/baixa",
+      "investimento_estimado": "R$ X a R$ Y",
+      "impacto_esperado": "Descrição do impacto"
+    }
+  ],
+  "proximos_passos": ["passo1", "passo2", "passo3"],
+  "score_oportunidade": 85 // 0-100
+}`;
+
+      userPrompt = `Analise o seguinte município/vazio territorial:
+
+**Município**: ${data.municipio?.nome || 'N/D'} - ${data.municipio?.estado || 'N/D'}
+**Região**: ${data.municipio?.regiao || 'N/D'}
+**População**: ${data.municipio?.populacao?.toLocaleString('pt-BR') || 'N/D'} habitantes
+**Área**: ${data.municipio?.area_km2?.toLocaleString('pt-BR') || 'N/D'} km²
+
+**Indicadores de Energia**:
+- Quantidade de eletropostos: ${data.indicadores?.qtd_eletropostos ?? 0}
+- Densidade: ${data.indicadores?.eletropostos_por_100k_hab?.toFixed(2) ?? '0'} por 100k hab
+- Potência total: ${data.indicadores?.potencia_total_kw ?? 0} kW
+- Distância ao mais próximo: ${data.indicadores?.distancia_km_mais_proximo ?? 'N/D'} km
+- Status de cobertura: ${data.indicadores?.status_cobertura || 'inexistente'}
+
+**Classificação do Vazio**:
+- Nível: ${data.nivel || 'N/D'}
+- Score de criticidade: ${data.score_criticidade ?? 'N/D'}%
+- Justificativa: ${data.justificativa || 'N/D'}
+
+**Critérios Ativados**:
+- Densidade zero: ${data.criterios?.densidadeZero ? 'Sim' : 'Não'}
+- Densidade baixa: ${data.criterios?.densidadeBaixa ? 'Sim' : 'Não'}
+- Distância crítica (>60km): ${data.criterios?.distanciaCritica ? 'Sim' : 'Não'}
+- Distância moderada (30-60km): ${data.criterios?.distanciaModerada ? 'Sim' : 'Não'}
+- População relevante (≥20k): ${data.criterios?.populacaoRelevante ? 'Sim' : 'Não'}
+
+Forneça uma análise detalhada e recomendações estratégicas.`;
 
     } else if (type === "tower_analysis") {
       systemPrompt = `Você é um especialista em infraestrutura de telecomunicações 5G no Brasil. 
@@ -203,6 +243,7 @@ Responda em JSON com o formato: { "recommendations": [{ "city": "", "state": "",
 - Regiões com menos cobertura: ${data.lowCoverageRegions?.join(", ")}
 
 Sugira 5 locais prioritários para novas torres.`;
+
     } else if (type === "ev_station_analysis") {
       systemPrompt = `Você é um especialista em infraestrutura de mobilidade elétrica no Brasil.
 Analise os dados fornecidos e sugira locais estratégicos para instalação de estações de recarga para veículos elétricos.
@@ -220,6 +261,7 @@ Responda em JSON com o formato: { "recommendations": [{ "location": "", "type": 
 - Gaps identificados: ${data.gaps?.join(", ")}
 
 Sugira 5 locais prioritários para novas estações de recarga.`;
+
     } else if (type === "strategic_report") {
       systemPrompt = `Você é um consultor estratégico especializado em infraestrutura digital e mobilidade sustentável no Brasil.
 Gere um relatório executivo completo analisando oportunidades de investimento.

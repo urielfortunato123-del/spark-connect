@@ -12,6 +12,8 @@ import InfraChat from "@/components/dashboard/InfraChat";
 import ExportButton from "@/components/dashboard/ExportButton";
 import DataImportButton from "@/components/dashboard/DataImportButton";
 import VaziosPanel from "@/components/dashboard/VaziosPanel";
+import VazioInsightsPanel from "@/components/dashboard/VazioInsightsPanel";
+import type { VazioTerritorial } from "@/hooks/useVaziosTerritoriais";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<"5g" | "ev" | "vazios" | "ai">("5g");
@@ -21,6 +23,7 @@ const Index = () => {
   ]);
   const [aiRecommendations, setAIRecommendations] = useState<any[]>([]);
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; name: string } | null>(null);
+  const [selectedVazio, setSelectedVazio] = useState<VazioTerritorial | null>(null);
 
   const toggleOperator = (operator: string) => {
     setSelectedOperators((prev) =>
@@ -32,6 +35,17 @@ const Index = () => {
 
   const handleMunicipioSelect = useCallback((lat: number, lng: number, nome: string) => {
     setMapCenter({ lat, lng, name: nome });
+  }, []);
+
+  const handleVazioSelect = useCallback((vazio: VazioTerritorial) => {
+    setSelectedVazio(vazio);
+    if (vazio.municipio.latitude && vazio.municipio.longitude) {
+      setMapCenter({ lat: vazio.municipio.latitude, lng: vazio.municipio.longitude, name: vazio.municipio.nome });
+    }
+  }, []);
+
+  const handleCloseInsights = useCallback(() => {
+    setSelectedVazio(null);
   }, []);
 
   return (
@@ -76,7 +90,10 @@ const Index = () => {
               </>
             )}
             {activeTab === "vazios" && (
-              <VaziosPanel onMunicipioSelect={handleMunicipioSelect} />
+              <VaziosPanel 
+                onMunicipioSelect={handleMunicipioSelect} 
+                onVazioSelect={handleVazioSelect}
+              />
             )}
             {activeTab === "ai" && (
               <AIAnalysisPanel onRecommendationsUpdate={setAIRecommendations} />
@@ -140,6 +157,12 @@ const Index = () => {
           </p>
         </footer>
       </div>
+
+      {/* Vazio Insights Panel - Slide from right */}
+      <VazioInsightsPanel 
+        vazio={selectedVazio} 
+        onClose={handleCloseInsights} 
+      />
     </div>
   );
 };

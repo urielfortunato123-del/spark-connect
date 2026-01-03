@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AlertTriangle, MapPin, Users, Zap, TrendingDown, Calculator, RefreshCw, Info, CheckCircle, AlertCircle } from "lucide-react";
+import { AlertTriangle, MapPin, Users, Zap, TrendingDown, Calculator, RefreshCw, Info, CheckCircle, AlertCircle, Brain } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import { toast } from "@/hooks/use-toast";
 
 interface VaziosPanelProps {
   onMunicipioSelect?: (lat: number, lng: number, nome: string) => void;
+  onVazioSelect?: (vazio: VazioTerritorial) => void;
 }
 
 const NivelBadge = ({ nivel }: { nivel: NivelVazio }) => {
@@ -83,7 +84,7 @@ const CriteriosTooltip = ({ vazio }: { vazio: VazioTerritorial }) => {
   );
 };
 
-const VaziosPanel = ({ onMunicipioSelect }: VaziosPanelProps) => {
+const VaziosPanel = ({ onMunicipioSelect, onVazioSelect }: VaziosPanelProps) => {
   const [parametros, setParametros] = useState<ParametrosVazio>(PARAMETROS_PADRAO);
   const [selectedVazio, setSelectedVazio] = useState<VazioTerritorial | null>(null);
   const [qtdSimular, setQtdSimular] = useState(1);
@@ -119,10 +120,13 @@ const VaziosPanel = ({ onMunicipioSelect }: VaziosPanelProps) => {
     });
   };
 
-  const handleSelectVazio = (vazio: VazioTerritorial) => {
+  const handleSelectVazio = (vazio: VazioTerritorial, openInsights: boolean = false) => {
     setSelectedVazio(vazio);
     if (vazio.municipio.latitude && vazio.municipio.longitude && onMunicipioSelect) {
       onMunicipioSelect(vazio.municipio.latitude, vazio.municipio.longitude, vazio.municipio.nome);
+    }
+    if (openInsights && onVazioSelect) {
+      onVazioSelect(vazio);
     }
   };
 
@@ -141,16 +145,18 @@ const VaziosPanel = ({ onMunicipioSelect }: VaziosPanelProps) => {
   }
 
   const VazioItem = ({ vazio, idx, showRank = true }: { vazio: VazioTerritorial; idx: number; showRank?: boolean }) => (
-    <button
+    <div
       key={vazio.municipio.id}
-      onClick={() => handleSelectVazio(vazio)}
       className={`w-full text-left p-3 rounded-lg transition-all ${
         selectedVazio?.municipio.id === vazio.municipio.id
           ? 'bg-primary/20 border border-primary/50'
           : 'bg-muted/30 hover:bg-muted/50 border border-transparent'
       }`}
     >
-      <div className="flex items-start justify-between gap-2">
+      <div 
+        className="flex items-start justify-between gap-2 cursor-pointer"
+        onClick={() => handleSelectVazio(vazio)}
+      >
         <div className="flex items-start gap-2 flex-1 min-w-0">
           {showRank && (
             <span className="text-xs font-bold text-muted-foreground w-5 shrink-0 mt-0.5">
@@ -180,7 +186,20 @@ const VaziosPanel = ({ onMunicipioSelect }: VaziosPanelProps) => {
           <CriteriosTooltip vazio={vazio} />
         </div>
       </div>
-    </button>
+      {/* Button to open AI insights */}
+      <Button
+        variant="ghost"
+        size="sm"
+        className="w-full mt-2 h-7 text-xs text-primary hover:bg-primary/10"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleSelectVazio(vazio, true);
+        }}
+      >
+        <Brain className="w-3 h-3 mr-1" />
+        Ver análise de IA
+      </Button>
+    </div>
   );
 
   return (
@@ -391,6 +410,15 @@ const VaziosPanel = ({ onMunicipioSelect }: VaziosPanelProps) => {
                     <li>• Novo nível: <strong className="capitalize">{simulacao.impacto.novoNivel}</strong></li>
                   </ul>
                 </div>
+
+                {/* AI Analysis Button */}
+                <Button
+                  className="w-full bg-gradient-to-r from-primary to-amber-500 hover:from-primary/90 hover:to-amber-500/90"
+                  onClick={() => handleSelectVazio(selectedVazio, true)}
+                >
+                  <Brain className="w-4 h-4 mr-2" />
+                  Análise detalhada com IA
+                </Button>
               </div>
             )}
           </CardContent>
