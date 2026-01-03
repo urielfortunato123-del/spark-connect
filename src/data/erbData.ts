@@ -1,5 +1,5 @@
 // ERB (Estações Rádio Base) data based on official Anatel data - Nov/2025
-// Source: Anatel/Teleco - https://www.teleco.com.br/erb.asp
+// Source: Conexis Brasil Digital / Anatel - https://conexis.org.br/numeros/mapa-de-antenas/
 
 export interface ERBOperatorData {
   operator: string;
@@ -38,13 +38,15 @@ export const operatorData: ERBOperatorData[] = [
 
 // Total stats
 export const totalERBStats = {
-  total: 109100,
+  total: 109004,
   erbs2G: 54923,
   erbs3G: 72222,
   erbs4G: 100002,
   erbs5G: 51447,
   monthlyGrowth: 754,
   lastUpdate: "Nov/2025",
+  source: "Conexis Brasil Digital / Anatel",
+  sourceUrl: "https://conexis.org.br/numeros/mapa-de-antenas/",
 };
 
 // ERBs by state - Nov/2025 (based on Anatel data)
@@ -92,7 +94,7 @@ export const historicalData = [
   { year: "2022", total: 87654, erbs5G: 8540 },
   { year: "2023", total: 93835, erbs5G: 18537 },
   { year: "2024", total: 102908, erbs5G: 37991 },
-  { year: "2025", total: 109100, erbs5G: 51447 },
+  { year: "2025", total: 109004, erbs5G: 51447 },
 ];
 
 // Generate sample tower locations for map visualization
