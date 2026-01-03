@@ -18,6 +18,7 @@ import {
   Droplets,
   Construction,
   Building,
+  Factory,
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
@@ -49,6 +50,7 @@ const devNavItems: NavItem[] = [
   { title: 'Mineração', url: '/mineracao', icon: Mountain, module: null, inDevelopment: true },
   { title: 'Saneamento', url: '/saneamento', icon: Droplets, module: null, inDevelopment: true },
   { title: 'Infraestrutura', url: '/infraestrutura', icon: Building, module: null, inDevelopment: true },
+  { title: 'Indústria', url: '/industria', icon: Factory, module: null, inDevelopment: true },
 ];
 
 export function AppSidebar() {
