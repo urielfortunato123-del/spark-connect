@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
-import { Upload, FileSpreadsheet, CheckCircle } from 'lucide-react';
+import { Upload, FileSpreadsheet, CheckCircle, Download } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { Button } from '@/components/ui/button';
 import {
@@ -70,7 +70,6 @@ function parseXLSX(buffer: ArrayBuffer): ParsedRow[] {
   if (!firstSheetName) return [];
   const sheet = wb.Sheets[firstSheetName];
 
-  // We read as arrays to normalize header ourselves.
   const aoa = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, defval: null });
   if (!aoa.length || !Array.isArray(aoa[0])) return [];
 
@@ -83,7 +82,6 @@ function parseXLSX(buffer: ArrayBuffer): ParsedRow[] {
     rawHeaders.forEach((h, idx) => {
       row[h] = cleanCell(rowArr?.[idx]);
     });
-    // Ignore fully empty rows
     if (Object.values(row).some((v) => v !== null && String(v).trim() !== '')) rows.push(row);
   }
 
@@ -101,6 +99,87 @@ function toNumber(value: unknown) {
   const str = String(value ?? '').trim().replace(',', '.');
   const n = Number(str);
   return Number.isFinite(n) ? n : null;
+}
+
+async function importRowsToDb(rows: ParsedRow[], dataType: DataImportButtonProps['dataType']) {
+  const mapped = rows.map((row) => {
+    const country_code = getFirstMatch(row, ['country_code', 'pais', 'country', 'countrycode']);
+    const city = getFirstMatch(row, ['city', 'cidade', 'municipio', 'município']);
+    const state = getFirstMatch(row, ['state', 'estado', 'uf']);
+    const latitude = toNumber(getFirstMatch(row, ['latitude', 'lat']));
+    const longitude = toNumber(getFirstMatch(row, ['longitude', 'lon', 'lng']));
+    const operator = getFirstMatch(row, ['operator', 'operadora', 'operador', 'carrier']);
+
+    return {
+      country_code: country_code ? String(country_code).trim().toUpperCase() : null,
+      city: city ? String(city).trim() : null,
+      state: state ? String(state).trim() : null,
+      latitude,
+      longitude,
+      operator: operator ? String(operator).trim() : null,
+
+      technology: getFirstMatch(row, ['technology', 'tecnologia']),
+      frequency: getFirstMatch(row, ['frequency', 'frequencia', 'frequência']),
+      status: getFirstMatch(row, ['status', 'situacao', 'situação']),
+      power_kw: toNumber(getFirstMatch(row, ['power_kw', 'power', 'potencia', 'potência'])),
+      num_chargers: toNumber(getFirstMatch(row, ['num_chargers', 'chargers', 'conectores', 'pontos'])),
+    };
+  });
+
+  const validRows = mapped.filter((r) => r.country_code && r.latitude !== null && r.longitude !== null);
+  const invalidCount = mapped.length - validRows.length;
+
+  let success = 0;
+  let errors = invalidCount;
+
+  const batchSize = 300;
+  for (let i = 0; i < validRows.length; i += batchSize) {
+    const batch = validRows.slice(i, i + batchSize);
+
+    if (dataType === 'towers') {
+      const payload = batch.map((r) => ({
+        country_code: r.country_code as string,
+        city: r.city,
+        state: r.state,
+        latitude: r.latitude as number,
+        longitude: r.longitude as number,
+        operator: r.operator,
+        technology: r.technology ? String(r.technology) : '5G',
+        frequency: r.frequency ? String(r.frequency) : null,
+        status: r.status ? String(r.status) : 'active',
+      }));
+
+      const { error } = await supabase.from('towers').insert(payload);
+      if (error) {
+        console.error(error);
+        errors += payload.length;
+      } else {
+        success += payload.length;
+      }
+    } else {
+      const payload = batch.map((r) => ({
+        country_code: r.country_code as string,
+        city: r.city,
+        state: r.state,
+        latitude: r.latitude as number,
+        longitude: r.longitude as number,
+        operator: r.operator,
+        power_kw: r.power_kw,
+        num_chargers: r.num_chargers !== null ? Math.max(1, Math.trunc(r.num_chargers)) : 1,
+        status: r.status ? String(r.status) : 'active',
+      }));
+
+      const { error } = await supabase.from('ev_stations').insert(payload);
+      if (error) {
+        console.error(error);
+        errors += payload.length;
+      } else {
+        success += payload.length;
+      }
+    }
+  }
+
+  return { success, errors };
 }
 
 const DataImportButton = ({ dataType }: DataImportButtonProps) => {
@@ -142,93 +221,46 @@ const DataImportButton = ({ dataType }: DataImportButtonProps) => {
         return;
       }
 
-      // Map headers flexíveis (útil para planilhas brasileiras)
-      const mapped = rows.map((row) => {
-        const country_code = getFirstMatch(row, ['country_code', 'pais', 'country', 'countrycode']);
-        const city = getFirstMatch(row, ['city', 'cidade', 'municipio', 'município']);
-        const state = getFirstMatch(row, ['state', 'estado', 'uf']);
-        const latitude = toNumber(getFirstMatch(row, ['latitude', 'lat']));
-        const longitude = toNumber(getFirstMatch(row, ['longitude', 'lon', 'lng']));
-        const operator = getFirstMatch(row, ['operator', 'operadora', 'operador', 'carrier']);
+      const res = await importRowsToDb(rows, dataType);
+      setResult(res);
 
-        return {
-          country_code: country_code ? String(country_code).trim().toUpperCase() : null,
-          city: city ? String(city).trim() : null,
-          state: state ? String(state).trim() : null,
-          latitude,
-          longitude,
-          operator: operator ? String(operator).trim() : null,
+      if (res.success > 0) toast.success(`Importação concluída: ${res.success} registros`);
+      if (res.success === 0 && res.errors > 0) toast.error('Nenhum registro foi importado (verifique as colunas e valores)');
 
-          // Extras
-          technology: getFirstMatch(row, ['technology', 'tecnologia']),
-          frequency: getFirstMatch(row, ['frequency', 'frequencia', 'frequência']),
-          status: getFirstMatch(row, ['status', 'situacao', 'situação']),
-          power_kw: toNumber(getFirstMatch(row, ['power_kw', 'power', 'potencia', 'potência'])),
-          num_chargers: toNumber(getFirstMatch(row, ['num_chargers', 'chargers', 'conectores', 'pontos'])),
-        };
-      });
-
-      // Validate minimally
-      const validRows = mapped.filter((r) => r.country_code && r.latitude !== null && r.longitude !== null);
-      const invalidCount = mapped.length - validRows.length;
-
-      let success = 0;
-      let errors = invalidCount;
-
-      const batchSize = 300;
-      for (let i = 0; i < validRows.length; i += batchSize) {
-        const batch = validRows.slice(i, i + batchSize);
-
-        if (dataType === 'towers') {
-          const payload = batch.map((r) => ({
-            country_code: r.country_code as string,
-            city: r.city,
-            state: r.state,
-            latitude: r.latitude as number,
-            longitude: r.longitude as number,
-            operator: r.operator,
-            technology: r.technology ? String(r.technology) : '5G',
-            frequency: r.frequency ? String(r.frequency) : null,
-            status: r.status ? String(r.status) : 'active',
-          }));
-
-          const { error } = await supabase.from('towers').insert(payload);
-          if (error) {
-            errors += payload.length;
-          } else {
-            success += payload.length;
-          }
-        } else {
-          const payload = batch.map((r) => ({
-            country_code: r.country_code as string,
-            city: r.city,
-            state: r.state,
-            latitude: r.latitude as number,
-            longitude: r.longitude as number,
-            operator: r.operator,
-            power_kw: r.power_kw,
-            num_chargers: r.num_chargers !== null ? Math.max(1, Math.trunc(r.num_chargers)) : 1,
-            status: r.status ? String(r.status) : 'active',
-          }));
-
-          const { error } = await supabase.from('ev_stations').insert(payload);
-          if (error) {
-            errors += payload.length;
-          } else {
-            success += payload.length;
-          }
-        }
-      }
-
-      setResult({ success, errors });
-      if (success > 0) toast.success(`Importação concluída: ${success} registros`);
-      if (success === 0 && errors > 0) toast.error('Nenhum registro foi importado (verifique as colunas e valores)');
-
-      // Reset input so selecting same file again triggers change
       if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (error) {
       toast.error('Erro ao processar arquivo');
       console.error(error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleImportBundledFile = async () => {
+    setIsUploading(true);
+    setResult(null);
+
+    try {
+      // This file was copied from chat upload into public/ so we can fetch it reliably.
+      const res = await fetch('/data/ERBs_Nov25_latest.xlsx', { cache: 'no-store' });
+      if (!res.ok) {
+        toast.error('Não consegui acessar o arquivo enviado');
+        return;
+      }
+      const buffer = await res.arrayBuffer();
+      const rows = parseXLSX(buffer);
+      if (!rows.length) {
+        toast.error('Arquivo vazio ou formato inválido');
+        return;
+      }
+
+      const importRes = await importRowsToDb(rows, dataType);
+      setResult(importRes);
+      if (importRes.success > 0) toast.success(`Importação concluída: ${importRes.success} registros`);
+      if (importRes.success === 0 && importRes.errors > 0) toast.error('Nenhum registro foi importado (verifique as colunas e valores)');
+    } catch (e) {
+      toast.error('Erro ao processar arquivo enviado');
+      console.error(e);
     } finally {
       setIsUploading(false);
     }
@@ -255,7 +287,7 @@ const DataImportButton = ({ dataType }: DataImportButtonProps) => {
             <input
               ref={fileInputRef}
               type="file"
-              accept={dataType === 'towers' ? '.csv,.xlsx,.xls' : '.csv,.xlsx,.xls'}
+              accept={'.csv,.xlsx,.xls'}
               onChange={handleFileSelect}
               className="hidden"
             />
@@ -279,17 +311,32 @@ const DataImportButton = ({ dataType }: DataImportButtonProps) => {
                 </Button>
               </div>
             ) : (
-              <div
-                className="flex flex-col items-center gap-2 cursor-pointer"
-                onClick={() => fileInputRef.current?.click()}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click();
-                }}
-              >
-                <FileSpreadsheet className="h-8 w-8 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">Clique para selecionar um arquivo (CSV ou XLSX)</p>
+              <div className="space-y-3">
+                <div
+                  className="flex flex-col items-center gap-2 cursor-pointer"
+                  onClick={() => fileInputRef.current?.click()}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click();
+                  }}
+                >
+                  <FileSpreadsheet className="h-8 w-8 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">Clique para selecionar um arquivo (CSV ou XLSX)</p>
+                </div>
+
+                <div className="flex justify-center">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="gap-2"
+                    onClick={handleImportBundledFile}
+                  >
+                    <Download className="h-4 w-4" />
+                    Importar arquivo enviado (Nov/25)
+                  </Button>
+                </div>
               </div>
             )}
           </div>
