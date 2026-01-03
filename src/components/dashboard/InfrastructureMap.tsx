@@ -7,7 +7,6 @@ import {
   operatorColors, 
   erbsByState 
 } from "@/data/erbData";
-import StateCitySelector from "./StatesCitySelector";
 import { useInfrastructureStats } from "@/hooks/useInfrastructureData";
 import { useMunicipios, useVaziosTerritoriais } from "@/hooks/useVaziosTerritoriais";
 
@@ -30,6 +29,7 @@ interface InfrastructureMapProps {
   countryFilter?: string;
   onMunicipioClick?: (lat: number, lng: number, nome: string) => void;
   onVazioClick?: (vazio: VazioTerritorial) => void;
+  navigateTo?: { lat: number; lng: number; zoom: number } | null;
 }
 
 interface LocationFilter {
@@ -51,6 +51,7 @@ const InfrastructureMap = ({
   countryFilter = "all",
   onMunicipioClick,
   onVazioClick,
+  navigateTo,
 }: InfrastructureMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
@@ -132,6 +133,16 @@ const InfrastructureMap = ({
       });
     }
   }, []);
+
+  // Navigate to location from external source (sidebar selector)
+  useEffect(() => {
+    if (!mapInstanceRef.current || !navigateTo) return;
+    
+    mapInstanceRef.current.flyTo([navigateTo.lat, navigateTo.lng], navigateTo.zoom, {
+      duration: 1.5,
+      easeLinearity: 0.25,
+    });
+  }, [navigateTo]);
 
   // Update map center based on country filter
   useEffect(() => {
@@ -561,17 +572,6 @@ const InfrastructureMap = ({
 
   return (
     <div className="relative h-full w-full rounded-xl overflow-hidden border border-border/50 z-0">
-      {/* State/City Selector - Conexis style - visible on all tabs */}
-      <StateCitySelector
-        onLocationSelect={handleStateCitySelect}
-        onClear={handleClearLocationFilter}
-        selectedState={locationFilter.state}
-        selectedCity={locationFilter.city}
-        filteredCount={locationFilter.erbCount}
-        showEV={showEVStations}
-        showVazios={showVazios}
-      />
-
       {/* Data source indicator */}
       {hasDBData && (
         <div className="absolute top-3 right-3 z-[1001] bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded-full border border-green-500/30">

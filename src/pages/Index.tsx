@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import Header from "@/components/dashboard/Header";
 import StatsPanel from "@/components/dashboard/StatsPanel";
 import FilterPanel from "@/components/dashboard/FilterPanel";
+import LocationSelector from "@/components/dashboard/LocationSelector";
 import InfrastructureMap from "@/components/dashboard/InfrastructureMap";
 import AIAnalysisPanel from "@/components/dashboard/AIAnalysisPanel";
 import DistributionChart from "@/components/dashboard/DistributionChart";
@@ -25,6 +26,7 @@ const Index = () => {
   const [aiRecommendations, setAIRecommendations] = useState<any[]>([]);
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; name: string } | null>(null);
   const [selectedVazio, setSelectedVazio] = useState<VazioTerritorial | null>(null);
+  const [mapNavigateTo, setMapNavigateTo] = useState<{ lat: number; lng: number; zoom: number } | null>(null);
 
   const toggleOperator = (operator: string) => {
     setSelectedOperators((prev) =>
@@ -49,6 +51,10 @@ const Index = () => {
     setSelectedVazio(null);
   }, []);
 
+  const handleMapNavigate = useCallback((lat: number, lng: number, zoom: number) => {
+    setMapNavigateTo({ lat, lng, zoom });
+  }, []);
+
   return (
     <div className="min-h-screen bg-background p-3 md:p-6 grid-pattern">
       <div className="max-w-[1800px] mx-auto space-y-4 md:space-y-5">
@@ -64,6 +70,12 @@ const Index = () => {
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_340px] xl:grid-cols-[300px_1fr_380px] gap-4 lg:gap-5">
           {/* Left Sidebar */}
           <div className="space-y-4 order-2 lg:order-1">
+            {/* Location Selector - visible on all tabs */}
+            <LocationSelector 
+              onNavigate={handleMapNavigate} 
+              variant={activeTab}
+            />
+
             {activeTab === "5g" && (
               <>
                 <StatsPanel />
@@ -126,6 +138,7 @@ const Index = () => {
                 countryFilter="BR"
                 onMunicipioClick={handleMunicipioSelect}
                 onVazioClick={handleVazioSelect}
+                navigateTo={mapNavigateTo}
               />
             </div>
 
