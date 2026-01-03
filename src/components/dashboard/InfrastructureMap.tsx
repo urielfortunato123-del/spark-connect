@@ -560,7 +560,7 @@ const InfrastructureMap = ({
   }, [aiRecommendations]);
 
   return (
-    <div className="relative h-full w-full rounded-xl overflow-hidden border border-border/50">
+    <div className="relative h-full w-full rounded-xl overflow-hidden border border-border/50 z-0">
       {/* State/City Selector - Conexis style - visible on all tabs */}
       <StateCitySelector
         onLocationSelect={handleStateCitySelect}
