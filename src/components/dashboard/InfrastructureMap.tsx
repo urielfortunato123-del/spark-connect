@@ -334,7 +334,7 @@ const InfrastructureMap = ({
     }
   }, [selectedOperators, showEVStations, showTowers, viewMode, localTowers, dbTowers, dbEVStations]);
 
-  // Handle vazios visualization
+  // Handle vazios visualization with new classification levels
   useEffect(() => {
     if (!mapInstanceRef.current) return;
 
@@ -343,41 +343,75 @@ const InfrastructureMap = ({
     vaziosMarkersRef.current = [];
 
     if (showVazios) {
-      // Add vazio markers (critical municipalities)
+      // Color mapping for vazio levels
+      const nivelColors = {
+        critico: '#ef4444',   // Red
+        moderado: '#f59e0b',  // Amber
+        adequado: '#22c55e',  // Green
+      };
+
+      const nivelLabels = {
+        critico: '🔴 Crítico',
+        moderado: '🟡 Moderado',
+        adequado: '🟢 Adequado',
+      };
+
+      // Add vazio markers (critical and moderate municipalities)
       vazios.forEach((vazio) => {
         if (!vazio.municipio.latitude || !vazio.municipio.longitude) return;
 
-        const isHighPriority = vazio.score_criticidade > 70;
-        const radius = 15 + (vazio.score_criticidade / 100) * 20;
+        const isCritico = vazio.nivel === 'critico';
+        const radius = isCritico ? 18 + (vazio.score_criticidade / 100) * 15 : 12 + (vazio.score_criticidade / 100) * 10;
+        const fillColor = nivelColors[vazio.nivel];
 
         const marker = L.circleMarker([vazio.municipio.latitude, vazio.municipio.longitude], {
           radius: radius,
-          fillColor: isHighPriority ? '#ef4444' : '#f59e0b',
+          fillColor: fillColor,
           color: '#ffffff',
           weight: 2,
           opacity: 0.9,
-          fillOpacity: 0.6,
+          fillOpacity: isCritico ? 0.7 : 0.5,
         });
 
+        // Build criteria display
+        const criteriosHtml = `
+          <div style="font-size: 10px; color: #64748b; margin-top: 6px;">
+            <strong>Critérios:</strong><br/>
+            ${vazio.criterios.densidadeZero ? '• Densidade = 0<br/>' : ''}
+            ${vazio.criterios.densidadeBaixa ? '• Densidade baixa<br/>' : ''}
+            ${vazio.criterios.distanciaCritica ? '• Distância > 60km<br/>' : ''}
+            ${vazio.criterios.distanciaModerada ? '• Distância 30-60km<br/>' : ''}
+            ${vazio.criterios.populacaoRelevante ? '• Pop. ≥ 20.000<br/>' : ''}
+          </div>
+        `;
+
         marker.bindPopup(`
-          <div style="font-family: 'Inter', sans-serif; padding: 8px; min-width: 220px;">
+          <div style="font-family: 'Inter', sans-serif; padding: 10px; min-width: 250px;">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-              <span style="font-size: 18px;">⚠️</span>
+              <span style="font-size: 16px;">${isCritico ? '⚠️' : '⚡'}</span>
               <strong style="font-size: 14px;">${vazio.municipio.nome}</strong>
             </div>
             <p style="color: #94a3b8; margin: 0; font-size: 11px;">📍 ${vazio.municipio.estado} • ${vazio.municipio.regiao}</p>
             <p style="color: #94a3b8; margin: 4px 0; font-size: 11px;">👥 ${vazio.municipio.populacao.toLocaleString('pt-BR')} habitantes</p>
-            <div style="background: ${isHighPriority ? '#fef2f2' : '#fffbeb'}; padding: 8px; border-radius: 6px; margin-top: 8px;">
-              <p style="color: ${isHighPriority ? '#dc2626' : '#d97706'}; margin: 0; font-size: 12px; font-weight: 600;">
-                Score de Criticidade: ${vazio.score_criticidade}%
+            
+            <div style="background: ${isCritico ? '#fef2f2' : '#fffbeb'}; padding: 8px; border-radius: 6px; margin-top: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 11px; font-weight: 600; color: ${fillColor}">
+                  ${nivelLabels[vazio.nivel]}
+                </span>
+                <span style="font-size: 12px; font-weight: 700; color: ${fillColor}">
+                  ${vazio.score_criticidade}%
+                </span>
+              </div>
+              <p style="color: #64748b; margin: 6px 0 0; font-size: 10px;">
+                ⚡ ${vazio.indicadores.qtd_eletropostos} eletropostos • ${(vazio.indicadores.eletropostos_por_100k_hab ?? 0).toFixed(2)}/100k hab
               </p>
-              <p style="color: #64748b; margin: 4px 0 0; font-size: 10px;">
-                ⚡ ${vazio.indicadores.qtd_eletropostos} eletropostos
-              </p>
-              <p style="color: #64748b; margin: 2px 0 0; font-size: 10px;">
-                Status: ${vazio.indicadores.status_cobertura}
-              </p>
+              ${criteriosHtml}
             </div>
+            
+            <p style="color: #64748b; margin: 8px 0 0; font-size: 10px; font-style: italic;">
+              ${vazio.justificativa}
+            </p>
           </div>
         `);
 
@@ -396,22 +430,22 @@ const InfrastructureMap = ({
         if (!mun.latitude || !mun.longitude) return;
 
         const marker = L.circleMarker([mun.latitude, mun.longitude], {
-          radius: 8,
+          radius: 6,
           fillColor: '#22c55e',
           color: '#ffffff',
           weight: 1,
-          opacity: 0.7,
-          fillOpacity: 0.5,
+          opacity: 0.6,
+          fillOpacity: 0.4,
         });
 
         marker.bindPopup(`
           <div style="font-family: 'Inter', sans-serif; padding: 8px; min-width: 180px;">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-              <span style="font-size: 18px;">✅</span>
+              <span style="font-size: 16px;">✅</span>
               <strong style="font-size: 14px;">${mun.nome}</strong>
             </div>
             <p style="color: #94a3b8; margin: 0; font-size: 11px;">📍 ${mun.estado}</p>
-            <p style="color: #22c55e; margin: 4px 0; font-size: 12px;">Cobertura adequada</p>
+            <p style="color: #22c55e; margin: 4px 0; font-size: 12px;">🟢 Cobertura Adequada</p>
           </div>
         `);
 
