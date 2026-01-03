@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Header from "@/components/dashboard/Header";
 import StatsPanel from "@/components/dashboard/StatsPanel";
 import FilterPanel from "@/components/dashboard/FilterPanel";
@@ -11,14 +11,16 @@ import EVStatsPanel from "@/components/dashboard/EVStatsPanel";
 import InfraChat from "@/components/dashboard/InfraChat";
 import ExportButton from "@/components/dashboard/ExportButton";
 import DataImportButton from "@/components/dashboard/DataImportButton";
+import VaziosPanel from "@/components/dashboard/VaziosPanel";
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState<"5g" | "ev" | "ai">("5g");
+  const [activeTab, setActiveTab] = useState<"5g" | "ev" | "vazios" | "ai">("5g");
   const [activeView, setActiveView] = useState<"markers" | "heat" | "clusters">("markers");
   const [selectedOperators, setSelectedOperators] = useState([
     "VIVO", "TIM", "CLARO", "BRISANET", "ALGAR", "UNIFIQUE"
   ]);
   const [aiRecommendations, setAIRecommendations] = useState<any[]>([]);
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; name: string } | null>(null);
 
   const toggleOperator = (operator: string) => {
     setSelectedOperators((prev) =>
@@ -27,6 +29,10 @@ const Index = () => {
         : [...prev, operator]
     );
   };
+
+  const handleMunicipioSelect = useCallback((lat: number, lng: number, nome: string) => {
+    setMapCenter({ lat, lng, name: nome });
+  }, []);
 
   return (
     <div className="min-h-screen bg-background p-3 md:p-6 grid-pattern">
@@ -69,6 +75,9 @@ const Index = () => {
                 </div>
               </>
             )}
+            {activeTab === "vazios" && (
+              <VaziosPanel onMunicipioSelect={handleMunicipioSelect} />
+            )}
             {activeTab === "ai" && (
               <AIAnalysisPanel onRecommendationsUpdate={setAIRecommendations} />
             )}
@@ -93,9 +102,11 @@ const Index = () => {
                 selectedOperators={selectedOperators}
                 showEVStations={activeTab === "ev"}
                 showTowers={activeTab === "5g" || activeTab === "ai"}
+                showVazios={activeTab === "vazios"}
                 aiRecommendations={aiRecommendations}
                 viewMode={activeView}
                 countryFilter="BR"
+                onMunicipioClick={handleMunicipioSelect}
               />
             </div>
 

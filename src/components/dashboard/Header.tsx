@@ -1,10 +1,10 @@
-import { Signal, Zap, Users, Brain, MapPin } from "lucide-react";
+import { Signal, Zap, Users, Brain, MapPin, AlertTriangle } from "lucide-react";
 import { useCountUp } from "@/hooks/useCountUp";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface HeaderProps {
-  activeTab: "5g" | "ev" | "ai";
-  setActiveTab: (tab: "5g" | "ev" | "ai") => void;
+  activeTab: "5g" | "ev" | "vazios" | "ai";
+  setActiveTab: (tab: "5g" | "ev" | "vazios" | "ai") => void;
 }
 
 const Header = ({ activeTab, setActiveTab }: HeaderProps) => {
@@ -58,7 +58,13 @@ const Header = ({ activeTab, setActiveTab }: HeaderProps) => {
             active={activeTab === "ev"}
             onClick={() => setActiveTab("ev")}
             icon={<Zap className="w-4 h-4" />}
-            label="Abastecimento"
+            label="Eletropostos"
+          />
+          <TabButton 
+            active={activeTab === "vazios"}
+            onClick={() => setActiveTab("vazios")}
+            icon={<AlertTriangle className="w-4 h-4" />}
+            label="Vazios"
           />
           <TabButton 
             active={activeTab === "ai"}

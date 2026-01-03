@@ -9,6 +9,7 @@ import {
 } from "@/data/erbData";
 import MapSearch from "./MapSearch";
 import { useInfrastructureStats } from "@/hooks/useInfrastructureData";
+import { useMunicipios, useVaziosTerritoriais } from "@/hooks/useVaziosTerritoriais";
 
 interface AIRecommendation {
   lat: number;
@@ -21,22 +22,27 @@ interface InfrastructureMapProps {
   selectedOperators: string[];
   showEVStations: boolean;
   showTowers: boolean;
+  showVazios?: boolean;
   aiRecommendations?: AIRecommendation[];
   viewMode?: "markers" | "heat" | "clusters";
   countryFilter?: string;
+  onMunicipioClick?: (lat: number, lng: number, nome: string) => void;
 }
 
 const InfrastructureMap = ({ 
   selectedOperators, 
   showEVStations, 
   showTowers,
+  showVazios = false,
   aiRecommendations = [],
   viewMode = "markers",
-  countryFilter = "all"
+  countryFilter = "all",
+  onMunicipioClick,
 }: InfrastructureMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.CircleMarker[]>([]);
+  const vaziosMarkersRef = useRef<L.CircleMarker[]>([]);
   const recommendationsRef = useRef<L.Marker[]>([]);
   const heatLayerRef = useRef<any>(null);
   
@@ -44,6 +50,9 @@ const InfrastructureMap = ({
   const { towers: dbTowers, evStations: dbEVStations, countries } = useInfrastructureStats(
     countryFilter !== "all" ? countryFilter : undefined
   );
+  
+  // Get vazios data
+  const { vazios, adequados } = useVaziosTerritoriais();
 
   // Fallback to local data if database is empty
   const localTowers = useMemo(() => generateTowersFromStateData(), []);
@@ -91,10 +100,10 @@ const InfrastructureMap = ({
         return;
       }
 
-      // World view by default
+      // Brazil focused view by default
       const map = L.map(container, {
-        center: [20, 0],
-        zoom: 2,
+        center: [-14.235, -51.9253], // Brazil center
+        zoom: 4,
         zoomControl: true,
         attributionControl: true,
         minZoom: 2,
@@ -325,6 +334,93 @@ const InfrastructureMap = ({
     }
   }, [selectedOperators, showEVStations, showTowers, viewMode, localTowers, dbTowers, dbEVStations]);
 
+  // Handle vazios visualization
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+
+    // Clear existing vazios markers
+    vaziosMarkersRef.current.forEach((marker) => marker.remove());
+    vaziosMarkersRef.current = [];
+
+    if (showVazios) {
+      // Add vazio markers (critical municipalities)
+      vazios.forEach((vazio) => {
+        if (!vazio.municipio.latitude || !vazio.municipio.longitude) return;
+
+        const isHighPriority = vazio.score_criticidade > 70;
+        const radius = 15 + (vazio.score_criticidade / 100) * 20;
+
+        const marker = L.circleMarker([vazio.municipio.latitude, vazio.municipio.longitude], {
+          radius: radius,
+          fillColor: isHighPriority ? '#ef4444' : '#f59e0b',
+          color: '#ffffff',
+          weight: 2,
+          opacity: 0.9,
+          fillOpacity: 0.6,
+        });
+
+        marker.bindPopup(`
+          <div style="font-family: 'Inter', sans-serif; padding: 8px; min-width: 220px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span style="font-size: 18px;">⚠️</span>
+              <strong style="font-size: 14px;">${vazio.municipio.nome}</strong>
+            </div>
+            <p style="color: #94a3b8; margin: 0; font-size: 11px;">📍 ${vazio.municipio.estado} • ${vazio.municipio.regiao}</p>
+            <p style="color: #94a3b8; margin: 4px 0; font-size: 11px;">👥 ${vazio.municipio.populacao.toLocaleString('pt-BR')} habitantes</p>
+            <div style="background: ${isHighPriority ? '#fef2f2' : '#fffbeb'}; padding: 8px; border-radius: 6px; margin-top: 8px;">
+              <p style="color: ${isHighPriority ? '#dc2626' : '#d97706'}; margin: 0; font-size: 12px; font-weight: 600;">
+                Score de Criticidade: ${vazio.score_criticidade}%
+              </p>
+              <p style="color: #64748b; margin: 4px 0 0; font-size: 10px;">
+                ⚡ ${vazio.indicadores.qtd_eletropostos} eletropostos
+              </p>
+              <p style="color: #64748b; margin: 2px 0 0; font-size: 10px;">
+                Status: ${vazio.indicadores.status_cobertura}
+              </p>
+            </div>
+          </div>
+        `);
+
+        marker.on('click', () => {
+          if (onMunicipioClick && vazio.municipio.latitude && vazio.municipio.longitude) {
+            onMunicipioClick(vazio.municipio.latitude, vazio.municipio.longitude, vazio.municipio.nome);
+          }
+        });
+
+        marker.addTo(mapInstanceRef.current!);
+        vaziosMarkersRef.current.push(marker);
+      });
+
+      // Add adequate municipalities with smaller green markers
+      adequados.forEach((mun) => {
+        if (!mun.latitude || !mun.longitude) return;
+
+        const marker = L.circleMarker([mun.latitude, mun.longitude], {
+          radius: 8,
+          fillColor: '#22c55e',
+          color: '#ffffff',
+          weight: 1,
+          opacity: 0.7,
+          fillOpacity: 0.5,
+        });
+
+        marker.bindPopup(`
+          <div style="font-family: 'Inter', sans-serif; padding: 8px; min-width: 180px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span style="font-size: 18px;">✅</span>
+              <strong style="font-size: 14px;">${mun.nome}</strong>
+            </div>
+            <p style="color: #94a3b8; margin: 0; font-size: 11px;">📍 ${mun.estado}</p>
+            <p style="color: #22c55e; margin: 4px 0; font-size: 12px;">Cobertura adequada</p>
+          </div>
+        `);
+
+        marker.addTo(mapInstanceRef.current!);
+        vaziosMarkersRef.current.push(marker);
+      });
+    }
+  }, [showVazios, vazios, adequados, onMunicipioClick]);
+
   // Handle AI recommendations
   useEffect(() => {
     if (!mapInstanceRef.current) return;
@@ -425,6 +521,26 @@ const InfrastructureMap = ({
                   <span className="text-muted-foreground">{provider}</span>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {showVazios && (
+          <div>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2">Vazios Territoriais</p>
+            <div className="space-y-1">
+              <div className="flex items-center gap-1.5 text-xs">
+                <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
+                <span className="text-muted-foreground">Crítico (&gt;70%)</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+                <span className="text-muted-foreground">Atenção (50-70%)</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs">
+                <span className="w-2.5 h-2.5 rounded-full bg-green-500" />
+                <span className="text-muted-foreground">Adequado</span>
+              </div>
             </div>
           </div>
         )}
