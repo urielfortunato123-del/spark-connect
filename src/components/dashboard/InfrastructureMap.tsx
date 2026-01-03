@@ -8,6 +8,7 @@ import {
   erbsByState 
 } from "@/data/erbData";
 import MapSearch from "./MapSearch";
+import { useInfrastructureStats } from "@/hooks/useInfrastructureData";
 
 interface AIRecommendation {
   lat: number;
@@ -22,6 +23,7 @@ interface InfrastructureMapProps {
   showTowers: boolean;
   aiRecommendations?: AIRecommendation[];
   viewMode?: "markers" | "heat" | "clusters";
+  countryFilter?: string;
 }
 
 const InfrastructureMap = ({ 
@@ -29,7 +31,8 @@ const InfrastructureMap = ({
   showEVStations, 
   showTowers,
   aiRecommendations = [],
-  viewMode = "markers"
+  viewMode = "markers",
+  countryFilter = "all"
 }: InfrastructureMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
@@ -37,8 +40,14 @@ const InfrastructureMap = ({
   const recommendationsRef = useRef<L.Marker[]>([]);
   const heatLayerRef = useRef<any>(null);
   
-  // Generate towers from real Anatel data
-  const towers = useMemo(() => generateTowersFromStateData(), []);
+  // Get data from database
+  const { towers: dbTowers, evStations: dbEVStations, countries } = useInfrastructureStats(
+    countryFilter !== "all" ? countryFilter : undefined
+  );
+
+  // Fallback to local data if database is empty
+  const localTowers = useMemo(() => generateTowersFromStateData(), []);
+  const hasDBData = dbTowers.length > 0 || dbEVStations.length > 0;
 
   // Navigate to location from search
   const handleLocationSelect = useCallback((lat: number, lng: number, zoom: number = 10) => {
@@ -49,6 +58,18 @@ const InfrastructureMap = ({
       });
     }
   }, []);
+
+  // Update map center based on country filter
+  useEffect(() => {
+    if (!mapInstanceRef.current || countryFilter === "all") return;
+    
+    const country = countries.find(c => c.code === countryFilter);
+    if (country && country.latitude && country.longitude) {
+      mapInstanceRef.current.flyTo([country.latitude, country.longitude], 5, {
+        duration: 1.5,
+      });
+    }
+  }, [countryFilter, countries]);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -70,11 +91,14 @@ const InfrastructureMap = ({
         return;
       }
 
+      // World view by default
       const map = L.map(container, {
-        center: [-14.235, -51.9253],
-        zoom: 4,
+        center: [20, 0],
+        zoom: 2,
         zoomControl: true,
         attributionControl: true,
+        minZoom: 2,
+        maxBounds: [[-90, -180], [90, 180]],
       });
 
       // Dynamic tile layer based on theme
@@ -168,74 +192,138 @@ const InfrastructureMap = ({
     markersRef.current.forEach((marker) => marker.remove());
     markersRef.current = [];
 
-    // Add tower markers
+    // Add tower markers from database or local data
     if (showTowers && viewMode === "markers") {
-      const filteredTowers = towers.filter((tower) => 
-        selectedOperators.includes(tower.operator)
-      );
+      // Use database data if available
+      if (dbTowers.length > 0) {
+        dbTowers.forEach((tower) => {
+          const color = operatorColors[tower.operator || ""] || "#3b82f6";
+          const marker = L.circleMarker([tower.latitude, tower.longitude], {
+            radius: 10,
+            fillColor: color,
+            color: "#ffffff",
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.9,
+          });
 
-      filteredTowers.forEach((tower) => {
-        const marker = L.circleMarker([tower.lat, tower.lng], {
-          radius: 10,
-          fillColor: operatorColors[tower.operator],
-          color: "#ffffff",
-          weight: 2,
-          opacity: 1,
-          fillOpacity: 0.9,
-        });
-
-        marker.bindPopup(`
-          <div style="font-family: 'Inter', sans-serif; padding: 8px; min-width: 180px;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-              <span style="width: 12px; height: 12px; border-radius: 4px; background: ${operatorColors[tower.operator]}"></span>
-              <strong style="font-size: 14px;">${tower.operator}</strong>
+          marker.bindPopup(`
+            <div style="font-family: 'Inter', sans-serif; padding: 8px; min-width: 180px;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <span style="width: 12px; height: 12px; border-radius: 4px; background: ${color}"></span>
+                <strong style="font-size: 14px;">${tower.operator || 'N/A'}</strong>
+              </div>
+              <p style="color: #94a3b8; margin: 0; font-size: 12px;">📍 ${tower.city || ''} ${tower.state ? `- ${tower.state}` : ''}</p>
+              <p style="color: #22c55e; margin: 4px 0 0; font-size: 11px;">📡 Torre ${tower.technology || '5G'} ${tower.status || 'Ativa'}</p>
             </div>
-            <p style="color: #94a3b8; margin: 0; font-size: 12px;">📍 ${tower.city} - ${tower.state}</p>
-            <p style="color: #22c55e; margin: 4px 0 0; font-size: 11px;">📡 Torre ${tower.technology} Ativa</p>
-            <p style="color: #64748b; margin: 4px 0 0; font-size: 10px;">Fonte: Anatel Nov/2025</p>
-          </div>
-        `);
+          `);
 
-        marker.addTo(mapInstanceRef.current!);
-        markersRef.current.push(marker);
-      });
+          marker.addTo(mapInstanceRef.current!);
+          markersRef.current.push(marker);
+        });
+      } else {
+        // Fallback to local data
+        const filteredTowers = localTowers.filter((tower) => 
+          selectedOperators.includes(tower.operator)
+        );
+
+        filteredTowers.forEach((tower) => {
+          const marker = L.circleMarker([tower.lat, tower.lng], {
+            radius: 10,
+            fillColor: operatorColors[tower.operator],
+            color: "#ffffff",
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.9,
+          });
+
+          marker.bindPopup(`
+            <div style="font-family: 'Inter', sans-serif; padding: 8px; min-width: 180px;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <span style="width: 12px; height: 12px; border-radius: 4px; background: ${operatorColors[tower.operator]}"></span>
+                <strong style="font-size: 14px;">${tower.operator}</strong>
+              </div>
+              <p style="color: #94a3b8; margin: 0; font-size: 12px;">📍 ${tower.city} - ${tower.state}</p>
+              <p style="color: #22c55e; margin: 4px 0 0; font-size: 11px;">📡 Torre ${tower.technology} Ativa</p>
+              <p style="color: #64748b; margin: 4px 0 0; font-size: 10px;">Fonte: Anatel Nov/2025</p>
+            </div>
+          `);
+
+          marker.addTo(mapInstanceRef.current!);
+          markersRef.current.push(marker);
+        });
+      }
     }
 
-    // Add EV station markers from real data
+    // Add EV station markers
     if (showEVStations) {
-      evStationsData.forEach((station) => {
-        const color = evOperatorColors[station.operator] || "#22c55e";
-        const marker = L.circleMarker([station.lat, station.lng], {
-          radius: 10,
-          fillColor: color,
-          color: "#ffffff",
-          weight: 2,
-          opacity: 1,
-          fillOpacity: 0.85,
-        });
+      // Use database data if available
+      if (dbEVStations.length > 0) {
+        dbEVStations.forEach((station) => {
+          const color = "#22c55e";
+          const marker = L.circleMarker([station.latitude, station.longitude], {
+            radius: 10,
+            fillColor: color,
+            color: "#ffffff",
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.85,
+          });
 
-        marker.bindPopup(`
-          <div style="font-family: 'Inter', sans-serif; padding: 8px; min-width: 200px;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-              <span style="font-size: 18px;">⚡</span>
-              <strong style="font-size: 13px;">${station.name}</strong>
+          marker.bindPopup(`
+            <div style="font-family: 'Inter', sans-serif; padding: 8px; min-width: 200px;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <span style="font-size: 18px;">⚡</span>
+                <strong style="font-size: 13px;">${station.operator || 'Estação EV'}</strong>
+              </div>
+              <p style="color: #94a3b8; margin: 0; font-size: 11px;">📍 ${station.city || ''} ${station.state ? `- ${station.state}` : ''}</p>
+              <p style="color: #22c55e; margin: 4px 0; font-size: 12px;">🔌 ${station.num_chargers || 1} carregadores • ${station.power_kw || 'N/A'} kW</p>
+              <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${station.latitude},${station.longitude}', '_blank')" 
+                style="margin-top: 8px; padding: 6px 12px; background: #22c55e; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 11px; width: 100%;">
+                🧭 Navegar até aqui
+              </button>
             </div>
-            <p style="color: #94a3b8; margin: 0; font-size: 11px;">📍 ${station.address}</p>
-            <p style="color: #94a3b8; margin: 4px 0; font-size: 11px;">${station.city} - ${station.state}</p>
-            <p style="color: #22c55e; margin: 4px 0; font-size: 12px;">🔌 ${station.chargers} carregadores • ${station.power}</p>
-            <p style="color: #60a5fa; margin: 4px 0 0; font-size: 11px;">${station.connectors.join(", ")}</p>
-            <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${station.lat},${station.lng}', '_blank')" 
-              style="margin-top: 8px; padding: 6px 12px; background: #22c55e; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 11px; width: 100%;">
-              🧭 Navegar até aqui
-            </button>
-          </div>
-        `);
+          `);
 
-        marker.addTo(mapInstanceRef.current!);
-        markersRef.current.push(marker);
-      });
+          marker.addTo(mapInstanceRef.current!);
+          markersRef.current.push(marker);
+        });
+      } else {
+        // Fallback to local data
+        evStationsData.forEach((station) => {
+          const color = evOperatorColors[station.operator] || "#22c55e";
+          const marker = L.circleMarker([station.lat, station.lng], {
+            radius: 10,
+            fillColor: color,
+            color: "#ffffff",
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.85,
+          });
+
+          marker.bindPopup(`
+            <div style="font-family: 'Inter', sans-serif; padding: 8px; min-width: 200px;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <span style="font-size: 18px;">⚡</span>
+                <strong style="font-size: 13px;">${station.name}</strong>
+              </div>
+              <p style="color: #94a3b8; margin: 0; font-size: 11px;">📍 ${station.address}</p>
+              <p style="color: #94a3b8; margin: 4px 0; font-size: 11px;">${station.city} - ${station.state}</p>
+              <p style="color: #22c55e; margin: 4px 0; font-size: 12px;">🔌 ${station.chargers} carregadores • ${station.power}</p>
+              <p style="color: #60a5fa; margin: 4px 0 0; font-size: 11px;">${station.connectors.join(", ")}</p>
+              <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${station.lat},${station.lng}', '_blank')" 
+                style="margin-top: 8px; padding: 6px 12px; background: #22c55e; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 11px; width: 100%;">
+                🧭 Navegar até aqui
+              </button>
+            </div>
+          `);
+
+          marker.addTo(mapInstanceRef.current!);
+          markersRef.current.push(marker);
+        });
+      }
     }
-  }, [selectedOperators, showEVStations, showTowers, viewMode, towers]);
+  }, [selectedOperators, showEVStations, showTowers, viewMode, localTowers, dbTowers, dbEVStations]);
 
   // Handle AI recommendations
   useEffect(() => {
@@ -283,6 +371,13 @@ const InfrastructureMap = ({
           showEV={showEVStations}
         />
       </div>
+
+      {/* Data source indicator */}
+      {hasDBData && (
+        <div className="absolute top-3 right-3 z-[1001] bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded-full border border-green-500/30">
+          Dados em tempo real
+        </div>
+      )}
 
       <div ref={mapRef} className="h-full w-full" style={{ minHeight: '350px' }} />
       
