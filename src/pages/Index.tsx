@@ -10,7 +10,6 @@ import RegionalChart from "@/components/dashboard/RegionalChart";
 import EVStatsPanel from "@/components/dashboard/EVStatsPanel";
 import InfraChat from "@/components/dashboard/InfraChat";
 import ExportButton from "@/components/dashboard/ExportButton";
-import CountryFilter from "@/components/dashboard/CountryFilter";
 import DataImportButton from "@/components/dashboard/DataImportButton";
 
 const Index = () => {
@@ -20,7 +19,6 @@ const Index = () => {
     "VIVO", "TIM", "CLARO", "BRISANET", "ALGAR", "UNIFIQUE"
   ]);
   const [aiRecommendations, setAIRecommendations] = useState<any[]>([]);
-  const [countryFilter, setCountryFilter] = useState("all");
 
   const toggleOperator = (operator: string) => {
     setSelectedOperators((prev) =>
@@ -35,13 +33,10 @@ const Index = () => {
       <div className="max-w-[1800px] mx-auto space-y-4 md:space-y-5">
         <Header activeTab={activeTab} setActiveTab={setActiveTab} />
 
-        {/* Global Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <CountryFilter value={countryFilter} onChange={setCountryFilter} />
-          <div className="flex items-center gap-2">
-            {activeTab === "5g" && <DataImportButton dataType="towers" />}
-            {activeTab === "ev" && <DataImportButton dataType="ev_stations" />}
-          </div>
+        {/* Data Import Controls */}
+        <div className="flex flex-wrap items-center justify-end gap-3">
+          {activeTab === "5g" && <DataImportButton dataType="towers" />}
+          {activeTab === "ev" && <DataImportButton dataType="ev_stations" />}
         </div>
 
         {/* Mobile: Stack layout, Desktop: Grid layout */}
@@ -100,7 +95,7 @@ const Index = () => {
                 showTowers={activeTab === "5g" || activeTab === "ai"}
                 aiRecommendations={aiRecommendations}
                 viewMode={activeView}
-                countryFilter={countryFilter}
+                countryFilter="BR"
               />
             </div>
 
@@ -130,7 +125,7 @@ const Index = () => {
         <div className="divider-gold mt-6 md:mt-8" />
         <footer className="text-center py-3 md:py-4">
           <p className="text-xs text-muted-foreground">
-            © 2025 InfraBrasil — Plataforma Integrada de Infraestrutura Global
+            © 2025 InfraBrasil — Plataforma Integrada de Infraestrutura Nacional
           </p>
         </footer>
       </div>
