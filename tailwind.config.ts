@@ -20,7 +20,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
-        display: ["Playfair Display", "Georgia", "serif"],
+        display: ["Space Grotesk", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -66,13 +66,14 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        gold: {
-          DEFAULT: "hsl(var(--gold))",
-          light: "hsl(var(--gold-light))",
-          dark: "hsl(var(--gold-dark))",
+        chart: {
+          green: "hsl(var(--chart-green))",
+          pink: "hsl(var(--chart-pink))",
+          yellow: "hsl(var(--chart-yellow))",
+          purple: "hsl(var(--chart-purple))",
+          blue: "hsl(var(--chart-blue))",
+          orange: "hsl(var(--chart-orange))",
         },
-        copper: "hsl(var(--copper))",
-        bronze: "hsl(var(--bronze))",
         operator: {
           vivo: "hsl(var(--vivo))",
           tim: "hsl(var(--tim))",
@@ -90,6 +91,8 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        "2xl": "1rem",
+        "3xl": "1.5rem",
       },
       keyframes: {
         "accordion-down": {
@@ -120,6 +123,10 @@ export default {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
         },
+        "pulse-glow": {
+          "0%, 100%": { boxShadow: "0 0 0 0 hsl(var(--primary) / 0.4)" },
+          "50%": { boxShadow: "0 0 20px 5px hsl(var(--primary) / 0.2)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -129,10 +136,12 @@ export default {
         "slide-in-left": "slide-in-left 0.4s ease-out forwards",
         "slide-in-right": "slide-in-right 0.4s ease-out forwards",
         shimmer: "shimmer 2s linear infinite",
+        "pulse-glow": "pulse-glow 3s ease-in-out infinite",
       },
       boxShadow: {
         premium: "0 8px 32px -8px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset",
-        "gold-glow": "0 0 40px -10px hsl(38 75% 55% / 0.3)",
+        glow: "0 0 40px -10px hsl(var(--primary) / 0.3)",
+        "content-border": "0 0 60px -20px hsl(var(--content-border) / 0.2)",
       },
     },
   },

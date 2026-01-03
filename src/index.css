@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,34 +6,35 @@
 
 @layer base {
   :root {
-    /* Light theme */
-    --background: 40 25% 97%;
+    /* Light theme - Keeping for compatibility but focus is dark */
+    --background: 230 25% 95%;
     --foreground: 220 20% 10%;
     --card: 0 0% 100%;
     --card-foreground: 220 20% 10%;
     --popover: 0 0% 100%;
     --popover-foreground: 220 20% 10%;
-    --primary: 38 75% 50%;
+    --primary: 145 60% 45%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 40 20% 92%;
+    --secondary: 230 20% 90%;
     --secondary-foreground: 220 20% 15%;
-    --muted: 40 15% 90%;
-    --muted-foreground: 220 10% 40%;
-    --accent: 25 80% 50%;
+    --muted: 230 15% 88%;
+    --muted-foreground: 220 10% 45%;
+    --accent: 260 60% 55%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 50%;
     --destructive-foreground: 0 0% 100%;
-    --border: 40 15% 85%;
-    --input: 40 15% 85%;
-    --ring: 38 75% 50%;
-    --radius: 0.75rem;
+    --border: 230 15% 82%;
+    --input: 230 15% 85%;
+    --ring: 145 60% 45%;
+    --radius: 1rem;
 
     /* Brand Colors */
-    --gold: 38 75% 50%;
-    --gold-light: 40 80% 60%;
-    --gold-dark: 35 70% 35%;
-    --copper: 25 80% 45%;
-    --bronze: 30 60% 30%;
+    --chart-green: 145 60% 50%;
+    --chart-pink: 330 70% 60%;
+    --chart-yellow: 45 90% 55%;
+    --chart-purple: 260 60% 55%;
+    --chart-blue: 210 80% 55%;
+    --chart-orange: 25 90% 55%;
     
     /* Operator Colors */
     --vivo: 330 85% 50%;
@@ -49,43 +50,49 @@
     --ev-tesla: 0 75% 50%;
     --ev-shell: 48 95% 45%;
 
-    --sidebar-background: 40 25% 97%;
-    --sidebar-foreground: 220 20% 10%;
-    --sidebar-primary: 38 75% 50%;
+    --sidebar-background: 232 25% 12%;
+    --sidebar-foreground: 220 15% 75%;
+    --sidebar-primary: 145 60% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 40 20% 92%;
-    --sidebar-accent-foreground: 220 20% 15%;
-    --sidebar-border: 40 15% 85%;
-    --sidebar-ring: 38 75% 50%;
+    --sidebar-accent: 232 25% 18%;
+    --sidebar-accent-foreground: 220 15% 85%;
+    --sidebar-border: 232 20% 20%;
+    --sidebar-ring: 145 60% 50%;
+
+    /* Content area gradient */
+    --content-gradient-start: 232 35% 18%;
+    --content-gradient-end: 232 25% 12%;
+    --content-border: 232 50% 45%;
   }
 
   .dark {
-    --background: 220 20% 6%;
-    --foreground: 40 20% 95%;
-    --card: 220 20% 8%;
-    --card-foreground: 40 20% 95%;
-    --popover: 220 20% 8%;
-    --popover-foreground: 40 20% 95%;
-    --primary: 38 75% 55%;
-    --primary-foreground: 220 20% 6%;
-    --secondary: 220 15% 12%;
-    --secondary-foreground: 40 20% 90%;
-    --muted: 220 15% 15%;
+    --background: 232 25% 8%;
+    --foreground: 220 15% 92%;
+    --card: 232 25% 12%;
+    --card-foreground: 220 15% 92%;
+    --popover: 232 25% 14%;
+    --popover-foreground: 220 15% 92%;
+    --primary: 145 60% 50%;
+    --primary-foreground: 232 25% 8%;
+    --secondary: 232 20% 16%;
+    --secondary-foreground: 220 15% 85%;
+    --muted: 232 20% 18%;
     --muted-foreground: 220 10% 55%;
-    --accent: 25 80% 50%;
-    --accent-foreground: 40 20% 95%;
-    --destructive: 0 62.8% 50%;
-    --destructive-foreground: 40 20% 95%;
-    --border: 220 15% 18%;
-    --input: 220 15% 18%;
-    --ring: 38 75% 55%;
+    --accent: 260 60% 55%;
+    --accent-foreground: 220 15% 92%;
+    --destructive: 0 62.8% 55%;
+    --destructive-foreground: 220 15% 92%;
+    --border: 232 20% 22%;
+    --input: 232 20% 20%;
+    --ring: 145 60% 50%;
 
     /* Brand Colors */
-    --gold: 38 75% 55%;
-    --gold-light: 40 80% 65%;
-    --gold-dark: 35 70% 40%;
-    --copper: 25 80% 50%;
-    --bronze: 30 60% 35%;
+    --chart-green: 145 60% 55%;
+    --chart-pink: 330 70% 65%;
+    --chart-yellow: 45 90% 60%;
+    --chart-purple: 260 60% 60%;
+    --chart-blue: 210 80% 60%;
+    --chart-orange: 25 90% 60%;
     
     /* Operator Colors */
     --vivo: 330 85% 55%;
@@ -101,14 +108,19 @@
     --ev-tesla: 0 75% 55%;
     --ev-shell: 48 95% 50%;
 
-    --sidebar-background: 220 20% 6%;
-    --sidebar-foreground: 40 20% 95%;
-    --sidebar-primary: 38 75% 55%;
-    --sidebar-primary-foreground: 220 20% 6%;
-    --sidebar-accent: 220 15% 12%;
-    --sidebar-accent-foreground: 40 20% 95%;
-    --sidebar-border: 220 15% 18%;
-    --sidebar-ring: 38 75% 55%;
+    --sidebar-background: 232 25% 8%;
+    --sidebar-foreground: 220 15% 70%;
+    --sidebar-primary: 145 60% 50%;
+    --sidebar-primary-foreground: 232 25% 8%;
+    --sidebar-accent: 232 25% 14%;
+    --sidebar-accent-foreground: 220 15% 85%;
+    --sidebar-border: 232 20% 16%;
+    --sidebar-ring: 145 60% 50%;
+
+    /* Content area gradient */
+    --content-gradient-start: 232 35% 16%;
+    --content-gradient-end: 232 25% 10%;
+    --content-border: 232 50% 45%;
   }
 }
 
@@ -122,52 +134,100 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
   h1, h2, h3 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Space Grotesk', sans-serif;
   }
 }
 
 @layer components {
-  /* Premium Glass Card */
+  /* Main content area with rounded border */
+  .content-area {
+    @apply rounded-3xl border-2 relative overflow-hidden;
+    background: linear-gradient(145deg, hsl(var(--content-gradient-start)), hsl(var(--content-gradient-end)));
+    border-color: hsl(var(--content-border) / 0.3);
+    box-shadow: 
+      0 0 60px -20px hsl(var(--content-border) / 0.2),
+      inset 0 1px 0 0 hsl(var(--content-border) / 0.1);
+  }
+
+  /* Dashboard Card */
+  .dashboard-card {
+    @apply bg-card/60 backdrop-blur-sm border border-border/50 rounded-2xl p-5 transition-all duration-300;
+    box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.3);
+  }
+
+  .dashboard-card:hover {
+    @apply border-border;
+    box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Glass Card */
   .glass-card {
-    @apply bg-card/80 backdrop-blur-xl border border-border/50 rounded-xl;
+    @apply bg-card/40 backdrop-blur-xl border border-border/30 rounded-2xl;
     box-shadow: 
       0 4px 24px -4px rgba(0, 0, 0, 0.4),
-      0 0 0 1px rgba(255, 255, 255, 0.03) inset,
-      0 -1px 0 0 rgba(255, 255, 255, 0.02) inset;
+      0 0 0 1px rgba(255, 255, 255, 0.03) inset;
   }
 
-  .glass-card-hover {
-    @apply glass-card transition-all duration-500;
+  /* Stat Cards */
+  .stat-card {
+    @apply dashboard-card flex flex-col gap-2;
   }
 
-  .glass-card-hover:hover {
-    @apply border-primary/30;
-    box-shadow: 
-      0 8px 32px -4px rgba(0, 0, 0, 0.5),
-      0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-      0 0 40px -10px hsl(38 75% 55% / 0.15);
+  .stat-value {
+    @apply text-2xl font-bold font-display;
+    font-variant-numeric: tabular-nums;
   }
 
-  /* Elegant Gradients */
-  .gradient-text-gold {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-gold-light via-gold to-copper;
+  .stat-label {
+    @apply text-sm text-muted-foreground;
   }
 
-  .gradient-text-cyber {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-gold-light via-gold to-copper;
+  .stat-change {
+    @apply text-xs font-medium px-2 py-0.5 rounded-full;
+  }
+
+  .stat-change-positive {
+    @apply bg-primary/20 text-primary;
+  }
+
+  .stat-change-negative {
+    @apply bg-destructive/20 text-destructive;
+  }
+
+  /* Chart area */
+  .chart-area {
+    @apply dashboard-card;
+  }
+
+  /* Sidebar icon button */
+  .sidebar-icon-btn {
+    @apply w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200;
+    @apply text-sidebar-foreground hover:text-sidebar-accent-foreground;
+    @apply hover:bg-sidebar-accent;
+  }
+
+  .sidebar-icon-btn.active {
+    @apply bg-primary text-primary-foreground;
+    box-shadow: 0 0 20px -4px hsl(var(--primary) / 0.5);
   }
 
   /* Subtle Grid Pattern */
   .grid-pattern {
     background-image: 
-      linear-gradient(to right, hsl(var(--border) / 0.3) 1px, transparent 1px),
-      linear-gradient(to bottom, hsl(var(--border) / 0.3) 1px, transparent 1px);
-    background-size: 60px 60px;
+      linear-gradient(to right, hsl(var(--border) / 0.15) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border) / 0.15) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* Gradient text */
+  .gradient-text-green {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(var(--primary)), hsl(145 80% 65%));
   }
 
   /* Animation Classes */
   .animate-in {
-    animation: fadeSlideIn 0.6s ease-out forwards;
+    animation: fadeSlideIn 0.5s ease-out forwards;
     opacity: 0;
   }
 
@@ -180,7 +240,7 @@
   @keyframes fadeSlideIn {
     from {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(15px);
     }
     to {
       opacity: 1;
@@ -189,22 +249,17 @@
   }
 
   /* Pulse Glow */
-  .pulse-gold {
-    animation: pulseGold 3s ease-in-out infinite;
+  .pulse-primary {
+    animation: pulsePrimary 3s ease-in-out infinite;
   }
 
-  @keyframes pulseGold {
+  @keyframes pulsePrimary {
     0%, 100% {
-      box-shadow: 0 0 0 0 hsl(38 75% 55% / 0.4);
+      box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4);
     }
     50% {
-      box-shadow: 0 0 20px 5px hsl(38 75% 55% / 0.2);
+      box-shadow: 0 0 20px 5px hsl(var(--primary) / 0.2);
     }
-  }
-
-  /* Stat value animation */
-  .stat-value {
-    font-variant-numeric: tabular-nums;
   }
 
   /* Operator Colors */
@@ -215,93 +270,90 @@
   .operator-algar { background-color: hsl(var(--algar)); }
   .operator-unifique { background-color: hsl(var(--unifique)); }
 
-  /* Divider */
-  .divider-gold {
-    height: 1px;
-    background: linear-gradient(
-      90deg, 
-      transparent, 
-      hsl(38 75% 55% / 0.5), 
-      transparent
-    );
-  }
+  /* Chart colors */
+  .chart-green { color: hsl(var(--chart-green)); }
+  .chart-pink { color: hsl(var(--chart-pink)); }
+  .chart-yellow { color: hsl(var(--chart-yellow)); }
+  .chart-purple { color: hsl(var(--chart-purple)); }
+  .chart-blue { color: hsl(var(--chart-blue)); }
+  .chart-orange { color: hsl(var(--chart-orange)); }
 }
 
 /* Leaflet overrides - Dark theme */
 .dark .leaflet-container {
-  background: hsl(220 20% 6%) !important;
+  background: hsl(232 25% 8%) !important;
   font-family: 'Inter', sans-serif;
-  border-radius: var(--radius);
+  border-radius: 1rem;
 }
 
 .dark .leaflet-control-zoom a {
-  background: hsl(220 20% 10%) !important;
-  color: hsl(40 20% 95%) !important;
-  border-color: hsl(220 15% 18%) !important;
+  background: hsl(232 25% 14%) !important;
+  color: hsl(220 15% 85%) !important;
+  border-color: hsl(232 20% 22%) !important;
 }
 
 .dark .leaflet-control-zoom a:hover {
-  background: hsl(220 20% 15%) !important;
+  background: hsl(232 25% 20%) !important;
 }
 
 .dark .leaflet-control-attribution {
-  background: hsl(220 20% 8% / 0.9) !important;
+  background: hsl(232 25% 10% / 0.9) !important;
   color: hsl(220 10% 55%) !important;
 }
 
 .dark .leaflet-control-attribution a {
-  color: hsl(38 75% 55%) !important;
+  color: hsl(145 60% 50%) !important;
 }
 
 .dark .leaflet-popup-content-wrapper {
-  background: hsl(220 20% 10% / 0.95) !important;
+  background: hsl(232 25% 14% / 0.95) !important;
   backdrop-filter: blur(12px);
-  border: 1px solid hsl(220 15% 20%) !important;
-  border-radius: 12px !important;
+  border: 1px solid hsl(232 20% 26%) !important;
+  border-radius: 16px !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
 }
 
 .dark .leaflet-popup-content {
   margin: 0 !important;
-  color: hsl(40 20% 95%) !important;
+  color: hsl(220 15% 92%) !important;
 }
 
 .dark .leaflet-popup-tip {
-  background: hsl(220 20% 10% / 0.95) !important;
-  border: 1px solid hsl(220 15% 20%) !important;
+  background: hsl(232 25% 14% / 0.95) !important;
+  border: 1px solid hsl(232 20% 26%) !important;
 }
 
 /* Leaflet overrides - Light theme */
 .leaflet-container {
-  background: hsl(40 25% 97%) !important;
+  background: hsl(230 25% 95%) !important;
   font-family: 'Inter', sans-serif;
-  border-radius: var(--radius);
+  border-radius: 1rem;
 }
 
 .leaflet-control-zoom a {
   background: hsl(0 0% 100%) !important;
   color: hsl(220 20% 20%) !important;
-  border-color: hsl(40 15% 85%) !important;
+  border-color: hsl(230 15% 82%) !important;
 }
 
 .leaflet-control-zoom a:hover {
-  background: hsl(40 20% 95%) !important;
+  background: hsl(230 20% 92%) !important;
 }
 
 .leaflet-control-attribution {
   background: hsl(0 0% 100% / 0.9) !important;
-  color: hsl(220 10% 40%) !important;
+  color: hsl(220 10% 45%) !important;
 }
 
 .leaflet-control-attribution a {
-  color: hsl(38 75% 50%) !important;
+  color: hsl(145 60% 45%) !important;
 }
 
 .leaflet-popup-content-wrapper {
   background: hsl(0 0% 100% / 0.95) !important;
   backdrop-filter: blur(12px);
-  border: 1px solid hsl(40 15% 85%) !important;
-  border-radius: 12px !important;
+  border: 1px solid hsl(230 15% 82%) !important;
+  border-radius: 16px !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
 }
 
@@ -312,7 +364,7 @@
 
 .leaflet-popup-tip {
   background: hsl(0 0% 100% / 0.95) !important;
-  border: 1px solid hsl(40 15% 85%) !important;
+  border: 1px solid hsl(230 15% 82%) !important;
 }
 
 /* Ensure leaflet has proper sizing */
@@ -339,17 +391,17 @@
 }
 
 .dark ::-webkit-scrollbar-track {
-  background: hsl(220 15% 12%);
+  background: hsl(232 20% 12%);
   border-radius: 3px;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: hsl(220 10% 30%);
+  background: hsl(232 15% 28%);
   border-radius: 3px;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: hsl(38 75% 55% / 0.5);
+  background: hsl(145 60% 40% / 0.5);
 }
 
 /* Scrollbar - Light */
@@ -359,15 +411,15 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(40 15% 92%);
+  background: hsl(230 15% 90%);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(40 10% 75%);
+  background: hsl(230 10% 70%);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(38 75% 50% / 0.5);
+  background: hsl(145 60% 45% / 0.5);
 }
