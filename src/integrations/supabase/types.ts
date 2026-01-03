@@ -14,7 +14,148 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      countries: {
+        Row: {
+          code: string
+          continent: string
+          created_at: string
+          id: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          name_pt: string | null
+        }
+        Insert: {
+          code: string
+          continent: string
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          name_pt?: string | null
+        }
+        Update: {
+          code?: string
+          continent?: string
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          name_pt?: string | null
+        }
+        Relationships: []
+      }
+      ev_stations: {
+        Row: {
+          city: string | null
+          connector_types: string[] | null
+          country_code: string
+          created_at: string
+          id: string
+          installed_at: string | null
+          latitude: number
+          longitude: number
+          num_chargers: number | null
+          operator: string | null
+          power_kw: number | null
+          state: string | null
+          status: string | null
+        }
+        Insert: {
+          city?: string | null
+          connector_types?: string[] | null
+          country_code: string
+          created_at?: string
+          id?: string
+          installed_at?: string | null
+          latitude: number
+          longitude: number
+          num_chargers?: number | null
+          operator?: string | null
+          power_kw?: number | null
+          state?: string | null
+          status?: string | null
+        }
+        Update: {
+          city?: string | null
+          connector_types?: string[] | null
+          country_code?: string
+          created_at?: string
+          id?: string
+          installed_at?: string | null
+          latitude?: number
+          longitude?: number
+          num_chargers?: number | null
+          operator?: string | null
+          power_kw?: number | null
+          state?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ev_stations_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      towers: {
+        Row: {
+          city: string | null
+          country_code: string
+          created_at: string
+          frequency: string | null
+          id: string
+          installed_at: string | null
+          latitude: number
+          longitude: number
+          operator: string | null
+          state: string | null
+          status: string | null
+          technology: string | null
+        }
+        Insert: {
+          city?: string | null
+          country_code: string
+          created_at?: string
+          frequency?: string | null
+          id?: string
+          installed_at?: string | null
+          latitude: number
+          longitude: number
+          operator?: string | null
+          state?: string | null
+          status?: string | null
+          technology?: string | null
+        }
+        Update: {
+          city?: string | null
+          country_code?: string
+          created_at?: string
+          frequency?: string | null
+          id?: string
+          installed_at?: string | null
+          latitude?: number
+          longitude?: number
+          operator?: string | null
+          state?: string | null
+          status?: string | null
+          technology?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "towers_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
