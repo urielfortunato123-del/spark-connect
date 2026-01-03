@@ -264,10 +264,14 @@ const LocationSelector = ({ onNavigate, variant = "5g", evCount = 0, vaziosCount
           <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Estado (UF)</span>
         </div>
         <Select value={selectedState} onValueChange={handleStateChange}>
-          <SelectTrigger className="h-9 text-sm bg-background/50">
+          <SelectTrigger className="h-9 text-sm bg-background border-border">
             <SelectValue placeholder="Selecione um estado" />
           </SelectTrigger>
-          <SelectContent className="max-h-[300px] z-[9999] bg-popover">
+          <SelectContent 
+            className="max-h-[300px] bg-popover border-border shadow-lg"
+            position="popper"
+            sideOffset={4}
+          >
             {states.map((state) => (
               <SelectItem key={state.code} value={state.code}>
                 <div className="flex items-center justify-between w-full gap-4">
@@ -301,10 +305,14 @@ const LocationSelector = ({ onNavigate, variant = "5g", evCount = 0, vaziosCount
           </div>
 
           <Select value={selectedCity} onValueChange={handleCityChange}>
-            <SelectTrigger className="h-9 text-sm bg-background/50">
+            <SelectTrigger className="h-9 text-sm bg-background border-border">
               <SelectValue placeholder="Selecione uma cidade" />
             </SelectTrigger>
-            <SelectContent className="max-h-[250px] z-[9999] bg-popover">
+            <SelectContent 
+              className="max-h-[250px] bg-popover border-border shadow-lg"
+              position="popper"
+              sideOffset={4}
+            >
               {cities.map((city) => (
                 <SelectItem key={city.name} value={city.name}>
                   <div className="flex items-center justify-between w-full gap-4">
