@@ -9,7 +9,7 @@ interface HeaderProps {
 
 const Header = ({ activeTab, setActiveTab }: HeaderProps) => {
   return (
-    <header className="glass-card px-4 md:px-6 py-4 md:py-5 animate-in">
+    <header className="glass-card px-4 md:px-6 py-4 md:py-5">
       <div className="flex flex-col gap-4">
         {/* Top Row: Logo + Theme Toggle + Quick Stats */}
         <div className="flex items-center justify-between">
