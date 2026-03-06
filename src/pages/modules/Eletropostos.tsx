@@ -15,9 +15,9 @@ import {
   CheckCircle2, ArrowRight, Bot, Sparkles, FileText, AlertTriangle,
   Clock, Target, FileCheck, Car, Fuel
 } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { LeafletMap } from '@/components/dashboard/LeafletMap';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useMemo, useEffect } from 'react';
@@ -49,20 +49,7 @@ const createMarkerIcon = (status: string) => {
   });
 };
 
-function MapController({ stations }: { stations: { latitude: number; longitude: number }[] }) {
-  const map = useMap();
-  
-  useEffect(() => {
-    if (stations.length > 0) {
-      const bounds = L.latLngBounds(
-        stations.map(s => [s.latitude, s.longitude] as [number, number])
-      );
-      map.fitBounds(bounds, { padding: [50, 50] });
-    }
-  }, [stations, map]);
-  
-  return null;
-}
+// MapController removed - using vanilla leaflet now
 
 function StatCardAnimated({ label, value, icon: Icon, suffix = '' }: { 
   label: string; 
