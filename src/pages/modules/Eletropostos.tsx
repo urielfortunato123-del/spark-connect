@@ -674,37 +674,26 @@ Considere o contexto brasileiro atual (Programa Rota 2030, incentivos estaduais,
                         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                       </div>
                     ) : (
-                      <MapContainer
-                        center={[-15.7801, -47.9292]}
-                        zoom={4}
-                        style={{ height: '100%', width: '100%' }}
+                      <LeafletMap
                         className="z-0"
-                      >
-                        <TileLayer
-                          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        />
-                        <MapController stations={stations.filter(s => s.latitude && s.longitude)} />
-                        {stations.filter(s => s.latitude && s.longitude).map((station) => (
-                          <Marker
-                            key={station.id}
-                            position={[station.latitude, station.longitude]}
-                            icon={createMarkerIcon(station.status || 'active')}
-                          >
-                            <Popup>
-                              <div className="min-w-[180px]">
-                                <h3 className="font-semibold text-sm">{station.operator}</h3>
-                                <p className="text-xs text-gray-600">{station.city}, {station.state}</p>
-                                <div className="mt-2 space-y-1">
-                                  <p className="text-xs"><strong>Potência:</strong> {station.power_kw} kW</p>
-                                  <p className="text-xs"><strong>Carregadores:</strong> {station.num_chargers}</p>
-                                  <p className="text-xs"><strong>Status:</strong> {station.status}</p>
-                                </div>
+                        markers={stations.filter(s => s.latitude && s.longitude).map((station) => ({
+                          id: station.id,
+                          lat: station.latitude,
+                          lng: station.longitude,
+                          icon: createMarkerIcon(station.status || 'active'),
+                          popupContent: `
+                            <div style="min-width:180px">
+                              <h3 style="font-weight:600;font-size:0.875rem">${station.operator}</h3>
+                              <p style="font-size:0.75rem;color:#666">${station.city}, ${station.state}</p>
+                              <div style="margin-top:0.5rem">
+                                <p style="font-size:0.75rem"><strong>Potência:</strong> ${station.power_kw} kW</p>
+                                <p style="font-size:0.75rem"><strong>Carregadores:</strong> ${station.num_chargers}</p>
+                                <p style="font-size:0.75rem"><strong>Status:</strong> ${station.status}</p>
                               </div>
-                            </Popup>
-                          </Marker>
-                        ))}
-                      </MapContainer>
+                            </div>
+                          `,
+                        }))}
+                      />
                     )}
                   </div>
                 </CardContent>
