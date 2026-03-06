@@ -621,39 +621,26 @@ Seja específico considerando a legislação brasileira (Resolução 303/2002 AN
                 </CardHeader>
                 <CardContent className="p-0">
                   <div className="h-[500px] rounded-b-lg overflow-hidden">
-                    <MapContainer
-                      center={[-15.7801, -47.9292]}
-                      zoom={4}
-                      style={{ height: '100%', width: '100%' }}
+                    <LeafletMap
                       className="z-0"
-                    >
-                      <TileLayer
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                      />
-                      {towers && towers.length > 0 && (
-                        <MapController towers={towers.filter(t => t.latitude && t.longitude)} />
-                      )}
-                      {towers?.filter(t => t.latitude && t.longitude).map((tower) => (
-                        <Marker
-                          key={tower.id}
-                          position={[tower.latitude, tower.longitude]}
-                          icon={createTowerIcon(tower.technology || '5G')}
-                        >
-                          <Popup>
-                            <div className="min-w-[180px]">
-                              <h3 className="font-semibold text-sm">{tower.operator || 'Torre'}</h3>
-                              <p className="text-xs text-gray-600">{tower.city}, {tower.state}</p>
-                              <div className="mt-2 space-y-1">
-                                <p className="text-xs"><strong>Tecnologia:</strong> {tower.technology}</p>
-                                <p className="text-xs"><strong>Frequência:</strong> {tower.frequency || 'N/A'}</p>
-                                <p className="text-xs"><strong>Status:</strong> {tower.status}</p>
-                              </div>
+                      markers={towers?.filter(t => t.latitude && t.longitude).map((tower) => ({
+                        id: tower.id,
+                        lat: tower.latitude,
+                        lng: tower.longitude,
+                        icon: createTowerIcon(tower.technology || '5G'),
+                        popupContent: `
+                          <div style="min-width:180px">
+                            <h3 style="font-weight:600;font-size:0.875rem">${tower.operator || 'Torre'}</h3>
+                            <p style="font-size:0.75rem;color:#666">${tower.city}, ${tower.state}</p>
+                            <div style="margin-top:0.5rem">
+                              <p style="font-size:0.75rem"><strong>Tecnologia:</strong> ${tower.technology}</p>
+                              <p style="font-size:0.75rem"><strong>Frequência:</strong> ${tower.frequency || 'N/A'}</p>
+                              <p style="font-size:0.75rem"><strong>Status:</strong> ${tower.status}</p>
                             </div>
-                          </Popup>
-                        </Marker>
-                      ))}
-                    </MapContainer>
+                          </div>
+                        `,
+                      })) || []}
+                    />
                   </div>
                 </CardContent>
               </Card>
