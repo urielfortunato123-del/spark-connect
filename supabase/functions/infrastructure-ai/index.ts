@@ -108,10 +108,10 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const GOOGLE_AI_KEY = Deno.env.get('GOOGLE_AI_STUDIO_KEY');
     
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY is not configured');
+    if (!GOOGLE_AI_KEY) {
+      throw new Error('GOOGLE_AI_STUDIO_KEY is not configured');
     }
 
     // Handle streaming chat
