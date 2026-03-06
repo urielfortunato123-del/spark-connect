@@ -30,7 +30,6 @@ interface NavItem {
   url: string;
   icon: React.ElementType;
   module: AppModule | null;
-  inDevelopment?: boolean;
 }
 
 const mainNavItems: NavItem[] = [
