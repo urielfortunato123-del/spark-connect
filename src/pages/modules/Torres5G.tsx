@@ -16,9 +16,9 @@ import {
   FileText, AlertTriangle, Clock, Target, Antenna,
   FileCheck, MessageSquare
 } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { LeafletMap } from '@/components/dashboard/LeafletMap';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useMemo, useEffect } from 'react';
@@ -51,20 +51,7 @@ const createTowerIcon = (technology: string) => {
   });
 };
 
-function MapController({ towers }: { towers: { latitude: number; longitude: number }[] }) {
-  const map = useMap();
-  
-  useEffect(() => {
-    if (towers.length > 0) {
-      const bounds = L.latLngBounds(
-        towers.map(t => [t.latitude, t.longitude] as [number, number])
-      );
-      map.fitBounds(bounds, { padding: [50, 50] });
-    }
-  }, [towers, map]);
-  
-  return null;
-}
+// MapController removed - using vanilla leaflet now
 
 function StatCardAnimated({ label, value, icon: Icon, suffix = '', color = 'blue' }: { 
   label: string; 
