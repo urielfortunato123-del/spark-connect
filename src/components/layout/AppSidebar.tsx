@@ -42,15 +42,12 @@ const mainNavItems: NavItem[] = [
   { title: 'Cenários', url: '/cenarios', icon: BarChart3, module: 'cenarios' },
   { title: 'Relatórios', url: '/relatorios', icon: FileText, module: 'relatorios' },
   { title: 'Assistente IA', url: '/assistente', icon: Bot, module: 'ia_assistant' },
-];
-
-const devNavItems: NavItem[] = [
-  { title: 'Petróleo & Gás', url: '/petroleo', icon: Fuel, module: null, inDevelopment: true },
-  { title: 'Energia Elétrica', url: '/energia', icon: Lightbulb, module: null, inDevelopment: true },
-  { title: 'Mineração', url: '/mineracao', icon: Mountain, module: null, inDevelopment: true },
-  { title: 'Saneamento', url: '/saneamento', icon: Droplets, module: null, inDevelopment: true },
-  { title: 'Infraestrutura', url: '/infraestrutura', icon: Building, module: null, inDevelopment: true },
-  { title: 'Indústria', url: '/industria', icon: Factory, module: null, inDevelopment: true },
+  { title: 'Petróleo & Gás', url: '/petroleo', icon: Fuel, module: null },
+  { title: 'Energia Elétrica', url: '/energia', icon: Lightbulb, module: null },
+  { title: 'Mineração', url: '/mineracao', icon: Mountain, module: null },
+  { title: 'Saneamento', url: '/saneamento', icon: Droplets, module: null },
+  { title: 'Infraestrutura', url: '/infraestrutura', icon: Building, module: null },
+  { title: 'Indústria', url: '/industria', icon: Factory, module: null },
 ];
 
 export function AppSidebar() {
