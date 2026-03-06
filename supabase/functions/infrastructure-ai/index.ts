@@ -171,9 +171,9 @@ ${Object.entries(evByOperator).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([k, 
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages: [
-            { role: "system", content: SYSTEM_PROMPT + "\n\n" + contextData },
+        model: "google/gemini-3-flash-preview",
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT + "\n\n" + contextData },
             ...body.messages,
           ],
           stream: true,
@@ -233,7 +233,7 @@ Forneça uma análise estratégica e recomendações.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
