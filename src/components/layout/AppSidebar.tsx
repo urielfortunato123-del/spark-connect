@@ -16,7 +16,7 @@ import {
   Mountain,
   Lightbulb,
   Droplets,
-  Construction,
+  
   Building,
   Factory,
 } from 'lucide-react';
