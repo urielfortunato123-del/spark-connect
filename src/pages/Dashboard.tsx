@@ -15,7 +15,13 @@ import {
   Users,
   Activity,
   ArrowUpRight,
-  Clock
+  Clock,
+  Flame,
+  BoltIcon,
+  Mountain,
+  Droplets,
+  Building,
+  Factory
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { NavLink } from '@/components/NavLink';
