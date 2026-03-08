@@ -204,7 +204,7 @@ export default function Dashboard() {
           <h2 className="text-lg font-semibold text-foreground mb-4">Módulos Disponíveis</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {moduleCards.map((module) => {
-              const hasAccess = hasModuleAccess(module.module);
+              const hasAccess = module.module ? hasModuleAccess(module.module) : true;
               
               return (
                 <Card 
