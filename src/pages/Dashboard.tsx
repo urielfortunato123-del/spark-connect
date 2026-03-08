@@ -88,6 +88,60 @@ const moduleCards = [
     color: 'text-cyan-400',
     bgColor: 'bg-cyan-500/10'
   },
+  { 
+    title: 'Petróleo & Gás', 
+    description: 'Exploração, refino e distribuição de petróleo e gás',
+    icon: Flame, 
+    url: '/petroleo',
+    stats: { value: '312', label: 'Campos mapeados' },
+    color: 'text-orange-400',
+    bgColor: 'bg-orange-500/10'
+  },
+  { 
+    title: 'Energia Elétrica', 
+    description: 'Geração, transmissão e distribuição de energia',
+    icon: BoltIcon, 
+    url: '/energia',
+    stats: { value: '1.847', label: 'Usinas cadastradas' },
+    color: 'text-yellow-400',
+    bgColor: 'bg-yellow-500/10'
+  },
+  { 
+    title: 'Mineração', 
+    description: 'Títulos minerários, lavra e beneficiamento',
+    icon: Mountain, 
+    url: '/mineracao',
+    stats: { value: '5.234', label: 'Títulos ativos' },
+    color: 'text-stone-400',
+    bgColor: 'bg-stone-500/10'
+  },
+  { 
+    title: 'Saneamento', 
+    description: 'Água, esgoto e resíduos sólidos',
+    icon: Droplets, 
+    url: '/saneamento',
+    stats: { value: '2.156', label: 'Municípios cobertos' },
+    color: 'text-sky-400',
+    bgColor: 'bg-sky-500/10'
+  },
+  { 
+    title: 'Infraestrutura', 
+    description: 'Rodovias, ferrovias, portos e aeroportos',
+    icon: Building, 
+    url: '/infraestrutura',
+    stats: { value: '1.423', label: 'Projetos ativos' },
+    color: 'text-blue-300',
+    bgColor: 'bg-blue-400/10'
+  },
+  { 
+    title: 'Indústria', 
+    description: 'Papel, cimento, fertilizantes e petroquímica',
+    icon: Factory, 
+    url: '/industria',
+    stats: { value: '967', label: 'Plantas industriais' },
+    color: 'text-violet-400',
+    bgColor: 'bg-violet-500/10'
+  },
 ];
 
 const quickStats = [
