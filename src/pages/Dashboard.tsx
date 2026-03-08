@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { NavLink } from '@/components/NavLink';
+import { useNavigate } from 'react-router-dom';
 
 const moduleCards = [
   { 
@@ -92,6 +93,7 @@ const quickStats = [
 
 export default function Dashboard() {
   const { user, profile, userPlan, hasModuleAccess } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <AppLayout title="Dashboard" subtitle="Visão geral da plataforma">
@@ -106,7 +108,7 @@ export default function Dashboard() {
               Bem-vindo ao InfraBrasil. Aqui está um resumo da sua plataforma.
             </p>
           </div>
-          <Button className="gap-2">
+          <Button className="gap-2" onClick={() => navigate('/assistente')}>
             <Bot className="h-4 w-4" />
             Perguntar à IA
           </Button>
