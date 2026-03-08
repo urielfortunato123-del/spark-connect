@@ -108,7 +108,7 @@ export default function Dashboard() {
               Bem-vindo ao InfraBrasil. Aqui está um resumo da sua plataforma.
             </p>
           </div>
-          <Button className="gap-2">
+          <Button className="gap-2" onClick={() => navigate('/assistente')}>
             <Bot className="h-4 w-4" />
             Perguntar à IA
           </Button>
