@@ -93,6 +93,7 @@ const quickStats = [
 
 export default function Dashboard() {
   const { user, profile, userPlan, hasModuleAccess } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <AppLayout title="Dashboard" subtitle="Visão geral da plataforma">
