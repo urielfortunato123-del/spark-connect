@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { NavLink } from '@/components/NavLink';
+import { useNavigate } from 'react-router-dom';
 
 const moduleCards = [
   { 
