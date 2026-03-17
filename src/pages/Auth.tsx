@@ -20,6 +20,7 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   
   const { user, signIn, signUp, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
