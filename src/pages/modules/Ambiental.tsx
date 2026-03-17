@@ -315,7 +315,17 @@ Seja específico e forneça informações práticas.`;
                     <Button onClick={() => toast.success('Análise salva!')}>
                       Salvar Análise
                     </Button>
-                    <Button variant="outline">
+                    <Button variant="outline" onClick={() => {
+                      const licenseInfo = licenseTypes.find(l => l.id === selectedLicense);
+                      const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
+                      exportPDF({
+                        title: 'Análise Ambiental',
+                        subtitle: licenseInfo?.title,
+                        moduleName: 'Ambiental',
+                        projectData: { ...projectData, categoria: licenseInfo?.title },
+                        analysisContent: content,
+                      });
+                    }}>
                       Exportar PDF
                     </Button>
                     <Button variant="outline" onClick={() => {
