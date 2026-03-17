@@ -226,10 +226,10 @@ Forneça uma análise estratégica e recomendações.`;
       userPrompt = data.message || "Olá";
     }
 
-    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/chat/completions", {
+    const response = await fetch("https://ai.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${GOOGLE_AI_KEY}`,
+        Authorization: `Bearer ${AI_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
