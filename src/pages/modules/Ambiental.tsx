@@ -320,9 +320,9 @@ Seja específico e forneça informações práticas.`;
                       const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
                       exportPDF({
                         title: 'Análise Ambiental',
-                        subtitle: licenseInfo?.title,
+                        subtitle: licenseInfo?.name,
                         moduleName: 'Ambiental',
-                        projectData: { ...projectData, categoria: licenseInfo?.title },
+                        projectData: { ...projectData, categoria: licenseInfo?.name },
                         analysisContent: content,
                       });
                     }}>
