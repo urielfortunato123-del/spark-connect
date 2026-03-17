@@ -164,10 +164,10 @@ ${Object.entries(towersByTech).map(([k, v]) => `- ${k}: ${v}`).join('\n') || '- 
 ${Object.entries(evByOperator).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([k, v]) => `- ${k}: ${v}`).join('\n') || '- Sem dados'}
 `;
 
-      const response = await fetch("https://generativelanguage.googleapis.com/v1beta/chat/completions", {
+      const response = await fetch("https://ai.lovable.dev/v1/chat/completions", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${GOOGLE_AI_KEY}`,
+          Authorization: `Bearer ${AI_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
