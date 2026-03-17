@@ -547,9 +547,12 @@ Seja específico considerando a legislação brasileira (Resolução 303/2002 AN
                     </div>
                   </ScrollArea>
                   <div className="flex gap-2 pt-4 border-t">
-                    <Button onClick={() => toast.success('Análise salva!')}>
+                    <Button onClick={() => {
+                      const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
+                      saveAnalysis.mutate({ module: 'Torres 5G', category: projectData.tecnologia, projectName: projectData.nome || 'Nova Torre', projectData, analysisContent: content });
+                    }} disabled={saveAnalysis.isPending}>
                       <FileCheck className="h-4 w-4 mr-2" />
-                      Salvar
+                      {saveAnalysis.isPending ? 'Salvando...' : 'Salvar'}
                     </Button>
                     <Button variant="outline" onClick={() => {
                       const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';

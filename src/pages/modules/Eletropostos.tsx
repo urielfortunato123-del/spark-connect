@@ -589,9 +589,12 @@ Considere o contexto brasileiro atual (Programa Rota 2030, incentivos estaduais,
                     </div>
                   </ScrollArea>
                   <div className="flex gap-2 pt-4 border-t">
-                    <Button onClick={() => toast.success('Análise salva!')}>
+                    <Button onClick={() => {
+                      const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
+                      saveAnalysis.mutate({ module: 'Eletropostos', category: projectData.tipoLocal, projectName: projectData.nome || 'Novo Eletroposto', projectData, analysisContent: content });
+                    }} disabled={saveAnalysis.isPending}>
                       <FileCheck className="h-4 w-4 mr-2" />
-                      Salvar
+                      {saveAnalysis.isPending ? 'Salvando...' : 'Salvar'}
                     </Button>
                     <Button variant="outline" onClick={() => {
                       const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';

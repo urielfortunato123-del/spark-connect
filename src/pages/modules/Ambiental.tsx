@@ -314,8 +314,12 @@ Seja específico e forneça informações práticas.`;
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button onClick={() => toast.success('Análise salva!')}>
-                      Salvar Análise
+                    <Button onClick={() => {
+                      const licenseInfo = licenseTypes.find(l => l.id === selectedLicense);
+                      const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
+                      saveAnalysis.mutate({ module: 'Ambiental', category: licenseInfo?.name, projectName: projectData.nome || 'Novo Projeto', projectData, analysisContent: content });
+                    }} disabled={saveAnalysis.isPending}>
+                      {saveAnalysis.isPending ? 'Salvando...' : 'Salvar Análise'}
                     </Button>
                     <Button variant="outline" onClick={() => {
                       const licenseInfo = licenseTypes.find(l => l.id === selectedLicense);
