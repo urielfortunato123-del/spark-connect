@@ -10,6 +10,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 // Pages
 import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import Install from "./pages/Install";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
