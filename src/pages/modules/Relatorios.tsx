@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   FileText, 
   Download, 
@@ -24,9 +25,13 @@ import {
   Loader2,
   Sparkles,
   Send,
-  CheckCircle2
+  CheckCircle2,
+  Trash2,
+  History
 } from 'lucide-react';
 import { useInfraAI } from '@/hooks/useInfraAI';
+import { useExportPDF } from '@/hooks/useExportPDF';
+import { useProjectAnalyses } from '@/hooks/useProjectAnalyses';
 import { toast } from 'sonner';
 
 const reportTypes = [
@@ -87,6 +92,9 @@ export default function Relatorios() {
   const [isGenerating, setIsGenerating] = useState(false);
   
   const { sendMessage, isLoading, messages } = useInfraAI();
+  const { exportPDF } = useExportPDF();
+  const { analyses, isLoading: analysesLoading, deleteAnalysis } = useProjectAnalyses();
+  const [viewingAnalysis, setViewingAnalysis] = useState<string | null>(null);
 
   const handleGenerateReport = async () => {
     if (!selectedReportType) {
@@ -167,6 +175,11 @@ Use dados relevantes do banco de dados e forneça insights acionáveis.`;
             <TabsTrigger value="salvos" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
               Relatórios Salvos
+            </TabsTrigger>
+            <TabsTrigger value="historico" className="flex items-center gap-2">
+              <History className="h-4 w-4" />
+              Histórico de Análises
+              {analyses.length > 0 && <Badge variant="secondary" className="ml-1 text-xs">{analyses.length}</Badge>}
             </TabsTrigger>
           </TabsList>
 
@@ -398,6 +411,94 @@ Use dados relevantes do banco de dados e forneça insights acionáveis.`;
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="historico" className="space-y-6 mt-6">
+            {analysesLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : analyses.length === 0 ? (
+              <Card className="glass-card">
+                <CardContent className="py-12 text-center">
+                  <History className="h-12 w-12 mx-auto mb-3 text-muted-foreground/30" />
+                  <p className="text-muted-foreground">Nenhuma análise salva ainda</p>
+                  <p className="text-xs text-muted-foreground mt-1">As análises salvas nos módulos aparecerão aqui</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card className="glass-card">
+                    <CardContent className="p-4 text-center">
+                      <p className="text-3xl font-bold text-primary">{analyses.length}</p>
+                      <p className="text-sm text-muted-foreground">Análises salvas</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="glass-card">
+                    <CardContent className="p-4 text-center">
+                      <p className="text-3xl font-bold text-accent">{[...new Set(analyses.map(a => a.module))].length}</p>
+                      <p className="text-sm text-muted-foreground">Módulos utilizados</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="glass-card">
+                    <CardContent className="p-4 text-center">
+                      <p className="text-3xl font-bold text-secondary-foreground">
+                        {analyses[0] ? new Date(analyses[0].created_at).toLocaleDateString('pt-BR') : '-'}
+                      </p>
+                      <p className="text-sm text-muted-foreground">Última análise</p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {analyses.map((analysis) => (
+                  <Card key={analysis.id} className="glass-card">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle className="text-base">{analysis.project_name}</CardTitle>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge variant="secondary">{analysis.module}</Badge>
+                            {analysis.category && <Badge variant="outline">{analysis.category}</Badge>}
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(analysis.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex gap-1">
+                          <Button size="icon" variant="ghost" onClick={() => setViewingAnalysis(viewingAnalysis === analysis.id ? null : analysis.id)}>
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button size="icon" variant="ghost" onClick={() => {
+                            exportPDF({
+                              title: 'Relatório de Viabilidade',
+                              subtitle: analysis.category || undefined,
+                              moduleName: analysis.module,
+                              projectData: { ...(analysis.project_data as Record<string, any>), nome: analysis.project_name },
+                              analysisContent: analysis.analysis_content,
+                            });
+                          }}>
+                            <Download className="h-4 w-4" />
+                          </Button>
+                          <Button size="icon" variant="ghost" className="text-destructive" onClick={() => deleteAnalysis.mutate(analysis.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    {viewingAnalysis === analysis.id && (
+                      <CardContent>
+                        <ScrollArea className="h-[400px]">
+                          <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap p-4 rounded-lg bg-muted/30 border">
+                            {analysis.analysis_content}
+                          </div>
+                        </ScrollArea>
+                      </CardContent>
+                    )}
+                  </Card>
+                ))}
+              </>
+            )}
           </TabsContent>
         </Tabs>
       </div>

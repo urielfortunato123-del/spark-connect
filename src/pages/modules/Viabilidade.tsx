@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { useInfraAI } from '@/hooks/useInfraAI';
 import { useExportPDF } from '@/hooks/useExportPDF';
+import { useProjectAnalyses } from '@/hooks/useProjectAnalyses';
 import { toast } from 'sonner';
 
 const analysisTypes = [
@@ -94,6 +95,7 @@ export default function Viabilidade() {
   
   const { sendMessage, isLoading, messages } = useInfraAI();
   const { exportPDF } = useExportPDF();
+  const { saveAnalysis } = useProjectAnalyses();
 
   const progress = (currentStep / workflowSteps.length) * 100;
 
@@ -163,8 +165,14 @@ export default function Viabilidade() {
   };
 
   const handleSaveReport = () => {
-    toast.success('Relatório salvo com sucesso!', {
-      description: 'Você pode acessá-lo no módulo de Relatórios.'
+    const typeInfo = analysisTypes.find(t => t.id === selectedType);
+    const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
+    saveAnalysis.mutate({
+      module: 'Viabilidade',
+      category: typeInfo?.title,
+      projectName: typeInfo?.title || 'Novo Projeto',
+      projectData: { ...projectData, municipio: location.city, estado: location.state },
+      analysisContent: content,
     });
   };
 

@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useInfraAI } from '@/hooks/useInfraAI';
 import { useExportPDF } from '@/hooks/useExportPDF';
+import { useProjectAnalyses } from '@/hooks/useProjectAnalyses';
 import { toast } from 'sonner';
 
 const subcategories = [
@@ -89,6 +90,7 @@ export default function Infraestrutura() {
   
   const { sendMessage, isLoading: aiLoading, messages, clearMessages } = useInfraAI();
   const { exportPDF } = useExportPDF();
+  const { saveAnalysis } = useProjectAnalyses();
 
   const progress = (currentStep / workflowSteps.length) * 100;
 
@@ -421,9 +423,13 @@ Considere legislação brasileira: Lei 8.987/95 (Concessões), Lei 11.079/04 (PP
                     </div>
                   </ScrollArea>
                   <div className="flex gap-2 pt-4 border-t">
-                    <Button onClick={() => toast.success('Análise salva!')}>
+                    <Button onClick={() => {
+                      const categoryInfo = subcategories.find(c => c.id === selectedCategory);
+                      const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
+                      saveAnalysis.mutate({ module: 'Infraestrutura', category: categoryInfo?.title, projectName: projectData.nome || 'Novo Projeto', projectData, analysisContent: content });
+                    }} disabled={saveAnalysis.isPending}>
                       <FileCheck className="h-4 w-4 mr-2" />
-                      Salvar
+                      {saveAnalysis.isPending ? 'Salvando...' : 'Salvar'}
                     </Button>
                     <Button variant="outline" onClick={() => {
                       const categoryInfo = subcategories.find(c => c.id === selectedCategory);

@@ -255,6 +255,39 @@ export type Database = {
         }
         Relationships: []
       }
+      project_analyses: {
+        Row: {
+          analysis_content: string
+          category: string | null
+          created_at: string
+          id: string
+          module: string
+          project_data: Json
+          project_name: string
+          user_id: string
+        }
+        Insert: {
+          analysis_content: string
+          category?: string | null
+          created_at?: string
+          id?: string
+          module: string
+          project_data?: Json
+          project_name: string
+          user_id: string
+        }
+        Update: {
+          analysis_content?: string
+          category?: string | null
+          created_at?: string
+          id?: string
+          module?: string
+          project_data?: Json
+          project_name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       towers: {
         Row: {
           city: string | null

@@ -24,6 +24,7 @@ import { useMemo, useEffect } from 'react';
 import { useCountUp } from '@/hooks/useCountUp';
 import { useInfraAI } from '@/hooks/useInfraAI';
 import { useExportPDF } from '@/hooks/useExportPDF';
+import { useProjectAnalyses } from '@/hooks/useProjectAnalyses';
 import { toast } from 'sonner';
 
 const createMarkerIcon = (status: string) => {
@@ -137,6 +138,7 @@ export default function Eletropostos() {
   
   const { sendMessage, isLoading: aiLoading, messages, clearMessages } = useInfraAI();
   const { exportPDF } = useExportPDF();
+  const { saveAnalysis } = useProjectAnalyses();
 
   const { data: dbStations, isLoading, refetch, isFetching } = useQuery({
     queryKey: ['ev-stations-brazil'],
@@ -587,9 +589,12 @@ Considere o contexto brasileiro atual (Programa Rota 2030, incentivos estaduais,
                     </div>
                   </ScrollArea>
                   <div className="flex gap-2 pt-4 border-t">
-                    <Button onClick={() => toast.success('Análise salva!')}>
+                    <Button onClick={() => {
+                      const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
+                      saveAnalysis.mutate({ module: 'Eletropostos', category: projectData.tipoLocal, projectName: projectData.nome || 'Novo Eletroposto', projectData, analysisContent: content });
+                    }} disabled={saveAnalysis.isPending}>
                       <FileCheck className="h-4 w-4 mr-2" />
-                      Salvar
+                      {saveAnalysis.isPending ? 'Salvando...' : 'Salvar'}
                     </Button>
                     <Button variant="outline" onClick={() => {
                       const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
