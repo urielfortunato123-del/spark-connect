@@ -108,10 +108,10 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const GOOGLE_AI_KEY = Deno.env.get('GOOGLE_AI_STUDIO_KEY');
+    const AI_KEY = Deno.env.get('LOVABLE_API_KEY') || Deno.env.get('GOOGLE_AI_STUDIO_KEY');
     
-    if (!GOOGLE_AI_KEY) {
-      throw new Error('GOOGLE_AI_STUDIO_KEY is not configured');
+    if (!AI_KEY) {
+      throw new Error('No AI API key configured');
     }
 
     // Handle streaming chat
@@ -164,10 +164,10 @@ ${Object.entries(towersByTech).map(([k, v]) => `- ${k}: ${v}`).join('\n') || '- 
 ${Object.entries(evByOperator).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([k, v]) => `- ${k}: ${v}`).join('\n') || '- Sem dados'}
 `;
 
-      const response = await fetch("https://generativelanguage.googleapis.com/v1beta/chat/completions", {
+      const response = await fetch("https://ai.lovable.dev/v1/chat/completions", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${GOOGLE_AI_KEY}`,
+          Authorization: `Bearer ${AI_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -226,10 +226,10 @@ Forneça uma análise estratégica e recomendações.`;
       userPrompt = data.message || "Olá";
     }
 
-    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/chat/completions", {
+    const response = await fetch("https://ai.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${GOOGLE_AI_KEY}`,
+        Authorization: `Bearer ${AI_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
