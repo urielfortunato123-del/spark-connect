@@ -102,6 +102,7 @@ export default function Petroleo() {
   
   const { sendMessage, isLoading: aiLoading, messages, clearMessages } = useInfraAI();
   const { exportPDF } = useExportPDF();
+  const { saveAnalysis } = useProjectAnalyses();
 
   const progress = (currentStep / workflowSteps.length) * 100;
 
