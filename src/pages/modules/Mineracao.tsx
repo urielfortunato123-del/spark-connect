@@ -16,6 +16,7 @@ import {
   AlertTriangle, Target, FileCheck, MapPin
 } from 'lucide-react';
 import { useInfraAI } from '@/hooks/useInfraAI';
+import { useExportPDF } from '@/hooks/useExportPDF';
 import { toast } from 'sonner';
 
 const subcategories = [
@@ -94,6 +95,7 @@ export default function Mineracao() {
   });
   
   const { sendMessage, isLoading: aiLoading, messages, clearMessages } = useInfraAI();
+  const { exportPDF } = useExportPDF();
 
   const progress = (currentStep / workflowSteps.length) * 100;
 
@@ -418,7 +420,17 @@ Considere legislação brasileira: Código de Mineração (Decreto-Lei 227/67), 
                       <FileCheck className="h-4 w-4 mr-2" />
                       Salvar
                     </Button>
-                    <Button variant="outline">
+                    <Button variant="outline" onClick={() => {
+                      const categoryInfo = subcategories.find(c => c.id === selectedCategory);
+                      const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
+                      exportPDF({
+                        title: 'Relatório de Viabilidade',
+                        subtitle: categoryInfo?.title,
+                        moduleName: 'Mineração',
+                        projectData: { ...projectData, categoria: categoryInfo?.title, nome: projectData.nome || 'Novo Projeto' },
+                        analysisContent: content,
+                      });
+                    }}>
                       <FileText className="h-4 w-4 mr-2" />
                       Exportar PDF
                     </Button>

@@ -30,6 +30,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { useInfraAI } from '@/hooks/useInfraAI';
+import { useExportPDF } from '@/hooks/useExportPDF';
 import { toast } from 'sonner';
 
 const subcategories = [
@@ -74,6 +75,7 @@ export default function Ambiental() {
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
   
   const { sendMessage, isLoading, messages } = useInfraAI();
+  const { exportPDF } = useExportPDF();
 
   const progress = (currentStep / workflowSteps.length) * 100;
 
@@ -313,7 +315,17 @@ Seja específico e forneça informações práticas.`;
                     <Button onClick={() => toast.success('Análise salva!')}>
                       Salvar Análise
                     </Button>
-                    <Button variant="outline">
+                    <Button variant="outline" onClick={() => {
+                      const licenseInfo = licenseTypes.find(l => l.id === selectedLicense);
+                      const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
+                      exportPDF({
+                        title: 'Análise Ambiental',
+                        subtitle: licenseInfo?.name,
+                        moduleName: 'Ambiental',
+                        projectData: { ...projectData, categoria: licenseInfo?.name },
+                        analysisContent: content,
+                      });
+                    }}>
                       Exportar PDF
                     </Button>
                     <Button variant="outline" onClick={() => {

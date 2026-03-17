@@ -23,6 +23,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useMemo, useEffect } from 'react';
 import { useCountUp } from '@/hooks/useCountUp';
 import { useInfraAI } from '@/hooks/useInfraAI';
+import { useExportPDF } from '@/hooks/useExportPDF';
 import { toast } from 'sonner';
 
 const createMarkerIcon = (status: string) => {
@@ -135,6 +136,7 @@ export default function Eletropostos() {
   });
   
   const { sendMessage, isLoading: aiLoading, messages, clearMessages } = useInfraAI();
+  const { exportPDF } = useExportPDF();
 
   const { data: dbStations, isLoading, refetch, isFetching } = useQuery({
     queryKey: ['ev-stations-brazil'],
@@ -589,7 +591,16 @@ Considere o contexto brasileiro atual (Programa Rota 2030, incentivos estaduais,
                       <FileCheck className="h-4 w-4 mr-2" />
                       Salvar
                     </Button>
-                    <Button variant="outline">
+                    <Button variant="outline" onClick={() => {
+                      const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
+                      exportPDF({
+                        title: 'Relatório de Viabilidade - Eletroposto',
+                        subtitle: `${projectData.operadora} - ${projectData.tipoLocal}`,
+                        moduleName: 'Eletropostos',
+                        projectData: { ...projectData, categoria: 'Estação de Recarga EV', capacidade: projectData.potenciaTotal ? `${projectData.potenciaTotal} kW` : '', nome: projectData.nome || 'Novo Eletroposto' },
+                        analysisContent: content,
+                      });
+                    }}>
                       <FileText className="h-4 w-4 mr-2" />
                       Exportar PDF
                     </Button>
