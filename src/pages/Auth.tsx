@@ -138,6 +138,58 @@ export default function Auth() {
         </div>
 
         <Card className="glass-card border-border/50">
+          {showForgotPassword ? (
+            <>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-xl text-center">Recuperar senha</CardTitle>
+                <CardDescription className="text-center">
+                  Digite seu e-mail para receber o link de recuperação
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleForgotPassword} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="forgot-email">E-mail</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="forgot-email"
+                        type="email"
+                        placeholder="seu@email.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                    {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+                  </div>
+
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Enviando...
+                      </>
+                    ) : (
+                      'Enviar link de recuperação'
+                    )}
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="w-full gap-2"
+                    onClick={() => setShowForgotPassword(false)}
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Voltar ao login
+                  </Button>
+                </form>
+              </CardContent>
+            </>
+          ) : (
+            <>
           <CardHeader className="pb-4">
             <CardTitle className="text-xl text-center">Acesse sua conta</CardTitle>
             <CardDescription className="text-center">
@@ -172,7 +224,17 @@ export default function Auth() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="signin-password">Senha</Label>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="signin-password">Senha</Label>
+                      <Button
+                        type="button"
+                        variant="link"
+                        className="px-0 h-auto text-xs text-muted-foreground hover:text-primary"
+                        onClick={() => setShowForgotPassword(true)}
+                      >
+                        Esqueci minha senha
+                      </Button>
+                    </div>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
