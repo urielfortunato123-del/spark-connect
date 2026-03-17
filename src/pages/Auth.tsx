@@ -88,6 +88,28 @@ export default function Auth() {
     setIsLoading(false);
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const emailResult = emailSchema.safeParse(email);
+    if (!emailResult.success) {
+      setErrors({ email: emailResult.error.errors[0].message });
+      return;
+    }
+
+    setIsLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success('E-mail de recuperação enviado! Verifique sua caixa de entrada.');
+      setShowForgotPassword(false);
+    }
+    setIsLoading(false);
+  };
+
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
