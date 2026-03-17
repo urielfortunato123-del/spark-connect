@@ -68,6 +68,10 @@ const projectTypes: Record<string, { label: string; subtypes: string[] }> = {
     label: 'Tratamento de Gás',
     subtypes: ['UPGN', 'Unidade de Dessulfurização', 'Planta de CO2', 'Unidade de Desidratação'] 
   },
+  processamento: { 
+    label: 'Processamento de Gás',
+    subtypes: ['Planta de Processamento', 'Unidade de Separação', 'Planta de LNG', 'Planta de GTL'] 
+  },
   distribuicao: { 
     label: 'Distribuição',
     subtypes: ['Rede de Média Pressão', 'Rede de Baixa Pressão', 'Estação de Regulagem', 'City Gate'] 

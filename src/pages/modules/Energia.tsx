@@ -64,9 +64,17 @@ const projectTypes: Record<string, { label: string; subtypes: string[] }> = {
     label: 'Transmissão',
     subtypes: ['LT 138 kV', 'LT 230 kV', 'LT 345 kV', 'LT 500 kV', 'LT 765 kV', 'LT CC'] 
   },
+  nuclear: { 
+    label: 'Nuclear',
+    subtypes: ['Usina PWR', 'Usina BWR', 'SMR (Reator Modular Pequeno)'] 
+  },
   subestacao: { 
     label: 'Subestação',
     subtypes: ['SE Elevadora', 'SE Abaixadora', 'SE Seccionadora', 'SE Conversora'] 
+  },
+  distribuicao: { 
+    label: 'Distribuição',
+    subtypes: ['Rede de MT', 'Rede de BT', 'Subestação de Distribuição', 'Linha de Distribuição Rural'] 
   },
 };
 
