@@ -426,7 +426,17 @@ Considere legislação brasileira: Lei 11.445/07, Lei 14.026/20, Decreto 7.217/1
                       <FileCheck className="h-4 w-4 mr-2" />
                       Salvar
                     </Button>
-                    <Button variant="outline">
+                    <Button variant="outline" onClick={() => {
+                      const categoryInfo = subcategories.find(c => c.id === selectedCategory);
+                      const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
+                      exportPDF({
+                        title: 'Relatório de Viabilidade',
+                        subtitle: categoryInfo?.title,
+                        moduleName: 'Saneamento',
+                        projectData: { ...projectData, categoria: categoryInfo?.title, nome: projectData.nome || 'Novo Projeto' },
+                        analysisContent: content,
+                      });
+                    }}>
                       <FileText className="h-4 w-4 mr-2" />
                       Exportar PDF
                     </Button>

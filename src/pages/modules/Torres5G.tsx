@@ -549,7 +549,16 @@ Seja específico considerando a legislação brasileira (Resolução 303/2002 AN
                       <FileCheck className="h-4 w-4 mr-2" />
                       Salvar
                     </Button>
-                    <Button variant="outline">
+                    <Button variant="outline" onClick={() => {
+                      const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
+                      exportPDF({
+                        title: 'Relatório de Viabilidade - Torre 5G',
+                        subtitle: `${projectData.operadora} - ${projectData.tecnologia}`,
+                        moduleName: 'Torres 5G',
+                        projectData: { ...projectData, categoria: 'Torre de Telecomunicação', nome: projectData.nome || 'Nova Torre' },
+                        analysisContent: content,
+                      });
+                    }}>
                       <FileText className="h-4 w-4 mr-2" />
                       Exportar PDF
                     </Button>

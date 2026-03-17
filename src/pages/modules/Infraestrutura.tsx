@@ -425,7 +425,17 @@ Considere legislação brasileira: Lei 8.987/95 (Concessões), Lei 11.079/04 (PP
                       <FileCheck className="h-4 w-4 mr-2" />
                       Salvar
                     </Button>
-                    <Button variant="outline">
+                    <Button variant="outline" onClick={() => {
+                      const categoryInfo = subcategories.find(c => c.id === selectedCategory);
+                      const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
+                      exportPDF({
+                        title: 'Relatório de Viabilidade',
+                        subtitle: categoryInfo?.title,
+                        moduleName: 'Infraestrutura',
+                        projectData: { ...projectData, categoria: categoryInfo?.title, nome: projectData.nome || 'Novo Projeto' },
+                        analysisContent: content,
+                      });
+                    }}>
                       <FileText className="h-4 w-4 mr-2" />
                       Exportar PDF
                     </Button>
