@@ -16,6 +16,7 @@ import {
   AlertTriangle, Target, FileCheck, MapPin
 } from 'lucide-react';
 import { useInfraAI } from '@/hooks/useInfraAI';
+import { useExportPDF } from '@/hooks/useExportPDF';
 import { toast } from 'sonner';
 
 const subcategories = [
