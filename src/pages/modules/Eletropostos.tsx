@@ -24,6 +24,7 @@ import { useMemo, useEffect } from 'react';
 import { useCountUp } from '@/hooks/useCountUp';
 import { useInfraAI } from '@/hooks/useInfraAI';
 import { useExportPDF } from '@/hooks/useExportPDF';
+import { useProjectAnalyses } from '@/hooks/useProjectAnalyses';
 import { toast } from 'sonner';
 
 const createMarkerIcon = (status: string) => {

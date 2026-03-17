@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { useInfraAI } from '@/hooks/useInfraAI';
 import { useExportPDF } from '@/hooks/useExportPDF';
+import { useProjectAnalyses } from '@/hooks/useProjectAnalyses';
 import { toast } from 'sonner';
 
 const analysisTypes = [
