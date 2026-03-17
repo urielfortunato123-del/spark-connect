@@ -45,6 +45,7 @@ const App = () => (
             <Routes>
               {/* Public Routes */}
               <Route path="/auth" element={<Auth />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/install" element={<Install />} />
 
               {/* Protected Routes */}
