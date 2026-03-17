@@ -176,6 +176,11 @@ Use dados relevantes do banco de dados e forneça insights acionáveis.`;
               <FileText className="h-4 w-4" />
               Relatórios Salvos
             </TabsTrigger>
+            <TabsTrigger value="historico" className="flex items-center gap-2">
+              <History className="h-4 w-4" />
+              Histórico de Análises
+              {analyses.length > 0 && <Badge variant="secondary" className="ml-1 text-xs">{analyses.length}</Badge>}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="gerar" className="space-y-6 mt-6">
