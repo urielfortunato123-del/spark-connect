@@ -389,7 +389,17 @@ export default function Viabilidade() {
                   <Save className="h-4 w-4 mr-2" />
                   Salvar Relatório
                 </Button>
-                <Button variant="outline">
+                <Button variant="outline" onClick={() => {
+                  const typeInfo = projectTypes.find(t => t.id === selectedType);
+                  const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
+                  exportPDF({
+                    title: 'Estudo de Viabilidade',
+                    subtitle: typeInfo?.title,
+                    moduleName: 'Viabilidade',
+                    projectData: { categoria: typeInfo?.title, municipio: location.city, estado: location.state, capacidade: projectData.capacidade, nome: typeInfo?.title || 'Novo Projeto' },
+                    analysisContent: content,
+                  });
+                }}>
                   <Download className="h-4 w-4 mr-2" />
                   Exportar PDF
                 </Button>
