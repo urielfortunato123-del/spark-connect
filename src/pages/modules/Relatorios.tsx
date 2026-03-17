@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   FileText, 
   Download, 
@@ -24,9 +25,13 @@ import {
   Loader2,
   Sparkles,
   Send,
-  CheckCircle2
+  CheckCircle2,
+  Trash2,
+  History
 } from 'lucide-react';
 import { useInfraAI } from '@/hooks/useInfraAI';
+import { useExportPDF } from '@/hooks/useExportPDF';
+import { useProjectAnalyses } from '@/hooks/useProjectAnalyses';
 import { toast } from 'sonner';
 
 const reportTypes = [
