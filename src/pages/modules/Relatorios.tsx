@@ -92,6 +92,9 @@ export default function Relatorios() {
   const [isGenerating, setIsGenerating] = useState(false);
   
   const { sendMessage, isLoading, messages } = useInfraAI();
+  const { exportPDF } = useExportPDF();
+  const { analyses, isLoading: analysesLoading, deleteAnalysis } = useProjectAnalyses();
+  const [viewingAnalysis, setViewingAnalysis] = useState<string | null>(null);
 
   const handleGenerateReport = async () => {
     if (!selectedReportType) {
