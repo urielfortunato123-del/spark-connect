@@ -95,6 +95,7 @@ export default function Viabilidade() {
   
   const { sendMessage, isLoading, messages } = useInfraAI();
   const { exportPDF } = useExportPDF();
+  const { saveAnalysis } = useProjectAnalyses();
 
   const progress = (currentStep / workflowSteps.length) * 100;
 

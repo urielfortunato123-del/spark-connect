@@ -138,6 +138,7 @@ export default function Eletropostos() {
   
   const { sendMessage, isLoading: aiLoading, messages, clearMessages } = useInfraAI();
   const { exportPDF } = useExportPDF();
+  const { saveAnalysis } = useProjectAnalyses();
 
   const { data: dbStations, isLoading, refetch, isFetching } = useQuery({
     queryKey: ['ev-stations-brazil'],
