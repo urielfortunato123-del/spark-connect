@@ -121,6 +121,7 @@ export default function Torres5G() {
   });
   
   const { sendMessage, isLoading: aiLoading, messages, clearMessages } = useInfraAI();
+  const { exportPDF } = useExportPDF();
 
   const { data: towers, isLoading } = useQuery({
     queryKey: ['towers-brazil'],
