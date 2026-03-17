@@ -390,7 +390,7 @@ export default function Viabilidade() {
                   Salvar Relatório
                 </Button>
                 <Button variant="outline" onClick={() => {
-                  const typeInfo = projectTypes.find(t => t.id === selectedType);
+                  const typeInfo = analysisTypes.find(t => t.id === selectedType);
                   const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
                   exportPDF({
                     title: 'Estudo de Viabilidade',
