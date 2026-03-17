@@ -329,6 +329,8 @@ export default function Auth() {
               </TabsContent>
             </Tabs>
           </CardContent>
+            </>
+          )}
         </Card>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
