@@ -82,6 +82,7 @@ export default function Industria() {
   });
   
   const { sendMessage, isLoading: aiLoading, messages, clearMessages } = useInfraAI();
+  const { exportPDF } = useExportPDF();
 
   const progress = (currentStep / workflowSteps.length) * 100;
 

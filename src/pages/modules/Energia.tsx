@@ -98,6 +98,7 @@ export default function Energia() {
   });
   
   const { sendMessage, isLoading: aiLoading, messages, clearMessages } = useInfraAI();
+  const { exportPDF } = useExportPDF();
 
   const progress = (currentStep / workflowSteps.length) * 100;
 

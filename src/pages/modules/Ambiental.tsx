@@ -75,6 +75,7 @@ export default function Ambiental() {
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
   
   const { sendMessage, isLoading, messages } = useInfraAI();
+  const { exportPDF } = useExportPDF();
 
   const progress = (currentStep / workflowSteps.length) * 100;
 

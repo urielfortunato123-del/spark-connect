@@ -88,6 +88,7 @@ export default function Saneamento() {
   });
   
   const { sendMessage, isLoading: aiLoading, messages, clearMessages } = useInfraAI();
+  const { exportPDF } = useExportPDF();
 
   const progress = (currentStep / workflowSteps.length) * 100;
 
