@@ -24,6 +24,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useMemo, useEffect } from 'react';
 import { useCountUp } from '@/hooks/useCountUp';
 import { useInfraAI } from '@/hooks/useInfraAI';
+import { useExportPDF } from '@/hooks/useExportPDF';
 import { toast } from 'sonner';
 
 // Tower marker icon
