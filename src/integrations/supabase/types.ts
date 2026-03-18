@@ -159,6 +159,51 @@ export type Database = {
           },
         ]
       }
+      module_categories: {
+        Row: {
+          category_id: string
+          color: string
+          created_at: string
+          description: string | null
+          icon_name: string
+          id: string
+          is_active: boolean
+          module_id: string
+          sort_order: number
+          subtypes: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category_id: string
+          color?: string
+          created_at?: string
+          description?: string | null
+          icon_name?: string
+          id?: string
+          is_active?: boolean
+          module_id: string
+          sort_order?: number
+          subtypes?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category_id?: string
+          color?: string
+          created_at?: string
+          description?: string | null
+          icon_name?: string
+          id?: string
+          is_active?: boolean
+          module_id?: string
+          sort_order?: number
+          subtypes?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       municipios: {
         Row: {
           area_km2: number | null
