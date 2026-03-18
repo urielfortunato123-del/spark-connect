@@ -160,21 +160,9 @@ export function SubtypeSelector({ moduleId, categoryId, value, onValueChange, la
 }
 
 // ─── Hook para gerenciar estado de categoria + subtipo ──────────
+// Delegates to useModuleCategories (backend + local fallback)
 
 export function useProjectSelector(moduleId: ModuleId) {
-  const categories = useMemo(() => getModuleCategories(moduleId), [moduleId]);
-
-  const getCategoryInfo = useCallback(
-    (categoryId: string | null): CategoryDef | undefined =>
-      categoryId ? categories.find((c) => c.id === categoryId) : undefined,
-    [categories]
-  );
-
-  const getCategorySubtypes = useCallback(
-    (categoryId: string | null): string[] =>
-      categoryId ? getSubtypes(moduleId, categoryId) : [],
-    [moduleId]
-  );
-
-  return { categories, getCategoryInfo, getCategorySubtypes };
+  return useModuleCategories(moduleId);
+}
 }
