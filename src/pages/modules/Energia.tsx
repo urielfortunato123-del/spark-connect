@@ -64,8 +64,7 @@ export default function Energia() {
     clearMessages();
     setCurrentStep(4);
     
-    const categoryInfo = subcategories.find(c => c.id === selectedCategory);
-    const typeInfo = projectTypes[selectedCategory || ''];
+    const categoryInfo = getCategoryInfo(selectedCategory);
     
     const prompt = `Faça uma análise completa de viabilidade para projeto de energia:
 
