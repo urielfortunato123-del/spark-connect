@@ -13,6 +13,7 @@ import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import Install from "./pages/Install";
 import Admin from "./pages/Admin";
+import AdminCategories from "./pages/AdminCategories";
 import NotFound from "./pages/NotFound";
 
 // Module Pages
@@ -166,12 +167,20 @@ const App = () => (
                 } 
               />
 
-              {/* Admin Route - Protected for admins only */}
+              {/* Admin Routes - Protected for admins only */}
               <Route 
                 path="/admin" 
                 element={
                   <ProtectedRoute requireAdmin>
                     <Admin />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/categorias" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <AdminCategories />
                   </ProtectedRoute>
                 } 
               />

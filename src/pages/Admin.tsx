@@ -11,7 +11,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Users, Crown, Shield, Settings2, Search, RefreshCw } from 'lucide-react';
+import { Users, Crown, Shield, Settings2, Search, RefreshCw, Layers } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 
 type AppPlan = 'free' | 'telecom' | 'ev' | 'governo' | 'pro';
@@ -51,6 +52,7 @@ const moduleLabels: Record<AppModule, string> = {
 const allModules: AppModule[] = ['torres_5g', 'eletropostos', 'viabilidade', 'ambiental', 'cenarios', 'relatorios', 'ia_assistant'];
 
 export default function Admin() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [editingUser, setEditingUser] = useState<UserData | null>(null);
@@ -199,10 +201,16 @@ export default function Admin() {
             <h1 className="text-2xl font-display font-bold text-foreground">Painel Administrativo</h1>
             <p className="text-muted-foreground">Gerencie usuários, planos e permissões</p>
           </div>
-          <Button variant="outline" onClick={() => refetch()} className="gap-2">
-            <RefreshCw className="h-4 w-4" />
-            Atualizar
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={() => navigate('/admin/categorias')} className="gap-2">
+              <Layers className="h-4 w-4" />
+              Categorias
+            </Button>
+            <Button variant="outline" onClick={() => refetch()} className="gap-2">
+              <RefreshCw className="h-4 w-4" />
+              Atualizar
+            </Button>
+          </div>
         </div>
 
         {/* Stats Cards */}
