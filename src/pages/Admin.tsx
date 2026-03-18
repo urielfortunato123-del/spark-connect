@@ -201,10 +201,16 @@ export default function Admin() {
             <h1 className="text-2xl font-display font-bold text-foreground">Painel Administrativo</h1>
             <p className="text-muted-foreground">Gerencie usuários, planos e permissões</p>
           </div>
-          <Button variant="outline" onClick={() => refetch()} className="gap-2">
-            <RefreshCw className="h-4 w-4" />
-            Atualizar
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={() => navigate('/admin/categorias')} className="gap-2">
+              <Layers className="h-4 w-4" />
+              Categorias
+            </Button>
+            <Button variant="outline" onClick={() => refetch()} className="gap-2">
+              <RefreshCw className="h-4 w-4" />
+              Atualizar
+            </Button>
+          </div>
         </div>
 
         {/* Stats Cards */}
