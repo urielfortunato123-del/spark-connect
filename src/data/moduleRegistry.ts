@@ -18,6 +18,8 @@ import {
   FileStack, Boxes, Leaf, Fuel, Beaker,
   // Petróleo
   Droplet, ArrowUpDown,
+  // Ambiental
+  TreePine, FileCheck, ClipboardCheck, Home, FileText, Map,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -29,7 +31,8 @@ export type ModuleId =
   | 'saneamento'
   | 'infraestrutura'
   | 'industria'
-  | 'petroleo';
+  | 'petroleo'
+  | 'ambiental';
 
 export interface CategoryDef {
   id: string;
@@ -106,6 +109,20 @@ const petroleoCategorias: CategoryDef[] = [
   { id: 'distribuicao', title: 'Gás - Distribuição', icon: ArrowUpDown, color: 'bg-yellow-600', desc: 'Redes de distribuição de gás', subtypes: ['Rede de Média Pressão', 'Rede de Baixa Pressão', 'Estação de Regulagem', 'City Gate'] },
 ];
 
+const ambientalCategorias: CategoryDef[] = [
+  { id: 'programas', title: 'Programas Ambientais', icon: TreePine, color: 'bg-green-500', desc: 'Planos e programas de gestão ambiental', subtypes: ['PBA - Plano Básico Ambiental', 'PRAD - Plano de Recuperação', 'Programa de Monitoramento', 'Programa de Educação Ambiental', 'Plano de Compensação Ambiental'] },
+  { id: 'licenciamento', title: 'Licenciamento Ambiental', icon: FileCheck, color: 'bg-emerald-500', desc: 'LP, LI, LO e licenças específicas', subtypes: ['Licença Prévia (LP)', 'Licença de Instalação (LI)', 'Licença de Operação (LO)', 'Licença Simplificada', 'Autorização de Supressão Vegetal'] },
+  { id: 'acompanhamento', title: 'Acompanhamento Ambiental', icon: ClipboardCheck, color: 'bg-teal-500', desc: 'Monitoramento e fiscalização', subtypes: ['Monitoramento de Fauna', 'Monitoramento de Flora', 'Monitoramento de Qualidade da Água', 'Monitoramento de Ar', 'Monitoramento de Ruído'] },
+  { id: 'patrimonial', title: 'Acompanhamento Patrimonial', icon: Building, color: 'bg-green-600', desc: 'Gestão de patrimônio histórico e cultural', subtypes: ['Arqueologia Preventiva', 'Educação Patrimonial', 'Salvamento Arqueológico', 'Prospecção Arqueológica'] },
+  { id: 'transportes', title: 'Transportes', icon: Truck, color: 'bg-blue-500', desc: 'Logística e transporte ambiental', subtypes: ['PGRCC', 'Transporte de Resíduos Perigosos', 'Plano de Transporte', 'Logística Reversa'] },
+  { id: 'coleta', title: 'Coleta e Tratamento', icon: Waves, color: 'bg-cyan-500', desc: 'Efluentes e resíduos', subtypes: ['Tratamento de Efluentes', 'Gestão de Resíduos Sólidos', 'PGRS', 'Tratamento de Resíduos Industriais'] },
+  { id: 'drenagem', title: 'Drenagem', icon: Droplet, color: 'bg-sky-500', desc: 'Sistemas de drenagem ambiental', subtypes: ['Drenagem Pluvial', 'Drenagem de Mina', 'Controle de Erosão', 'Contenção de Sedimentos'] },
+  { id: 'energia', title: 'Engenharia Gás e Energia', icon: Factory, color: 'bg-orange-500', desc: 'Gestão ambiental de empreendimentos energéticos', subtypes: ['Licenciamento de Usina', 'Licenciamento de LT', 'EIA/RIMA Energético', 'Compensação Florestal'] },
+  { id: 'urbanizacao', title: 'Urbanização de Favelas', icon: Home, color: 'bg-purple-500', desc: 'Projetos de urbanização sustentável', subtypes: ['Reassentamento', 'Urbanização Integrada', 'Regularização Fundiária Urbana', 'Saneamento Integrado'] },
+  { id: 'fundiaria', title: 'Regularização Fundiária', icon: Map, color: 'bg-amber-500', desc: 'Regularização fundiária rural e urbana', subtypes: ['Georreferenciamento', 'CAR - Cadastro Ambiental Rural', 'Regularização de APP', 'Averbação de Reserva Legal'] },
+  { id: 'estudos', title: 'Estudos Ambientais', icon: FileText, color: 'bg-lime-500', desc: 'EIA/RIMA, RAP, RCA e estudos técnicos', subtypes: ['EIA/RIMA', 'RAP', 'RCA', 'PCA', 'PRAD', 'Estudo de Impacto de Vizinhança (EIV)'] },
+];
+
 // ──────────────────────────── Registry ────────────────────────────
 
 export const MODULE_REGISTRY: Record<ModuleId, ModuleDef> = {
@@ -115,6 +132,7 @@ export const MODULE_REGISTRY: Record<ModuleId, ModuleDef> = {
   infraestrutura:  { id: 'infraestrutura',  label: 'Infraestrutura & Transportes', categories: infraestruturaCategorias },
   industria:       { id: 'industria',       label: 'Indústria',                  categories: industriaCategorias },
   petroleo:        { id: 'petroleo',        label: 'Petróleo & Gás',             categories: petroleoCategorias },
+  ambiental:       { id: 'ambiental',       label: 'Ambiental',                  categories: ambientalCategorias },
 };
 
 // ──────────────────────────── Helpers ────────────────────────────
