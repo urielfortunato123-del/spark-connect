@@ -434,20 +434,19 @@ Considere legislação brasileira: Lei 9.074/95, Lei 10.848/04, Resoluções ANE
           </TabsList>
 
           <TabsContent value="categorias" className="mt-6">
-            <CategoryAccordion 
-              categories={subcategories} 
-              onSelect={handleCategorySelect}
+            <CategoryGrid
+              moduleId={MODULE_ID}
               selectedCategory={selectedCategory}
-              getSubtypes={(categoryId) => projectTypes[categoryId]?.subtypes ?? []}
+              onSelectCategory={handleCategorySelect}
             />
           </TabsContent>
 
           <TabsContent value="projeto" className="space-y-6 mt-6">
             <div className="flex items-center gap-3">
               <span className="text-sm font-medium text-muted-foreground">Categoria:</span>
-              <CategoryDropdown 
-                categories={subcategories} 
-                value={selectedCategory} 
+              <CategoryDropdownNew
+                moduleId={MODULE_ID}
+                value={selectedCategory}
                 onValueChange={(v) => {
                   setSelectedCategory(v);
                   setProjectData((current) => ({ ...current, subtipo: '' }));
