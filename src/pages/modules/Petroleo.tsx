@@ -203,6 +203,7 @@ Considere legislação brasileira: Lei do Petróleo (9.478/97), Lei da Partilha 
 
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(categoryId);
+    setProjectData((current) => ({ ...current, subtipo: '' }));
     setActiveTab('projeto');
     setCurrentStep(1);
   };
@@ -519,6 +520,7 @@ Considere legislação brasileira: Lei do Petróleo (9.478/97), Lei da Partilha 
               categories={subcategories} 
               onSelect={handleCategorySelect}
               selectedCategory={selectedCategory}
+              getSubtypes={(categoryId) => projectTypes[categoryId]?.subtypes ?? []}
             />
           </TabsContent>
 
@@ -528,7 +530,11 @@ Considere legislação brasileira: Lei do Petróleo (9.478/97), Lei da Partilha 
               <CategoryDropdown 
                 categories={subcategories} 
                 value={selectedCategory} 
-                onValueChange={(v) => { setSelectedCategory(v); setCurrentStep(1); }}
+                onValueChange={(v) => {
+                  setSelectedCategory(v);
+                  setProjectData((current) => ({ ...current, subtipo: '' }));
+                  setCurrentStep(1);
+                }}
               />
             </div>
             {/* Progress Bar */}

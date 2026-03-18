@@ -201,6 +201,7 @@ Considere legislação brasileira: Código de Mineração (Decreto-Lei 227/67), 
 
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(categoryId);
+    setProjectData((current) => ({ ...current, subtipo: '' }));
     setActiveTab('projeto');
     setCurrentStep(1);
   };
@@ -491,6 +492,7 @@ Considere legislação brasileira: Código de Mineração (Decreto-Lei 227/67), 
               categories={subcategories} 
               onSelect={handleCategorySelect}
               selectedCategory={selectedCategory}
+              getSubtypes={(categoryId) => projectTypes[categoryId]?.subtypes ?? []}
             />
           </TabsContent>
 
@@ -500,7 +502,11 @@ Considere legislação brasileira: Código de Mineração (Decreto-Lei 227/67), 
               <CategoryDropdown 
                 categories={subcategories} 
                 value={selectedCategory} 
-                onValueChange={(v) => { setSelectedCategory(v); setCurrentStep(1); }}
+                onValueChange={(v) => {
+                  setSelectedCategory(v);
+                  setProjectData((current) => ({ ...current, subtipo: '' }));
+                  setCurrentStep(1);
+                }}
               />
             </div>
             {/* Progress Bar */}

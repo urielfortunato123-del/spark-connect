@@ -1,21 +1,11 @@
-import { useState } from 'react';
-import { 
-  Accordion, 
-  AccordionContent, 
-  AccordionItem, 
-  AccordionTrigger 
-} from '@/components/ui/accordion';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface CategoryItem {
@@ -32,53 +22,65 @@ interface CategoryAccordionProps {
   categories: CategoryItem[];
   onSelect: (categoryId: string) => void;
   selectedCategory?: string | null;
+  getSubtypes?: (categoryId: string) => string[];
 }
 
-export function CategoryAccordion({ categories, onSelect, selectedCategory }: CategoryAccordionProps) {
+export function CategoryAccordion({
+  categories,
+  onSelect,
+  selectedCategory,
+  getSubtypes,
+}: CategoryAccordionProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
       {categories.map((cat) => {
         const Icon = cat.icon;
         const isSelected = selectedCategory === cat.id;
-        
+        const subtypes = cat.subtypes?.length ? cat.subtypes : getSubtypes?.(cat.id) ?? [];
+
         return (
-          <Card 
-            key={cat.id} 
-            className={cn(
-              "glass-card cursor-pointer transition-all hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5",
-              isSelected && "border-primary/50 bg-primary/5"
-            )}
+          <button
+            key={cat.id}
+            type="button"
             onClick={() => onSelect(cat.id)}
+            className={cn(
+              'glass-card w-full rounded-3xl border border-border/60 p-6 text-center transition-all duration-200 hover:border-primary/40 hover:bg-accent/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40',
+              isSelected && 'border-primary/50 bg-primary/5 shadow-lg shadow-primary/5'
+            )}
           >
-            <CardContent className="p-6 flex flex-col items-center text-center gap-3">
-              <div className={cn(
-                "w-12 h-12 rounded-xl flex items-center justify-center",
-                cat.color + '/10'
-              )}>
-                <Icon className={cn("h-6 w-6", cat.color.replace('bg-', 'text-'))} />
+            <div className="flex flex-col items-center gap-3">
+              <div
+                className={cn(
+                  'flex h-12 w-12 items-center justify-center rounded-2xl',
+                  `${cat.color}/10`
+                )}
+              >
+                <Icon className={cn('h-6 w-6', cat.color.replace('bg-', 'text-'))} />
               </div>
-              <div>
-                <h3 className="font-semibold text-sm">{cat.title}</h3>
+
+              <div className="space-y-1">
+                <h3 className="text-base font-semibold text-foreground">{cat.title}</h3>
                 {(cat.desc || cat.description) && (
-                  <p className="text-xs text-muted-foreground mt-1">{cat.desc || cat.description}</p>
+                  <p className="text-sm text-muted-foreground">{cat.desc || cat.description}</p>
                 )}
               </div>
-              {cat.subtypes && cat.subtypes.length > 0 && (
-                <div className="flex flex-wrap gap-1 justify-center mt-1">
-                  {cat.subtypes.slice(0, 3).map((s) => (
-                    <Badge key={s} variant="outline" className="text-[10px] px-1.5 py-0">
-                      {s}
+
+              {subtypes.length > 0 && (
+                <div className="flex flex-wrap justify-center gap-1.5 pt-1">
+                  {subtypes.slice(0, 3).map((subtype) => (
+                    <Badge key={subtype} variant="secondary" className="max-w-full truncate text-[10px]">
+                      {subtype}
                     </Badge>
                   ))}
-                  {cat.subtypes.length > 3 && (
-                    <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-                      +{cat.subtypes.length - 3}
+                  {subtypes.length > 3 && (
+                    <Badge variant="outline" className="text-[10px]">
+                      +{subtypes.length - 3} serviços
                     </Badge>
                   )}
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </button>
         );
       })}
     </div>
@@ -92,7 +94,12 @@ interface CategoryDropdownProps {
   placeholder?: string;
 }
 
-export function CategoryDropdown({ categories, value, onValueChange, placeholder = "Selecione uma categoria" }: CategoryDropdownProps) {
+export function CategoryDropdown({
+  categories,
+  value,
+  onValueChange,
+  placeholder = 'Selecione uma categoria',
+}: CategoryDropdownProps) {
   return (
     <Select value={value || ''} onValueChange={onValueChange}>
       <SelectTrigger className="w-full md:w-[300px]">
@@ -101,10 +108,11 @@ export function CategoryDropdown({ categories, value, onValueChange, placeholder
       <SelectContent>
         {categories.map((cat) => {
           const Icon = cat.icon;
+
           return (
             <SelectItem key={cat.id} value={cat.id}>
               <div className="flex items-center gap-2">
-                <Icon className={cn("h-4 w-4", cat.color.replace('bg-', 'text-'))} />
+                <Icon className={cn('h-4 w-4', cat.color.replace('bg-', 'text-'))} />
                 <span>{cat.title}</span>
               </div>
             </SelectItem>
