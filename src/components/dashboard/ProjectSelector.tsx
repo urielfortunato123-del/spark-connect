@@ -165,4 +165,3 @@ export function SubtypeSelector({ moduleId, categoryId, value, onValueChange, la
 export function useProjectSelector(moduleId: ModuleId) {
   return useModuleCategories(moduleId);
 }
-}
