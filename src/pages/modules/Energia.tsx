@@ -69,7 +69,7 @@ export default function Energia() {
     const prompt = `Faça uma análise completa de viabilidade para projeto de energia:
 
 **TIPO DE PROJETO:** ${categoryInfo?.title || selectedCategory}
-**SUBTIPO:** ${projectData.subtipo || typeInfo?.subtypes[0] || 'A definir'}
+**SUBTIPO:** ${projectData.subtipo || 'A definir'}
 
 **DADOS DO PROJETO:**
 - Nome: ${projectData.nome || 'Novo Projeto de Energia'}
