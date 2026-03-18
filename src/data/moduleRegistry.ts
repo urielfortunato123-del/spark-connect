@@ -31,7 +31,8 @@ export type ModuleId =
   | 'saneamento'
   | 'infraestrutura'
   | 'industria'
-  | 'petroleo';
+  | 'petroleo'
+  | 'ambiental';
 
 export interface CategoryDef {
   id: string;
