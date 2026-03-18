@@ -175,16 +175,12 @@ Considere legislação brasileira: Lei 9.074/95, Lei 10.848/04, Resoluções ANE
                     onChange={(e) => setProjectData({...projectData, nome: e.target.value})}
                   />
                 </div>
-                <div>
-                  <Label>Subtipo *</Label>
-                  <Select 
-                    value={projectData.subtipo}
-                    onValueChange={(v) => setProjectData({...projectData, subtipo: v})}
-                  >
-                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                    <SelectContent>
-                      {typeInfo?.subtypes.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                    </SelectContent>
+                <SubtypeSelector
+                  moduleId={MODULE_ID}
+                  categoryId={selectedCategory}
+                  value={projectData.subtipo}
+                  onValueChange={(v) => setProjectData({...projectData, subtipo: v})}
+                />
                   </Select>
                 </div>
               </div>
