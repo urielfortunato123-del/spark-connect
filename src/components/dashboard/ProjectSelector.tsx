@@ -24,6 +24,7 @@ import {
   getModuleCategories,
   getSubtypes,
 } from '@/data/moduleRegistry';
+import { useModuleCategories } from '@/hooks/useModuleCategories';
 
 // ─── Grid de categorias (aba Categorias) ────────────────────────
 
