@@ -22,67 +22,12 @@ import { useExportPDF } from '@/hooks/useExportPDF';
 import { useProjectAnalyses } from '@/hooks/useProjectAnalyses';
 import { toast } from 'sonner';
 
-const subcategories = [
-  { id: 'solar', title: 'Geração Solar', icon: Sun, color: 'bg-amber-500', desc: 'Usinas fotovoltaicas e solares térmicas' },
-  { id: 'eolica', title: 'Geração Eólica', icon: Wind, color: 'bg-cyan-500', desc: 'Parques eólicos onshore e offshore' },
-  { id: 'hidraulica', title: 'Geração Hidráulica', icon: Zap, color: 'bg-blue-500', desc: 'PCHs, CGHs e UHEs' },
-  { id: 'termica', title: 'Geração Térmica', icon: Flame, color: 'bg-orange-500', desc: 'Termelétricas a gás, carvão, biomassa' },
-  { id: 'nuclear', title: 'Geração Nuclear', icon: Atom, color: 'bg-purple-500', desc: 'Usinas nucleares' },
-  { id: 'transmissao', title: 'Linhas de Transmissão', icon: Cable, color: 'bg-yellow-500', desc: 'LTs de alta tensão' },
-  { id: 'subestacao', title: 'Subestações', icon: Building2, color: 'bg-yellow-600', desc: 'SEs de transformação' },
-  { id: 'distribuicao', title: 'Distribuição', icon: Zap, color: 'bg-emerald-500', desc: 'Redes de distribuição' },
-];
-
-const workflowSteps = [
-  { step: 1, id: 'tipo', title: 'Tipo de Projeto' },
-  { step: 2, id: 'local', title: 'Localização' },
-  { step: 3, id: 'tecnico', title: 'Dados Técnicos' },
-  { step: 4, id: 'analise', title: 'Análise IA' },
-  { step: 5, id: 'resultado', title: 'Resultado' },
-];
-
-const brazilianStates = [
-  "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", 
-  "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", 
-  "RS", "RO", "RR", "SC", "SP", "SE", "TO"
-];
-
-const projectTypes: Record<string, { label: string; subtypes: string[] }> = {
-  solar: { 
-    label: 'Solar',
-    subtypes: ['Usina Solar Fotovoltaica (UFV)', 'Usina Solar Térmica (CSP)', 'Geração Distribuída (GD)', 'Minigeração'] 
-  },
-  eolica: { 
-    label: 'Eólica',
-    subtypes: ['Parque Eólico Onshore', 'Parque Eólico Offshore', 'Aerogerador Isolado'] 
-  },
-  hidraulica: { 
-    label: 'Hidráulica',
-    subtypes: ['CGH (até 5 MW)', 'PCH (5 a 30 MW)', 'UHE (acima 30 MW)', 'Reversível'] 
-  },
-  termica: { 
-    label: 'Térmica',
-    subtypes: ['Gás Natural', 'Carvão', 'Biomassa', 'Resíduos Sólidos', 'Cogeração'] 
-  },
-  transmissao: { 
-    label: 'Transmissão',
-    subtypes: ['LT 138 kV', 'LT 230 kV', 'LT 345 kV', 'LT 500 kV', 'LT 765 kV', 'LT CC'] 
-  },
-  nuclear: { 
-    label: 'Nuclear',
-    subtypes: ['Usina PWR', 'Usina BWR', 'SMR (Reator Modular Pequeno)'] 
-  },
-  subestacao: { 
-    label: 'Subestação',
-    subtypes: ['SE Elevadora', 'SE Abaixadora', 'SE Seccionadora', 'SE Conversora'] 
-  },
-  distribuicao: { 
-    label: 'Distribuição',
-    subtypes: ['Rede de MT', 'Rede de BT', 'Subestação de Distribuição', 'Linha de Distribuição Rural'] 
-  },
-};
+const MODULE_ID = 'energia' as const;
 
 export default function Energia() {
+  const { categories: subcategories, getCategoryInfo, getCategorySubtypes } = useProjectSelector(MODULE_ID);
+  const workflowSteps = DEFAULT_WORKFLOW_STEPS;
+  const brazilianStates = BRAZILIAN_STATES;
   const [activeTab, setActiveTab] = useState('categorias');
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
