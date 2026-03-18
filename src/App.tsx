@@ -167,12 +167,20 @@ const App = () => (
                 } 
               />
 
-              {/* Admin Route - Protected for admins only */}
+              {/* Admin Routes - Protected for admins only */}
               <Route 
                 path="/admin" 
                 element={
                   <ProtectedRoute requireAdmin>
                     <Admin />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/categorias" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <AdminCategories />
                   </ProtectedRoute>
                 } 
               />
