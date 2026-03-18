@@ -375,7 +375,7 @@ Considere legislação brasileira: Lei 9.074/95, Lei 10.848/04, Resoluções ANE
                       {saveAnalysis.isPending ? 'Salvando...' : 'Salvar'}
                     </Button>
                     <Button variant="outline" onClick={() => {
-                      const categoryInfo = subcategories.find(c => c.id === selectedCategory);
+                      const categoryInfo = getCategoryInfo(selectedCategory);
                       const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
                       exportPDF({
                         title: 'Relatório de Viabilidade',
