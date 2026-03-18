@@ -101,7 +101,7 @@ export function CategoryDropdown({
   placeholder = 'Selecione uma categoria',
 }: CategoryDropdownProps) {
   return (
-    <Select value={value || ''} onValueChange={onValueChange}>
+    <Select value={value ?? undefined} onValueChange={onValueChange}>
       <SelectTrigger className="w-full md:w-[300px]">
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>

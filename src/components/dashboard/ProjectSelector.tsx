@@ -92,7 +92,7 @@ export function CategoryDropdown({ moduleId, value, onValueChange, placeholder =
   const categories = useMemo(() => getModuleCategories(moduleId), [moduleId]);
 
   return (
-    <Select value={value || ''} onValueChange={onValueChange}>
+    <Select value={value ?? undefined} onValueChange={onValueChange}>
       <SelectTrigger className="w-full md:w-[300px]">
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
@@ -130,13 +130,23 @@ export function SubtypeSelector({ moduleId, categoryId, value, onValueChange, la
   );
 
   const isDisabled = !categoryId || subtypes.length === 0;
+  const selectPlaceholder = !categoryId
+    ? 'Selecione a categoria primeiro'
+    : subtypes.length === 0
+      ? 'Nenhum subtipo disponível'
+      : 'Selecione';
 
   return (
     <div>
       <Label>{label}</Label>
-      <Select value={value} onValueChange={onValueChange} disabled={isDisabled}>
+      <Select
+        key={`${moduleId}-${categoryId ?? 'sem-categoria'}`}
+        value={value || undefined}
+        onValueChange={onValueChange}
+        disabled={isDisabled}
+      >
         <SelectTrigger className={cn(isDisabled && 'opacity-50')}>
-          <SelectValue placeholder={isDisabled ? 'Selecione a categoria primeiro' : 'Selecione'} />
+          <SelectValue placeholder={selectPlaceholder} />
         </SelectTrigger>
         <SelectContent>
           {subtypes.map((s) => (
