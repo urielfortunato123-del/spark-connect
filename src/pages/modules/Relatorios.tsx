@@ -458,6 +458,7 @@ Use dados relevantes do banco de dados e forneça insights acionáveis.`;
               </Card>
             ) : (
               <>
+                {/* Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <Card className="glass-card">
                     <CardContent className="p-4 text-center">
@@ -467,7 +468,7 @@ Use dados relevantes do banco de dados e forneça insights acionáveis.`;
                   </Card>
                   <Card className="glass-card">
                     <CardContent className="p-4 text-center">
-                      <p className="text-3xl font-bold text-accent">{[...new Set(analyses.map(a => a.module))].length}</p>
+                      <p className="text-3xl font-bold text-accent">{availableModules.length}</p>
                       <p className="text-sm text-muted-foreground">Módulos utilizados</p>
                     </CardContent>
                   </Card>
@@ -481,52 +482,110 @@ Use dados relevantes do banco de dados e forneça insights acionáveis.`;
                   </Card>
                 </div>
 
-                {analyses.map((analysis) => (
-                  <Card key={analysis.id} className="glass-card">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <CardTitle className="text-base">{analysis.project_name}</CardTitle>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Badge variant="secondary">{analysis.module}</Badge>
-                            {analysis.category && <Badge variant="outline">{analysis.category}</Badge>}
-                            <span className="text-xs text-muted-foreground">
-                              {new Date(analysis.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex gap-1">
-                          <Button size="icon" variant="ghost" onClick={() => setViewingAnalysis(viewingAnalysis === analysis.id ? null : analysis.id)}>
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button size="icon" variant="ghost" onClick={() => {
-                            exportPDF({
-                              title: 'Relatório de Viabilidade',
-                              subtitle: analysis.category || undefined,
-                              moduleName: analysis.module,
-                              projectData: { ...(analysis.project_data as Record<string, any>), nome: analysis.project_name },
-                              analysisContent: analysis.analysis_content,
-                            });
-                          }}>
-                            <Download className="h-4 w-4" />
-                          </Button>
-                          <Button size="icon" variant="ghost" className="text-destructive" onClick={() => deleteAnalysis.mutate(analysis.id)}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
+                {/* Filters */}
+                <Card className="glass-card">
+                  <CardContent className="p-4">
+                    <div className="flex flex-col md:flex-row gap-3">
+                      <div className="flex-1">
+                        <Input
+                          placeholder="Buscar por nome, módulo ou categoria..."
+                          value={filterSearch}
+                          onChange={(e) => setFilterSearch(e.target.value)}
+                          className="w-full"
+                        />
                       </div>
-                    </CardHeader>
-                    {viewingAnalysis === analysis.id && (
-                      <CardContent>
-                        <ScrollArea className="h-[400px]">
-                          <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap p-4 rounded-lg bg-muted/30 border">
-                            {analysis.analysis_content}
-                          </div>
-                        </ScrollArea>
-                      </CardContent>
+                      <Select value={filterModule} onValueChange={setFilterModule}>
+                        <SelectTrigger className="w-full md:w-[200px]">
+                          <SelectValue placeholder="Módulo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Todos os módulos</SelectItem>
+                          {availableModules.map(m => (
+                            <SelectItem key={m} value={m}>{m}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Select value={filterPeriod} onValueChange={setFilterPeriod}>
+                        <SelectTrigger className="w-full md:w-[180px]">
+                          <SelectValue placeholder="Período" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Todo o período</SelectItem>
+                          <SelectItem value="7d">Últimos 7 dias</SelectItem>
+                          <SelectItem value="30d">Últimos 30 dias</SelectItem>
+                          <SelectItem value="90d">Últimos 3 meses</SelectItem>
+                          <SelectItem value="1y">Último ano</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {(filterModule !== 'all' || filterPeriod !== 'all' || filterSearch) && (
+                      <div className="flex items-center justify-between mt-3 pt-3 border-t">
+                        <span className="text-sm text-muted-foreground">
+                          {filteredAnalyses.length} de {analyses.length} análises
+                        </span>
+                        <Button variant="ghost" size="sm" onClick={() => { setFilterModule('all'); setFilterPeriod('all'); setFilterSearch(''); }}>
+                          Limpar filtros
+                        </Button>
+                      </div>
                     )}
+                  </CardContent>
+                </Card>
+
+                {/* Analysis List */}
+                {filteredAnalyses.length === 0 ? (
+                  <Card className="glass-card">
+                    <CardContent className="py-8 text-center">
+                      <p className="text-muted-foreground">Nenhuma análise encontrada com os filtros aplicados</p>
+                    </CardContent>
                   </Card>
-                ))}
+                ) : (
+                  filteredAnalyses.map((analysis) => (
+                    <Card key={analysis.id} className="glass-card">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <CardTitle className="text-base">{analysis.project_name}</CardTitle>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Badge variant="secondary">{analysis.module}</Badge>
+                              {analysis.category && <Badge variant="outline">{analysis.category}</Badge>}
+                              <span className="text-xs text-muted-foreground">
+                                {new Date(analysis.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex gap-1">
+                            <Button size="icon" variant="ghost" onClick={() => setViewingAnalysis(viewingAnalysis === analysis.id ? null : analysis.id)}>
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button size="icon" variant="ghost" onClick={() => {
+                              exportPDF({
+                                title: 'Relatório de Viabilidade',
+                                subtitle: analysis.category || undefined,
+                                moduleName: analysis.module,
+                                projectData: { ...(analysis.project_data as Record<string, any>), nome: analysis.project_name },
+                                analysisContent: analysis.analysis_content,
+                              });
+                            }}>
+                              <Download className="h-4 w-4" />
+                            </Button>
+                            <Button size="icon" variant="ghost" className="text-destructive" onClick={() => deleteAnalysis.mutate(analysis.id)}>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      {viewingAnalysis === analysis.id && (
+                        <CardContent>
+                          <ScrollArea className="h-[400px]">
+                            <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap p-4 rounded-lg bg-muted/30 border">
+                              {analysis.analysis_content}
+                            </div>
+                          </ScrollArea>
+                        </CardContent>
+                      )}
+                    </Card>
+                  ))
+                )}
               </>
             )}
           </TabsContent>
