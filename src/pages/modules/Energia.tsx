@@ -180,8 +180,6 @@ Considere legislação brasileira: Lei 9.074/95, Lei 10.848/04, Resoluções ANE
                   value={projectData.subtipo}
                   onValueChange={(v) => setProjectData({...projectData, subtipo: v})}
                 />
-                  </Select>
-                </div>
               </div>
               <div>
                 <Label>Modelo Comercial</Label>
