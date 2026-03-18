@@ -367,7 +367,7 @@ Considere legislação brasileira: Lei 9.074/95, Lei 10.848/04, Resoluções ANE
                   </ScrollArea>
                   <div className="flex gap-2 pt-4 border-t">
                     <Button onClick={() => {
-                      const categoryInfo = subcategories.find(c => c.id === selectedCategory);
+                      const categoryInfo = getCategoryInfo(selectedCategory);
                       const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
                       saveAnalysis.mutate({ module: 'Energia Elétrica', category: categoryInfo?.title, projectName: projectData.nome || 'Novo Projeto', projectData, analysisContent: content });
                     }} disabled={saveAnalysis.isPending}>
