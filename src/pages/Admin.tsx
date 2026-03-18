@@ -52,6 +52,7 @@ const moduleLabels: Record<AppModule, string> = {
 const allModules: AppModule[] = ['torres_5g', 'eletropostos', 'viabilidade', 'ambiental', 'cenarios', 'relatorios', 'ia_assistant'];
 
 export default function Admin() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [editingUser, setEditingUser] = useState<UserData | null>(null);
