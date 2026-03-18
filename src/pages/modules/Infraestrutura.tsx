@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { CategoryAccordion, CategoryDropdown } from '@/components/dashboard/CategorySelector';
+import { CategoryGrid, CategoryDropdown as CategoryDropdownNew, SubtypeSelector, useProjectSelector } from '@/components/dashboard/ProjectSelector';
+import { BRAZILIAN_STATES, DEFAULT_WORKFLOW_STEPS } from '@/data/moduleRegistry';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -21,57 +22,12 @@ import { useExportPDF } from '@/hooks/useExportPDF';
 import { useProjectAnalyses } from '@/hooks/useProjectAnalyses';
 import { toast } from 'sonner';
 
-const subcategories = [
-  { id: 'rodovias', title: 'Rodovias', icon: Route, color: 'bg-blue-500', desc: 'Implantação, duplicação e concessão rodoviária' },
-  { id: 'ferrovias', title: 'Ferrovias', icon: Train, color: 'bg-emerald-500', desc: 'Ferrovias de carga e passageiros' },
-  { id: 'portos', title: 'Portos', icon: Ship, color: 'bg-cyan-500', desc: 'Terminais portuários e TUPs' },
-  { id: 'aeroportos', title: 'Aeroportos', icon: Plane, color: 'bg-sky-500', desc: 'Aeroportos e terminais de carga aérea' },
-  { id: 'logistica', title: 'Logística', icon: Truck, color: 'bg-orange-500', desc: 'Centros logísticos e intermodais' },
-  { id: 'armazenamento', title: 'Armazenamento', icon: Warehouse, color: 'bg-amber-500', desc: 'Armazéns, silos e terminais' },
-];
-
-const workflowSteps = [
-  { step: 1, id: 'tipo', title: 'Tipo de Projeto' },
-  { step: 2, id: 'local', title: 'Localização' },
-  { step: 3, id: 'tecnico', title: 'Dados Técnicos' },
-  { step: 4, id: 'analise', title: 'Análise IA' },
-  { step: 5, id: 'resultado', title: 'Resultado' },
-];
-
-const brazilianStates = [
-  "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", 
-  "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", 
-  "RS", "RO", "RR", "SC", "SP", "SE", "TO"
-];
-
-const projectTypes: Record<string, { label: string; subtypes: string[] }> = {
-  rodovias: { 
-    label: 'Rodovias',
-    subtypes: ['Duplicação', 'Implantação', 'Concessão', 'Restauração', 'Contorno/Anel Viário', 'Ponte/Viaduto'] 
-  },
-  ferrovias: { 
-    label: 'Ferrovias',
-    subtypes: ['Ferrovia de Carga', 'VLT/Metrô', 'Trem de Passageiros', 'Ramal Ferroviário', 'TAV', 'Pátio de Manobras'] 
-  },
-  portos: { 
-    label: 'Portos',
-    subtypes: ['Terminal de Contêineres', 'Terminal Granéis Sólidos', 'Terminal Granéis Líquidos', 'TUP', 'Porto Seco', 'Marina'] 
-  },
-  aeroportos: { 
-    label: 'Aeroportos',
-    subtypes: ['Aeroporto Internacional', 'Aeroporto Regional', 'Terminal de Carga (TECA)', 'Ampliação de Pista', 'Novo Terminal'] 
-  },
-  logistica: { 
-    label: 'Logística',
-    subtypes: ['Centro de Distribuição', 'Terminal Intermodal', 'Estação Aduaneira (EADI)', 'Hub Logístico', 'Plataforma Logística'] 
-  },
-  armazenamento: { 
-    label: 'Armazenamento',
-    subtypes: ['Silo Graneleiro', 'Armazém Frigorífico', 'Terminal de Combustíveis', 'Armazém Geral', 'Centro de Armazenagem'] 
-  },
-};
+const MODULE_ID = 'infraestrutura' as const;
 
 export default function Infraestrutura() {
+  const { categories: subcategories, getCategoryInfo, getCategorySubtypes } = useProjectSelector(MODULE_ID);
+  const workflowSteps = DEFAULT_WORKFLOW_STEPS;
+  const brazilianStates = BRAZILIAN_STATES;
   const [activeTab, setActiveTab] = useState('categorias');
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -108,13 +64,13 @@ export default function Infraestrutura() {
     clearMessages();
     setCurrentStep(4);
     
-    const categoryInfo = subcategories.find(c => c.id === selectedCategory);
-    const typeInfo = projectTypes[selectedCategory || ''];
+    const categoryInfo = getCategoryInfo(selectedCategory);
+    
     
     const prompt = `Faça uma análise completa de viabilidade para projeto de infraestrutura e transportes:
 
 **TIPO DE PROJETO:** ${categoryInfo?.title || selectedCategory}
-**SUBTIPO:** ${projectData.subtipo || typeInfo?.subtypes[0] || 'A definir'}
+**SUBTIPO:** ${projectData.subtipo || 'A definir'}
 
 **DADOS DO PROJETO:**
 - Nome: ${projectData.nome || 'Novo Projeto de Infraestrutura'}
@@ -206,8 +162,8 @@ Considere legislação brasileira: Lei 8.987/95 (Concessões), Lei 11.079/04 (PP
   };
 
   const renderWorkflowStep = () => {
-    const categoryInfo = subcategories.find(c => c.id === selectedCategory);
-    const typeInfo = projectTypes[selectedCategory || ''];
+    const categoryInfo = getCategoryInfo(selectedCategory);
+    
     const isLinear = selectedCategory === 'rodovias' || selectedCategory === 'ferrovias';
     const isTerminal = selectedCategory === 'portos' || selectedCategory === 'aeroportos' || selectedCategory === 'armazenamento';
 
@@ -232,18 +188,12 @@ Considere legislação brasileira: Lei 8.987/95 (Concessões), Lei 11.079/04 (PP
                     onChange={(e) => setProjectData({...projectData, nome: e.target.value})}
                   />
                 </div>
-                <div>
-                  <Label>Subtipo *</Label>
-                  <Select 
-                    value={projectData.subtipo}
-                    onValueChange={(v) => setProjectData({...projectData, subtipo: v})}
-                  >
-                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                    <SelectContent>
-                      {typeInfo?.subtypes.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <SubtypeSelector
+                  moduleId={MODULE_ID}
+                  categoryId={selectedCategory}
+                  value={projectData.subtipo}
+                  onValueChange={(v) => setProjectData({...projectData, subtipo: v})}
+                />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -426,7 +376,7 @@ Considere legislação brasileira: Lei 8.987/95 (Concessões), Lei 11.079/04 (PP
                   </ScrollArea>
                   <div className="flex gap-2 pt-4 border-t">
                     <Button onClick={() => {
-                      const categoryInfo = subcategories.find(c => c.id === selectedCategory);
+                      const categoryInfo = getCategoryInfo(selectedCategory);
                       const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
                       saveAnalysis.mutate({ module: 'Infraestrutura', category: categoryInfo?.title, projectName: projectData.nome || 'Novo Projeto', projectData, analysisContent: content });
                     }} disabled={saveAnalysis.isPending}>
@@ -434,7 +384,7 @@ Considere legislação brasileira: Lei 8.987/95 (Concessões), Lei 11.079/04 (PP
                       {saveAnalysis.isPending ? 'Salvando...' : 'Salvar'}
                     </Button>
                     <Button variant="outline" onClick={() => {
-                      const categoryInfo = subcategories.find(c => c.id === selectedCategory);
+                      const categoryInfo = getCategoryInfo(selectedCategory);
                       const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
                       exportPDF({
                         title: 'Relatório de Viabilidade',
@@ -490,27 +440,26 @@ Considere legislação brasileira: Lei 8.987/95 (Concessões), Lei 11.079/04 (PP
               Projeto
               {selectedCategory && (
                 <Badge variant="secondary" className="ml-2 text-xs">
-                  {subcategories.find(c => c.id === selectedCategory)?.title}
+                  {getCategoryInfo(selectedCategory)?.title}
                 </Badge>
               )}
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="categorias" className="mt-6">
-            <CategoryAccordion 
-              categories={subcategories} 
-              onSelect={handleCategorySelect}
+            <CategoryGrid
+              moduleId={MODULE_ID}
               selectedCategory={selectedCategory}
-              getSubtypes={(categoryId) => projectTypes[categoryId]?.subtypes ?? []}
+              onSelectCategory={handleCategorySelect}
             />
           </TabsContent>
 
           <TabsContent value="projeto" className="mt-6 space-y-6">
             <div className="flex items-center gap-3">
               <span className="text-sm font-medium text-muted-foreground">Categoria:</span>
-              <CategoryDropdown 
-                categories={subcategories} 
-                value={selectedCategory} 
+              <CategoryDropdownNew
+                moduleId={MODULE_ID}
+                value={selectedCategory}
                 onValueChange={(v) => {
                   setSelectedCategory(v);
                   setProjectData((current) => ({ ...current, subtipo: '' }));

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { CategoryAccordion, CategoryDropdown } from '@/components/dashboard/CategorySelector';
+import { CategoryGrid, CategoryDropdown as CategoryDropdownNew, SubtypeSelector, useProjectSelector } from '@/components/dashboard/ProjectSelector';
+import { BRAZILIAN_STATES, DEFAULT_WORKFLOW_STEPS } from '@/data/moduleRegistry';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -21,52 +22,12 @@ import { useExportPDF } from '@/hooks/useExportPDF';
 import { useProjectAnalyses } from '@/hooks/useProjectAnalyses';
 import { toast } from 'sonner';
 
-const subcategories = [
-  { id: 'celulose', title: 'Papel e Celulose', icon: FileStack, color: 'bg-amber-600', desc: 'Fábricas de celulose, papel e embalagens' },
-  { id: 'cimento', title: 'Cimento', icon: Boxes, color: 'bg-stone-500', desc: 'Fábricas de cimento e concreto' },
-  { id: 'fertilizantes', title: 'Fertilizantes', icon: Leaf, color: 'bg-green-500', desc: 'Plantas de fertilizantes e agroquímicos' },
-  { id: 'biocombustiveis', title: 'Biocombustíveis', icon: Fuel, color: 'bg-emerald-500', desc: 'Usinas de etanol, biodiesel e biogás' },
-  { id: 'petroquimica', title: 'Petroquímica', icon: Beaker, color: 'bg-purple-500', desc: 'Plantas petroquímicas e polímeros' },
-];
-
-const workflowSteps = [
-  { step: 1, id: 'tipo', title: 'Tipo de Projeto' },
-  { step: 2, id: 'local', title: 'Localização' },
-  { step: 3, id: 'tecnico', title: 'Dados Técnicos' },
-  { step: 4, id: 'analise', title: 'Análise IA' },
-  { step: 5, id: 'resultado', title: 'Resultado' },
-];
-
-const brazilianStates = [
-  "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", 
-  "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", 
-  "RS", "RO", "RR", "SC", "SP", "SE", "TO"
-];
-
-const projectTypes: Record<string, { label: string; subtypes: string[] }> = {
-  celulose: { 
-    label: 'Papel e Celulose',
-    subtypes: ['Fábrica de Celulose Kraft', 'Fábrica de Celulose Solúvel', 'Fábrica de Papel', 'Fábrica de Embalagens', 'Linha de Fibras', 'Planta de Tissue'] 
-  },
-  cimento: { 
-    label: 'Cimento',
-    subtypes: ['Fábrica Integrada', 'Moagem de Cimento', 'Planta de Concreto (Batching)', 'Fábrica de Argamassa', 'Planta de Cal'] 
-  },
-  fertilizantes: { 
-    label: 'Fertilizantes',
-    subtypes: ['Planta de NPK', 'Fábrica de Fosfatados', 'Fábrica de Nitrogenados', 'Planta de Potássio', 'Defensivos Agrícolas', 'Misturadora'] 
-  },
-  biocombustiveis: { 
-    label: 'Biocombustíveis',
-    subtypes: ['Usina de Etanol 1G', 'Usina de Etanol 2G', 'Planta de Biodiesel', 'Planta de Biogás', 'Usina de Cogeração (Biomassa)', 'Planta de SAF'] 
-  },
-  petroquimica: { 
-    label: 'Petroquímica',
-    subtypes: ['Central Petroquímica', 'Planta de Polietileno', 'Planta de Polipropileno', 'Planta de PVC', 'Planta de PET', 'Planta de Resinas'] 
-  },
-};
+const MODULE_ID = 'industria' as const;
 
 export default function Industria() {
+  const { categories: subcategories, getCategoryInfo, getCategorySubtypes } = useProjectSelector(MODULE_ID);
+  const workflowSteps = DEFAULT_WORKFLOW_STEPS;
+  const brazilianStates = BRAZILIAN_STATES;
   const [activeTab, setActiveTab] = useState('categorias');
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -102,13 +63,13 @@ export default function Industria() {
     clearMessages();
     setCurrentStep(4);
     
-    const categoryInfo = subcategories.find(c => c.id === selectedCategory);
-    const typeInfo = projectTypes[selectedCategory || ''];
+    const categoryInfo = getCategoryInfo(selectedCategory);
+    
     
     const prompt = `Faça uma análise completa de viabilidade para projeto industrial:
 
 **TIPO DE PROJETO:** ${categoryInfo?.title || selectedCategory}
-**SUBTIPO:** ${projectData.subtipo || typeInfo?.subtypes[0] || 'A definir'}
+**SUBTIPO:** ${projectData.subtipo || 'A definir'}
 
 **DADOS DO PROJETO:**
 - Nome: ${projectData.nome || 'Novo Projeto Industrial'}
@@ -203,8 +164,8 @@ Considere legislação brasileira: PNRS (Lei 12.305/10), Política Nacional de B
   };
 
   const renderWorkflowStep = () => {
-    const categoryInfo = subcategories.find(c => c.id === selectedCategory);
-    const typeInfo = projectTypes[selectedCategory || ''];
+    const categoryInfo = getCategoryInfo(selectedCategory);
+    
 
     switch (currentStep) {
       case 1:
@@ -227,18 +188,12 @@ Considere legislação brasileira: PNRS (Lei 12.305/10), Política Nacional de B
                     onChange={(e) => setProjectData({...projectData, nome: e.target.value})}
                   />
                 </div>
-                <div>
-                  <Label>Subtipo *</Label>
-                  <Select 
-                    value={projectData.subtipo}
-                    onValueChange={(v) => setProjectData({...projectData, subtipo: v})}
-                  >
-                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                    <SelectContent>
-                      {typeInfo?.subtypes.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <SubtypeSelector
+                  moduleId={MODULE_ID}
+                  categoryId={selectedCategory}
+                  value={projectData.subtipo}
+                  onValueChange={(v) => setProjectData({...projectData, subtipo: v})}
+                />
               </div>
               <div>
                 <Label>Investidor/Grupo</Label>
@@ -394,7 +349,7 @@ Considere legislação brasileira: PNRS (Lei 12.305/10), Política Nacional de B
                   </ScrollArea>
                   <div className="flex gap-2 pt-4 border-t">
                     <Button onClick={() => {
-                      const categoryInfo = subcategories.find(c => c.id === selectedCategory);
+                      const categoryInfo = getCategoryInfo(selectedCategory);
                       const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
                       saveAnalysis.mutate({ module: 'Indústria', category: categoryInfo?.title, projectName: projectData.nome || 'Novo Projeto', projectData, analysisContent: content });
                     }} disabled={saveAnalysis.isPending}>
@@ -402,7 +357,7 @@ Considere legislação brasileira: PNRS (Lei 12.305/10), Política Nacional de B
                       {saveAnalysis.isPending ? 'Salvando...' : 'Salvar'}
                     </Button>
                     <Button variant="outline" onClick={() => {
-                      const categoryInfo = subcategories.find(c => c.id === selectedCategory);
+                      const categoryInfo = getCategoryInfo(selectedCategory);
                       const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
                       exportPDF({
                         title: 'Relatório de Viabilidade',
@@ -458,27 +413,26 @@ Considere legislação brasileira: PNRS (Lei 12.305/10), Política Nacional de B
               Projeto
               {selectedCategory && (
                 <Badge variant="secondary" className="ml-2 text-xs">
-                  {subcategories.find(c => c.id === selectedCategory)?.title}
+                  {getCategoryInfo(selectedCategory)?.title}
                 </Badge>
               )}
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="categorias" className="mt-6">
-            <CategoryAccordion 
-              categories={subcategories} 
-              onSelect={handleCategorySelect}
+            <CategoryGrid
+              moduleId={MODULE_ID}
               selectedCategory={selectedCategory}
-              getSubtypes={(categoryId) => projectTypes[categoryId]?.subtypes ?? []}
+              onSelectCategory={handleCategorySelect}
             />
           </TabsContent>
 
           <TabsContent value="projeto" className="mt-6 space-y-6">
             <div className="flex items-center gap-3">
               <span className="text-sm font-medium text-muted-foreground">Categoria:</span>
-              <CategoryDropdown 
-                categories={subcategories} 
-                value={selectedCategory} 
+              <CategoryDropdownNew
+                moduleId={MODULE_ID}
+                value={selectedCategory}
                 onValueChange={(v) => {
                   setSelectedCategory(v);
                   setProjectData((current) => ({ ...current, subtipo: '' }));

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { CategoryAccordion, CategoryDropdown } from '@/components/dashboard/CategorySelector';
+import { CategoryGrid, CategoryDropdown as CategoryDropdownNew, SubtypeSelector, useProjectSelector } from '@/components/dashboard/ProjectSelector';
+import { BRAZILIAN_STATES, DEFAULT_WORKFLOW_STEPS } from '@/data/moduleRegistry';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -21,67 +22,12 @@ import { useExportPDF } from '@/hooks/useExportPDF';
 import { useProjectAnalyses } from '@/hooks/useProjectAnalyses';
 import { toast } from 'sonner';
 
-const subcategories = [
-  { id: 'offshore', title: 'Exploração Offshore', icon: Ship, color: 'bg-amber-500', desc: 'Plataformas e campos marítimos' },
-  { id: 'onshore', title: 'Exploração Onshore', icon: Fuel, color: 'bg-amber-600', desc: 'Campos terrestres de petróleo e gás' },
-  { id: 'refino', title: 'Refino', icon: Factory, color: 'bg-orange-500', desc: 'Refinarias e unidades de processamento' },
-  { id: 'petroquimica', title: 'Petroquímica', icon: Droplet, color: 'bg-yellow-500', desc: 'Plantas petroquímicas' },
-  { id: 'dutos', title: 'Oleoduto e Gasoduto', icon: ArrowUpDown, color: 'bg-amber-400', desc: 'Dutos de transporte' },
-  { id: 'tratamento', title: 'Gás - Tratamento', icon: Waves, color: 'bg-orange-400', desc: 'UPGNs e unidades de tratamento' },
-  { id: 'processamento', title: 'Gás - Processamento', icon: Flame, color: 'bg-red-500', desc: 'Processamento de gás natural' },
-  { id: 'distribuicao', title: 'Gás - Distribuição', icon: ArrowUpDown, color: 'bg-yellow-600', desc: 'Redes de distribuição de gás' },
-];
-
-const workflowSteps = [
-  { step: 1, id: 'tipo', title: 'Tipo de Projeto' },
-  { step: 2, id: 'local', title: 'Localização' },
-  { step: 3, id: 'tecnico', title: 'Dados Técnicos' },
-  { step: 4, id: 'analise', title: 'Análise IA' },
-  { step: 5, id: 'resultado', title: 'Resultado' },
-];
-
-const brazilianStates = [
-  "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", 
-  "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", 
-  "RS", "RO", "RR", "SC", "SP", "SE", "TO"
-];
-
-const projectTypes: Record<string, { label: string; subtypes: string[] }> = {
-  offshore: { 
-    label: 'Offshore',
-    subtypes: ['Plataforma Fixa', 'FPSO', 'Semi-Submersível', 'Jacket', 'TLP', 'SPAR'] 
-  },
-  onshore: { 
-    label: 'Onshore',
-    subtypes: ['Campo Terrestre', 'Poços de Desenvolvimento', 'EOR/IOR', 'Gás Não-Convencional'] 
-  },
-  refino: { 
-    label: 'Refino',
-    subtypes: ['Refinaria Completa', 'Unidade de Destilação', 'FCC', 'HDT', 'Coqueamento'] 
-  },
-  petroquimica: { 
-    label: 'Petroquímica',
-    subtypes: ['Crackeador de Etileno', 'Planta de Polímeros', 'Aromáticos', 'Fertilizantes'] 
-  },
-  dutos: { 
-    label: 'Dutos',
-    subtypes: ['Oleoduto', 'Gasoduto', 'Poliduto', 'Duto de GLP', 'Flowline Submarino'] 
-  },
-  tratamento: { 
-    label: 'Tratamento de Gás',
-    subtypes: ['UPGN', 'Unidade de Dessulfurização', 'Planta de CO2', 'Unidade de Desidratação'] 
-  },
-  processamento: { 
-    label: 'Processamento de Gás',
-    subtypes: ['Planta de Processamento', 'Unidade de Separação', 'Planta de LNG', 'Planta de GTL'] 
-  },
-  distribuicao: { 
-    label: 'Distribuição',
-    subtypes: ['Rede de Média Pressão', 'Rede de Baixa Pressão', 'Estação de Regulagem', 'City Gate'] 
-  },
-};
+const MODULE_ID = 'petroleo' as const;
 
 export default function Petroleo() {
+  const { categories: subcategories, getCategoryInfo, getCategorySubtypes } = useProjectSelector(MODULE_ID);
+  const workflowSteps = DEFAULT_WORKFLOW_STEPS;
+  const brazilianStates = BRAZILIAN_STATES;
   const [activeTab, setActiveTab] = useState('categorias');
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -120,13 +66,13 @@ export default function Petroleo() {
     clearMessages();
     setCurrentStep(4);
     
-    const categoryInfo = subcategories.find(c => c.id === selectedCategory);
-    const typeInfo = projectTypes[selectedCategory || ''];
+    const categoryInfo = getCategoryInfo(selectedCategory);
+    
     
     const prompt = `Faça uma análise completa de viabilidade para projeto de petróleo e gás:
 
 **TIPO DE PROJETO:** ${categoryInfo?.title || selectedCategory}
-**SUBTIPO:** ${projectData.subtipo || typeInfo?.subtypes[0] || 'A definir'}
+**SUBTIPO:** ${projectData.subtipo || 'A definir'}
 
 **DADOS DO PROJETO:**
 - Nome: ${projectData.nome || 'Novo Projeto P&G'}
@@ -209,8 +155,8 @@ Considere legislação brasileira: Lei do Petróleo (9.478/97), Lei da Partilha 
   };
 
   const renderWorkflowStep = () => {
-    const categoryInfo = subcategories.find(c => c.id === selectedCategory);
-    const typeInfo = projectTypes[selectedCategory || ''];
+    const categoryInfo = getCategoryInfo(selectedCategory);
+    
     const isDutos = selectedCategory === 'dutos';
     const isOffshore = selectedCategory === 'offshore';
 
@@ -235,18 +181,12 @@ Considere legislação brasileira: Lei do Petróleo (9.478/97), Lei da Partilha 
                     onChange={(e) => setProjectData({...projectData, nome: e.target.value})}
                   />
                 </div>
-                <div>
-                  <Label>Subtipo *</Label>
-                  <Select 
-                    value={projectData.subtipo}
-                    onValueChange={(v) => setProjectData({...projectData, subtipo: v})}
-                  >
-                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                    <SelectContent>
-                      {typeInfo?.subtypes.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <SubtypeSelector
+                  moduleId={MODULE_ID}
+                  categoryId={selectedCategory}
+                  value={projectData.subtipo}
+                  onValueChange={(v) => setProjectData({...projectData, subtipo: v})}
+                />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -449,7 +389,7 @@ Considere legislação brasileira: Lei do Petróleo (9.478/97), Lei da Partilha 
                   </ScrollArea>
                   <div className="flex gap-2 pt-4 border-t">
                     <Button onClick={() => {
-                      const categoryInfo = subcategories.find(c => c.id === selectedCategory);
+                      const categoryInfo = getCategoryInfo(selectedCategory);
                       const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
                       saveAnalysis.mutate({ module: 'Petróleo & Gás', category: categoryInfo?.title, projectName: projectData.nome || 'Novo Projeto', projectData, analysisContent: content });
                     }} disabled={saveAnalysis.isPending}>
@@ -457,7 +397,7 @@ Considere legislação brasileira: Lei do Petróleo (9.478/97), Lei da Partilha 
                       {saveAnalysis.isPending ? 'Salvando...' : 'Salvar'}
                     </Button>
                     <Button variant="outline" onClick={() => {
-                      const categoryInfo = subcategories.find(c => c.id === selectedCategory);
+                      const categoryInfo = getCategoryInfo(selectedCategory);
                       const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
                       exportPDF({
                         title: 'Relatório de Viabilidade',
@@ -516,20 +456,19 @@ Considere legislação brasileira: Lei do Petróleo (9.478/97), Lei da Partilha 
           </TabsList>
 
           <TabsContent value="categorias" className="space-y-6 mt-6">
-            <CategoryAccordion 
-              categories={subcategories} 
-              onSelect={handleCategorySelect}
+            <CategoryGrid
+              moduleId={MODULE_ID}
               selectedCategory={selectedCategory}
-              getSubtypes={(categoryId) => projectTypes[categoryId]?.subtypes ?? []}
+              onSelectCategory={handleCategorySelect}
             />
           </TabsContent>
 
           <TabsContent value="projeto" className="space-y-6 mt-6">
             <div className="flex items-center gap-3">
               <span className="text-sm font-medium text-muted-foreground">Categoria:</span>
-              <CategoryDropdown 
-                categories={subcategories} 
-                value={selectedCategory} 
+              <CategoryDropdownNew
+                moduleId={MODULE_ID}
+                value={selectedCategory}
                 onValueChange={(v) => {
                   setSelectedCategory(v);
                   setProjectData((current) => ({ ...current, subtipo: '' }));

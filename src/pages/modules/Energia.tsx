@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { CategoryAccordion, CategoryDropdown } from '@/components/dashboard/CategorySelector';
+import { CategoryGrid, CategoryDropdown as CategoryDropdownNew, SubtypeSelector, useProjectSelector } from '@/components/dashboard/ProjectSelector';
+import { getModuleCategories, BRAZILIAN_STATES, DEFAULT_WORKFLOW_STEPS } from '@/data/moduleRegistry';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -21,67 +22,12 @@ import { useExportPDF } from '@/hooks/useExportPDF';
 import { useProjectAnalyses } from '@/hooks/useProjectAnalyses';
 import { toast } from 'sonner';
 
-const subcategories = [
-  { id: 'solar', title: 'Geração Solar', icon: Sun, color: 'bg-amber-500', desc: 'Usinas fotovoltaicas e solares térmicas' },
-  { id: 'eolica', title: 'Geração Eólica', icon: Wind, color: 'bg-cyan-500', desc: 'Parques eólicos onshore e offshore' },
-  { id: 'hidraulica', title: 'Geração Hidráulica', icon: Zap, color: 'bg-blue-500', desc: 'PCHs, CGHs e UHEs' },
-  { id: 'termica', title: 'Geração Térmica', icon: Flame, color: 'bg-orange-500', desc: 'Termelétricas a gás, carvão, biomassa' },
-  { id: 'nuclear', title: 'Geração Nuclear', icon: Atom, color: 'bg-purple-500', desc: 'Usinas nucleares' },
-  { id: 'transmissao', title: 'Linhas de Transmissão', icon: Cable, color: 'bg-yellow-500', desc: 'LTs de alta tensão' },
-  { id: 'subestacao', title: 'Subestações', icon: Building2, color: 'bg-yellow-600', desc: 'SEs de transformação' },
-  { id: 'distribuicao', title: 'Distribuição', icon: Zap, color: 'bg-emerald-500', desc: 'Redes de distribuição' },
-];
-
-const workflowSteps = [
-  { step: 1, id: 'tipo', title: 'Tipo de Projeto' },
-  { step: 2, id: 'local', title: 'Localização' },
-  { step: 3, id: 'tecnico', title: 'Dados Técnicos' },
-  { step: 4, id: 'analise', title: 'Análise IA' },
-  { step: 5, id: 'resultado', title: 'Resultado' },
-];
-
-const brazilianStates = [
-  "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", 
-  "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", 
-  "RS", "RO", "RR", "SC", "SP", "SE", "TO"
-];
-
-const projectTypes: Record<string, { label: string; subtypes: string[] }> = {
-  solar: { 
-    label: 'Solar',
-    subtypes: ['Usina Solar Fotovoltaica (UFV)', 'Usina Solar Térmica (CSP)', 'Geração Distribuída (GD)', 'Minigeração'] 
-  },
-  eolica: { 
-    label: 'Eólica',
-    subtypes: ['Parque Eólico Onshore', 'Parque Eólico Offshore', 'Aerogerador Isolado'] 
-  },
-  hidraulica: { 
-    label: 'Hidráulica',
-    subtypes: ['CGH (até 5 MW)', 'PCH (5 a 30 MW)', 'UHE (acima 30 MW)', 'Reversível'] 
-  },
-  termica: { 
-    label: 'Térmica',
-    subtypes: ['Gás Natural', 'Carvão', 'Biomassa', 'Resíduos Sólidos', 'Cogeração'] 
-  },
-  transmissao: { 
-    label: 'Transmissão',
-    subtypes: ['LT 138 kV', 'LT 230 kV', 'LT 345 kV', 'LT 500 kV', 'LT 765 kV', 'LT CC'] 
-  },
-  nuclear: { 
-    label: 'Nuclear',
-    subtypes: ['Usina PWR', 'Usina BWR', 'SMR (Reator Modular Pequeno)'] 
-  },
-  subestacao: { 
-    label: 'Subestação',
-    subtypes: ['SE Elevadora', 'SE Abaixadora', 'SE Seccionadora', 'SE Conversora'] 
-  },
-  distribuicao: { 
-    label: 'Distribuição',
-    subtypes: ['Rede de MT', 'Rede de BT', 'Subestação de Distribuição', 'Linha de Distribuição Rural'] 
-  },
-};
+const MODULE_ID = 'energia' as const;
 
 export default function Energia() {
+  const { categories: subcategories, getCategoryInfo, getCategorySubtypes } = useProjectSelector(MODULE_ID);
+  const workflowSteps = DEFAULT_WORKFLOW_STEPS;
+  const brazilianStates = BRAZILIAN_STATES;
   const [activeTab, setActiveTab] = useState('categorias');
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -118,13 +64,12 @@ export default function Energia() {
     clearMessages();
     setCurrentStep(4);
     
-    const categoryInfo = subcategories.find(c => c.id === selectedCategory);
-    const typeInfo = projectTypes[selectedCategory || ''];
+    const categoryInfo = getCategoryInfo(selectedCategory);
     
     const prompt = `Faça uma análise completa de viabilidade para projeto de energia:
 
 **TIPO DE PROJETO:** ${categoryInfo?.title || selectedCategory}
-**SUBTIPO:** ${projectData.subtipo || typeInfo?.subtypes[0] || 'A definir'}
+**SUBTIPO:** ${projectData.subtipo || 'A definir'}
 
 **DADOS DO PROJETO:**
 - Nome: ${projectData.nome || 'Novo Projeto de Energia'}
@@ -204,8 +149,7 @@ Considere legislação brasileira: Lei 9.074/95, Lei 10.848/04, Resoluções ANE
   };
 
   const renderWorkflowStep = () => {
-    const categoryInfo = subcategories.find(c => c.id === selectedCategory);
-    const typeInfo = projectTypes[selectedCategory || ''];
+    const categoryInfo = getCategoryInfo(selectedCategory);
     const isTransmission = selectedCategory === 'transmissao' || selectedCategory === 'subestacao';
 
     switch (currentStep) {
@@ -229,18 +173,12 @@ Considere legislação brasileira: Lei 9.074/95, Lei 10.848/04, Resoluções ANE
                     onChange={(e) => setProjectData({...projectData, nome: e.target.value})}
                   />
                 </div>
-                <div>
-                  <Label>Subtipo *</Label>
-                  <Select 
-                    value={projectData.subtipo}
-                    onValueChange={(v) => setProjectData({...projectData, subtipo: v})}
-                  >
-                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                    <SelectContent>
-                      {typeInfo?.subtypes.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <SubtypeSelector
+                  moduleId={MODULE_ID}
+                  categoryId={selectedCategory}
+                  value={projectData.subtipo}
+                  onValueChange={(v) => setProjectData({...projectData, subtipo: v})}
+                />
               </div>
               <div>
                 <Label>Modelo Comercial</Label>
@@ -429,7 +367,7 @@ Considere legislação brasileira: Lei 9.074/95, Lei 10.848/04, Resoluções ANE
                   </ScrollArea>
                   <div className="flex gap-2 pt-4 border-t">
                     <Button onClick={() => {
-                      const categoryInfo = subcategories.find(c => c.id === selectedCategory);
+                      const categoryInfo = getCategoryInfo(selectedCategory);
                       const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
                       saveAnalysis.mutate({ module: 'Energia Elétrica', category: categoryInfo?.title, projectName: projectData.nome || 'Novo Projeto', projectData, analysisContent: content });
                     }} disabled={saveAnalysis.isPending}>
@@ -437,7 +375,7 @@ Considere legislação brasileira: Lei 9.074/95, Lei 10.848/04, Resoluções ANE
                       {saveAnalysis.isPending ? 'Salvando...' : 'Salvar'}
                     </Button>
                     <Button variant="outline" onClick={() => {
-                      const categoryInfo = subcategories.find(c => c.id === selectedCategory);
+                      const categoryInfo = getCategoryInfo(selectedCategory);
                       const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
                       exportPDF({
                         title: 'Relatório de Viabilidade',
@@ -487,25 +425,24 @@ Considere legislação brasileira: Lei 9.074/95, Lei 10.848/04, Resoluções ANE
           <TabsList>
             <TabsTrigger value="categorias">Categorias</TabsTrigger>
             <TabsTrigger value="projeto" disabled={!selectedCategory}>
-              Novo Projeto {selectedCategory && `(${subcategories.find(c => c.id === selectedCategory)?.title})`}
+              Novo Projeto {selectedCategory && `(${getCategoryInfo(selectedCategory)?.title})`}
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="categorias" className="mt-6">
-            <CategoryAccordion 
-              categories={subcategories} 
-              onSelect={handleCategorySelect}
+            <CategoryGrid
+              moduleId={MODULE_ID}
               selectedCategory={selectedCategory}
-              getSubtypes={(categoryId) => projectTypes[categoryId]?.subtypes ?? []}
+              onSelectCategory={handleCategorySelect}
             />
           </TabsContent>
 
           <TabsContent value="projeto" className="space-y-6 mt-6">
             <div className="flex items-center gap-3">
               <span className="text-sm font-medium text-muted-foreground">Categoria:</span>
-              <CategoryDropdown 
-                categories={subcategories} 
-                value={selectedCategory} 
+              <CategoryDropdownNew
+                moduleId={MODULE_ID}
+                value={selectedCategory}
                 onValueChange={(v) => {
                   setSelectedCategory(v);
                   setProjectData((current) => ({ ...current, subtipo: '' }));
