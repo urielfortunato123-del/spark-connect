@@ -7,7 +7,7 @@
  * - Compatível com dark-theme e inputs estilizados do projeto.
  */
 
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import {
   Select,
   SelectContent,
