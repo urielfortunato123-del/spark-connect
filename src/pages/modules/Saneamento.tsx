@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { CategoryAccordion, CategoryDropdown } from '@/components/dashboard/CategorySelector';
+import { CategoryGrid, CategoryDropdown as CategoryDropdownNew, SubtypeSelector, useProjectSelector } from '@/components/dashboard/ProjectSelector';
+import { BRAZILIAN_STATES, DEFAULT_WORKFLOW_STEPS } from '@/data/moduleRegistry';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -21,57 +22,12 @@ import { useExportPDF } from '@/hooks/useExportPDF';
 import { useProjectAnalyses } from '@/hooks/useProjectAnalyses';
 import { toast } from 'sonner';
 
-const subcategories = [
-  { id: 'agua', title: 'Saneamento - Água', icon: Droplets, color: 'bg-cyan-500', desc: 'Captação, tratamento e distribuição' },
-  { id: 'esgoto', title: 'Saneamento - Esgoto', icon: Waves, color: 'bg-cyan-600', desc: 'Coleta e tratamento de esgoto' },
-  { id: 'drenagem', title: 'Saneamento - Drenagem', icon: Filter, color: 'bg-blue-500', desc: 'Drenagem de águas pluviais' },
-  { id: 'ete', title: 'Coleta e Tratamento', icon: Building2, color: 'bg-teal-500', desc: 'ETEs e sistemas de tratamento' },
-  { id: 'residuos', title: 'Resíduos Sólidos', icon: Trash2, color: 'bg-orange-500', desc: 'Coleta, transbordo e aterros' },
-  { id: 'reciclagem', title: 'Reciclagem', icon: Recycle, color: 'bg-green-500', desc: 'Centrais de triagem e reciclagem' },
-];
-
-const workflowSteps = [
-  { step: 1, id: 'tipo', title: 'Tipo de Projeto' },
-  { step: 2, id: 'local', title: 'Localização' },
-  { step: 3, id: 'tecnico', title: 'Dados Técnicos' },
-  { step: 4, id: 'analise', title: 'Análise IA' },
-  { step: 5, id: 'resultado', title: 'Resultado' },
-];
-
-const brazilianStates = [
-  "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", 
-  "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", 
-  "RS", "RO", "RR", "SC", "SP", "SE", "TO"
-];
-
-const projectTypes: Record<string, { label: string; subtypes: string[] }> = {
-  agua: { 
-    label: 'Água',
-    subtypes: ['Sistema de Captação', 'ETA - Estação de Tratamento', 'Reservatório', 'Adutora', 'Rede de Distribuição', 'Poço Profundo'] 
-  },
-  esgoto: { 
-    label: 'Esgoto',
-    subtypes: ['Rede Coletora', 'Coletor Tronco', 'Interceptor', 'Emissário', 'Estação Elevatória (EEEB)', 'Ligação Domiciliar'] 
-  },
-  drenagem: { 
-    label: 'Drenagem',
-    subtypes: ['Microdrenagem', 'Macrodrenagem', 'Piscinão/Reservatório', 'Canal de Drenagem', 'Galeria', 'Bacia de Detenção'] 
-  },
-  ete: { 
-    label: 'Tratamento',
-    subtypes: ['ETE - Lodos Ativados', 'ETE - Lagoas', 'ETE - UASB', 'ETE - MBR', 'Reúso de Água', 'Tratamento de Lodo'] 
-  },
-  residuos: { 
-    label: 'Resíduos',
-    subtypes: ['Aterro Sanitário', 'Central de Transbordo', 'Coleta Seletiva', 'Coleta Convencional', 'Unidade de Valorização Energética'] 
-  },
-  reciclagem: { 
-    label: 'Reciclagem',
-    subtypes: ['Central de Triagem', 'Cooperativa de Catadores', 'Usina de Compostagem', 'CDR - Combustível Derivado de Resíduos'] 
-  },
-};
+const MODULE_ID = 'saneamento' as const;
 
 export default function Saneamento() {
+  const { categories: subcategories, getCategoryInfo, getCategorySubtypes } = useProjectSelector(MODULE_ID);
+  const workflowSteps = DEFAULT_WORKFLOW_STEPS;
+  const brazilianStates = BRAZILIAN_STATES;
   const [activeTab, setActiveTab] = useState('categorias');
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -108,13 +64,13 @@ export default function Saneamento() {
     clearMessages();
     setCurrentStep(4);
     
-    const categoryInfo = subcategories.find(c => c.id === selectedCategory);
-    const typeInfo = projectTypes[selectedCategory || ''];
+    const categoryInfo = getCategoryInfo(selectedCategory);
+    
     
     const prompt = `Faça uma análise completa de viabilidade para projeto de saneamento básico:
 
 **TIPO DE PROJETO:** ${categoryInfo?.title || selectedCategory}
-**SUBTIPO:** ${projectData.subtipo || typeInfo?.subtypes[0] || 'A definir'}
+**SUBTIPO:** ${projectData.subtipo || 'A definir'}
 
 **DADOS DO PROJETO:**
 - Nome: ${projectData.nome || 'Novo Projeto de Saneamento'}
@@ -214,8 +170,8 @@ Considere legislação brasileira: Lei 11.445/07, Lei 14.026/20, Decreto 7.217/1
   };
 
   const renderWorkflowStep = () => {
-    const categoryInfo = subcategories.find(c => c.id === selectedCategory);
-    const typeInfo = projectTypes[selectedCategory || ''];
+    const categoryInfo = getCategoryInfo(selectedCategory);
+    
     const isResiduos = selectedCategory === 'residuos' || selectedCategory === 'reciclagem';
 
     switch (currentStep) {
@@ -239,18 +195,12 @@ Considere legislação brasileira: Lei 11.445/07, Lei 14.026/20, Decreto 7.217/1
                     onChange={(e) => setProjectData({...projectData, nome: e.target.value})}
                   />
                 </div>
-                <div>
-                  <Label>Subtipo *</Label>
-                  <Select 
-                    value={projectData.subtipo}
-                    onValueChange={(v) => setProjectData({...projectData, subtipo: v})}
-                  >
-                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                    <SelectContent>
-                      {typeInfo?.subtypes.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <SubtypeSelector
+                  moduleId={MODULE_ID}
+                  categoryId={selectedCategory}
+                  value={projectData.subtipo}
+                  onValueChange={(v) => setProjectData({...projectData, subtipo: v})}
+                />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -427,7 +377,7 @@ Considere legislação brasileira: Lei 11.445/07, Lei 14.026/20, Decreto 7.217/1
                   </ScrollArea>
                   <div className="flex gap-2 pt-4 border-t">
                     <Button onClick={() => {
-                      const categoryInfo = subcategories.find(c => c.id === selectedCategory);
+                      const categoryInfo = getCategoryInfo(selectedCategory);
                       const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
                       saveAnalysis.mutate({ module: 'Saneamento', category: categoryInfo?.title, projectName: projectData.nome || 'Novo Projeto', projectData, analysisContent: content });
                     }} disabled={saveAnalysis.isPending}>
@@ -435,7 +385,7 @@ Considere legislação brasileira: Lei 11.445/07, Lei 14.026/20, Decreto 7.217/1
                       {saveAnalysis.isPending ? 'Salvando...' : 'Salvar'}
                     </Button>
                     <Button variant="outline" onClick={() => {
-                      const categoryInfo = subcategories.find(c => c.id === selectedCategory);
+                      const categoryInfo = getCategoryInfo(selectedCategory);
                       const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
                       exportPDF({
                         title: 'Relatório de Viabilidade',
@@ -494,20 +444,19 @@ Considere legislação brasileira: Lei 11.445/07, Lei 14.026/20, Decreto 7.217/1
           </TabsList>
 
           <TabsContent value="categorias" className="space-y-6 mt-6">
-            <CategoryAccordion 
-              categories={subcategories} 
-              onSelect={handleCategorySelect}
+            <CategoryGrid
+              moduleId={MODULE_ID}
               selectedCategory={selectedCategory}
-              getSubtypes={(categoryId) => projectTypes[categoryId]?.subtypes ?? []}
+              onSelectCategory={handleCategorySelect}
             />
           </TabsContent>
 
           <TabsContent value="projeto" className="space-y-6 mt-6">
             <div className="flex items-center gap-3">
               <span className="text-sm font-medium text-muted-foreground">Categoria:</span>
-              <CategoryDropdown 
-                categories={subcategories} 
-                value={selectedCategory} 
+              <CategoryDropdownNew
+                moduleId={MODULE_ID}
+                value={selectedCategory}
                 onValueChange={(v) => {
                   setSelectedCategory(v);
                   setProjectData((current) => ({ ...current, subtipo: '' }));

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { CategoryAccordion, CategoryDropdown } from '@/components/dashboard/CategorySelector';
+import { CategoryGrid, CategoryDropdown as CategoryDropdownNew, SubtypeSelector, useProjectSelector } from '@/components/dashboard/ProjectSelector';
+import { BRAZILIAN_STATES, DEFAULT_WORKFLOW_STEPS } from '@/data/moduleRegistry';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -21,55 +22,7 @@ import { useExportPDF } from '@/hooks/useExportPDF';
 import { useProjectAnalyses } from '@/hooks/useProjectAnalyses';
 import { toast } from 'sonner';
 
-const subcategories = [
-  { id: 'extracao', title: 'Mineração', icon: Mountain, color: 'bg-stone-500', desc: 'Extração mineral a céu aberto e subterrânea' },
-  { id: 'infraestrutura', title: 'Infraestrutura Mineral', icon: Factory, color: 'bg-stone-600', desc: 'Usinas de beneficiamento e processamento' },
-  { id: 'patrimonial', title: 'Patrimonial', icon: Building, color: 'bg-amber-600', desc: 'Gestão de patrimônio mineral' },
-  { id: 'jazidas', title: 'Jazidas e Minas', icon: Gem, color: 'bg-purple-500', desc: 'Pesquisa e desenvolvimento de jazidas' },
-  { id: 'logistica', title: 'Logística Mineral', icon: Truck, color: 'bg-orange-500', desc: 'Transporte e escoamento' },
-  { id: 'concessao', title: 'Áreas de Concessão', icon: HardHat, color: 'bg-emerald-500', desc: 'Gestão de títulos e direitos minerários' },
-];
-
-const workflowSteps = [
-  { step: 1, id: 'tipo', title: 'Tipo de Projeto' },
-  { step: 2, id: 'local', title: 'Localização' },
-  { step: 3, id: 'tecnico', title: 'Dados Técnicos' },
-  { step: 4, id: 'analise', title: 'Análise IA' },
-  { step: 5, id: 'resultado', title: 'Resultado' },
-];
-
-const brazilianStates = [
-  "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", 
-  "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", 
-  "RS", "RO", "RR", "SC", "SP", "SE", "TO"
-];
-
-const projectTypes: Record<string, { label: string; subtypes: string[] }> = {
-  extracao: { 
-    label: 'Extração',
-    subtypes: ['Mina a Céu Aberto', 'Mina Subterrânea', 'Lavra de Aluvião', 'Garimpo', 'Pedreira'] 
-  },
-  infraestrutura: { 
-    label: 'Infraestrutura',
-    subtypes: ['Usina de Beneficiamento', 'Planta de Pelotização', 'Concentrador', 'Barragem de Rejeitos', 'Pilha de Estéril'] 
-  },
-  patrimonial: { 
-    label: 'Patrimonial',
-    subtypes: ['Aquisição de Direitos', 'Joint Venture', 'Cessão de Direitos', 'Arrendamento'] 
-  },
-  jazidas: { 
-    label: 'Jazidas',
-    subtypes: ['Pesquisa Mineral', 'Avaliação de Recursos', 'Estudo de Pré-Viabilidade', 'Estudo de Viabilidade (FS)'] 
-  },
-  logistica: { 
-    label: 'Logística',
-    subtypes: ['Mineroduto', 'Correia Transportadora', 'Terminal Portuário', 'Ramal Ferroviário'] 
-  },
-  concessao: { 
-    label: 'Concessão',
-    subtypes: ['Requerimento de Pesquisa', 'Portaria de Lavra', 'Licenciamento', 'PLG', 'Guia de Utilização'] 
-  },
-};
+const MODULE_ID = 'mineracao' as const;
 
 const mineralTypes = [
   "Minério de Ferro", "Bauxita", "Manganês", "Ouro", "Cobre", 
@@ -79,6 +32,9 @@ const mineralTypes = [
 ];
 
 export default function Mineracao() {
+  const { categories: subcategories, getCategoryInfo, getCategorySubtypes } = useProjectSelector(MODULE_ID);
+  const workflowSteps = DEFAULT_WORKFLOW_STEPS;
+  const brazilianStates = BRAZILIAN_STATES;
   const [activeTab, setActiveTab] = useState('categorias');
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -115,13 +71,13 @@ export default function Mineracao() {
     clearMessages();
     setCurrentStep(4);
     
-    const categoryInfo = subcategories.find(c => c.id === selectedCategory);
-    const typeInfo = projectTypes[selectedCategory || ''];
+    const categoryInfo = getCategoryInfo(selectedCategory);
+    
     
     const prompt = `Faça uma análise completa de viabilidade para projeto de mineração:
 
 **TIPO DE PROJETO:** ${categoryInfo?.title || selectedCategory}
-**SUBTIPO:** ${projectData.subtipo || typeInfo?.subtypes[0] || 'A definir'}
+**SUBTIPO:** ${projectData.subtipo || 'A definir'}
 
 **DADOS DO PROJETO:**
 - Nome: ${projectData.nome || 'Novo Projeto de Mineração'}
@@ -207,8 +163,8 @@ Considere legislação brasileira: Código de Mineração (Decreto-Lei 227/67), 
   };
 
   const renderWorkflowStep = () => {
-    const categoryInfo = subcategories.find(c => c.id === selectedCategory);
-    const typeInfo = projectTypes[selectedCategory || ''];
+    const categoryInfo = getCategoryInfo(selectedCategory);
+    
 
     switch (currentStep) {
       case 1:
@@ -231,18 +187,12 @@ Considere legislação brasileira: Código de Mineração (Decreto-Lei 227/67), 
                     onChange={(e) => setProjectData({...projectData, nome: e.target.value})}
                   />
                 </div>
-                <div>
-                  <Label>Subtipo *</Label>
-                  <Select 
-                    value={projectData.subtipo}
-                    onValueChange={(v) => setProjectData({...projectData, subtipo: v})}
-                  >
-                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                    <SelectContent>
-                      {typeInfo?.subtypes.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <SubtypeSelector
+                  moduleId={MODULE_ID}
+                  categoryId={selectedCategory}
+                  value={projectData.subtipo}
+                  onValueChange={(v) => setProjectData({...projectData, subtipo: v})}
+                />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -421,7 +371,7 @@ Considere legislação brasileira: Código de Mineração (Decreto-Lei 227/67), 
                   </ScrollArea>
                   <div className="flex gap-2 pt-4 border-t">
                     <Button onClick={() => {
-                      const categoryInfo = subcategories.find(c => c.id === selectedCategory);
+                      const categoryInfo = getCategoryInfo(selectedCategory);
                       const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
                       saveAnalysis.mutate({ module: 'Mineração', category: categoryInfo?.title, projectName: projectData.nome || 'Novo Projeto', projectData, analysisContent: content });
                     }} disabled={saveAnalysis.isPending}>
@@ -429,7 +379,7 @@ Considere legislação brasileira: Código de Mineração (Decreto-Lei 227/67), 
                       {saveAnalysis.isPending ? 'Salvando...' : 'Salvar'}
                     </Button>
                     <Button variant="outline" onClick={() => {
-                      const categoryInfo = subcategories.find(c => c.id === selectedCategory);
+                      const categoryInfo = getCategoryInfo(selectedCategory);
                       const content = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
                       exportPDF({
                         title: 'Relatório de Viabilidade',
@@ -488,20 +438,19 @@ Considere legislação brasileira: Código de Mineração (Decreto-Lei 227/67), 
           </TabsList>
 
           <TabsContent value="categorias" className="space-y-6 mt-6">
-            <CategoryAccordion 
-              categories={subcategories} 
-              onSelect={handleCategorySelect}
+            <CategoryGrid
+              moduleId={MODULE_ID}
               selectedCategory={selectedCategory}
-              getSubtypes={(categoryId) => projectTypes[categoryId]?.subtypes ?? []}
+              onSelectCategory={handleCategorySelect}
             />
           </TabsContent>
 
           <TabsContent value="projeto" className="space-y-6 mt-6">
             <div className="flex items-center gap-3">
               <span className="text-sm font-medium text-muted-foreground">Categoria:</span>
-              <CategoryDropdown 
-                categories={subcategories} 
-                value={selectedCategory} 
+              <CategoryDropdownNew
+                moduleId={MODULE_ID}
+                value={selectedCategory}
                 onValueChange={(v) => {
                   setSelectedCategory(v);
                   setProjectData((current) => ({ ...current, subtipo: '' }));
