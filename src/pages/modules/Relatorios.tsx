@@ -96,6 +96,35 @@ export default function Relatorios() {
   const { exportPDF } = useExportPDF();
   const { analyses, isLoading: analysesLoading, deleteAnalysis } = useProjectAnalyses();
   const [viewingAnalysis, setViewingAnalysis] = useState<string | null>(null);
+  const [filterModule, setFilterModule] = useState<string>('all');
+  const [filterPeriod, setFilterPeriod] = useState<string>('all');
+  const [filterSearch, setFilterSearch] = useState('');
+
+  const availableModules = useMemo(() => {
+    const modules = [...new Set(analyses.map(a => a.module))];
+    return modules.sort();
+  }, [analyses]);
+
+  const filteredAnalyses = useMemo(() => {
+    return analyses.filter((a) => {
+      if (filterModule !== 'all' && a.module !== filterModule) return false;
+      if (filterPeriod !== 'all') {
+        const createdAt = new Date(a.created_at);
+        const now = new Date();
+        if (filterPeriod === '7d' && !isAfter(createdAt, subDays(now, 7))) return false;
+        if (filterPeriod === '30d' && !isAfter(createdAt, subDays(now, 30))) return false;
+        if (filterPeriod === '90d' && !isAfter(createdAt, subMonths(now, 3))) return false;
+        if (filterPeriod === '1y' && !isAfter(createdAt, subMonths(now, 12))) return false;
+      }
+      if (filterSearch) {
+        const search = filterSearch.toLowerCase();
+        return a.project_name.toLowerCase().includes(search) || 
+               a.module.toLowerCase().includes(search) || 
+               (a.category && a.category.toLowerCase().includes(search));
+      }
+      return true;
+    });
+  }, [analyses, filterModule, filterPeriod, filterSearch]);
 
   const handleGenerateReport = async () => {
     if (!selectedReportType) {
