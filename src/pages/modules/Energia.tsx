@@ -491,23 +491,11 @@ Considere legislação brasileira: Lei 9.074/95, Lei 10.848/04, Resoluções ANE
           </TabsList>
 
           <TabsContent value="categorias" className="mt-6">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {subcategories.map((sub) => (
-                <Card 
-                  key={sub.id} 
-                  className="group cursor-pointer hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5"
-                  onClick={() => handleCategorySelect(sub.id)}
-                >
-                  <CardContent className="p-6 flex flex-col items-center text-center gap-3">
-                    <div className={`w-14 h-14 rounded-xl ${sub.color}/10 flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                      <sub.icon className={`h-7 w-7 ${sub.color.replace('bg-', 'text-')}`} />
-                    </div>
-                    <span className="font-medium text-sm">{sub.title}</span>
-                    <span className="text-xs text-muted-foreground">{sub.desc}</span>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <CategoryAccordion 
+              categories={subcategories} 
+              onSelect={handleCategorySelect}
+              selectedCategory={selectedCategory}
+            />
           </TabsContent>
 
           <TabsContent value="projeto" className="space-y-6 mt-6">
