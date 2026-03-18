@@ -425,7 +425,7 @@ Considere legislação brasileira: Lei 9.074/95, Lei 10.848/04, Resoluções ANE
           <TabsList>
             <TabsTrigger value="categorias">Categorias</TabsTrigger>
             <TabsTrigger value="projeto" disabled={!selectedCategory}>
-              Novo Projeto {selectedCategory && `(${subcategories.find(c => c.id === selectedCategory)?.title})`}
+              Novo Projeto {selectedCategory && `(${getCategoryInfo(selectedCategory)?.title})`}
             </TabsTrigger>
           </TabsList>
 
