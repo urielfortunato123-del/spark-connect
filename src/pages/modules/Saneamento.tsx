@@ -492,24 +492,12 @@ Considere legislação brasileira: Lei 11.445/07, Lei 14.026/20, Decreto 7.217/1
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="categorias" className="space-y-6">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {subcategories.map((sub) => (
-                <Card 
-                  key={sub.id} 
-                  className="group cursor-pointer hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5"
-                  onClick={() => handleCategorySelect(sub.id)}
-                >
-                  <CardContent className="p-6 flex flex-col items-center text-center gap-3">
-                    <div className={`w-14 h-14 rounded-xl ${sub.color}/10 flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                      <sub.icon className={`h-7 w-7 ${sub.color.replace('bg-', 'text-')}`} />
-                    </div>
-                    <span className="font-medium text-sm">{sub.title}</span>
-                    <span className="text-xs text-muted-foreground">{sub.desc}</span>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+          <TabsContent value="categorias" className="space-y-6 mt-6">
+            <CategoryAccordion 
+              categories={subcategories} 
+              onSelect={handleCategorySelect}
+              selectedCategory={selectedCategory}
+            />
           </TabsContent>
 
           <TabsContent value="projeto" className="space-y-6">
