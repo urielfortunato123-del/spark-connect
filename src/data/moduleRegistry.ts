@@ -18,6 +18,8 @@ import {
   FileStack, Boxes, Leaf, Fuel, Beaker,
   // Petróleo
   Droplet, ArrowUpDown,
+  // Ambiental
+  TreePine, FileCheck, ClipboardCheck, Home, FileText, Map,
   type LucideIcon,
 } from 'lucide-react';
 
