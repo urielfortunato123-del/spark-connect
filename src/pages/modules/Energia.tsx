@@ -496,6 +496,7 @@ Considere legislação brasileira: Lei 9.074/95, Lei 10.848/04, Resoluções ANE
               categories={subcategories} 
               onSelect={handleCategorySelect}
               selectedCategory={selectedCategory}
+              getSubtypes={(categoryId) => projectTypes[categoryId]?.subtypes ?? []}
             />
           </TabsContent>
 
@@ -505,7 +506,11 @@ Considere legislação brasileira: Lei 9.074/95, Lei 10.848/04, Resoluções ANE
               <CategoryDropdown 
                 categories={subcategories} 
                 value={selectedCategory} 
-                onValueChange={(v) => { setSelectedCategory(v); setCurrentStep(1); }}
+                onValueChange={(v) => {
+                  setSelectedCategory(v);
+                  setProjectData((current) => ({ ...current, subtipo: '' }));
+                  setCurrentStep(1);
+                }}
               />
             </div>
             {/* Progress Bar */}

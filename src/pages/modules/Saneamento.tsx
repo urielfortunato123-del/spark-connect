@@ -498,6 +498,7 @@ Considere legislação brasileira: Lei 11.445/07, Lei 14.026/20, Decreto 7.217/1
               categories={subcategories} 
               onSelect={handleCategorySelect}
               selectedCategory={selectedCategory}
+              getSubtypes={(categoryId) => projectTypes[categoryId]?.subtypes ?? []}
             />
           </TabsContent>
 
@@ -507,7 +508,11 @@ Considere legislação brasileira: Lei 11.445/07, Lei 14.026/20, Decreto 7.217/1
               <CategoryDropdown 
                 categories={subcategories} 
                 value={selectedCategory} 
-                onValueChange={(v) => { setSelectedCategory(v); setCurrentStep(1); }}
+                onValueChange={(v) => {
+                  setSelectedCategory(v);
+                  setProjectData((current) => ({ ...current, subtipo: '' }));
+                  setCurrentStep(1);
+                }}
               />
             </div>
             {/* Progress Bar */}
