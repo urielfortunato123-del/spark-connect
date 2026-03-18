@@ -203,6 +203,7 @@ Considere legislação brasileira: Lei do Petróleo (9.478/97), Lei da Partilha 
 
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(categoryId);
+    setProjectData((current) => ({ ...current, subtipo: '' }));
     setActiveTab('projeto');
     setCurrentStep(1);
   };

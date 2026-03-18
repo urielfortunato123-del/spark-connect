@@ -201,6 +201,7 @@ Considere legislação brasileira: Código de Mineração (Decreto-Lei 227/67), 
 
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(categoryId);
+    setProjectData((current) => ({ ...current, subtipo: '' }));
     setActiveTab('projeto');
     setCurrentStep(1);
   };

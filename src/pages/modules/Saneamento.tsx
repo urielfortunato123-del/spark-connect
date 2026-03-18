@@ -208,6 +208,7 @@ Considere legislação brasileira: Lei 11.445/07, Lei 14.026/20, Decreto 7.217/1
 
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(categoryId);
+    setProjectData((current) => ({ ...current, subtipo: '' }));
     setActiveTab('projeto');
     setCurrentStep(1);
   };

@@ -197,6 +197,7 @@ Considere legislação brasileira: PNRS (Lei 12.305/10), Política Nacional de B
 
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(categoryId);
+    setProjectData((current) => ({ ...current, subtipo: '' }));
     setActiveTab('projeto');
     setCurrentStep(1);
   };

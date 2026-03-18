@@ -200,6 +200,7 @@ Considere legislação brasileira: Lei 8.987/95 (Concessões), Lei 11.079/04 (PP
 
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(categoryId);
+    setProjectData((current) => ({ ...current, subtipo: '' }));
     setActiveTab('projeto');
     setCurrentStep(1);
   };

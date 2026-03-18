@@ -198,6 +198,7 @@ Considere legislação brasileira: Lei 9.074/95, Lei 10.848/04, Resoluções ANE
 
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(categoryId);
+    setProjectData((current) => ({ ...current, subtipo: '' }));
     setActiveTab('projeto');
     setCurrentStep(1);
   };
