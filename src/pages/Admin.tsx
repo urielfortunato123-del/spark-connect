@@ -11,7 +11,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Users, Crown, Shield, Settings2, Search, RefreshCw } from 'lucide-react';
+import { Users, Crown, Shield, Settings2, Search, RefreshCw, Layers } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 
 type AppPlan = 'free' | 'telecom' | 'ev' | 'governo' | 'pro';
