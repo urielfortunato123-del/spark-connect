@@ -522,7 +522,15 @@ Considere legislação brasileira: Lei do Petróleo (9.478/97), Lei da Partilha 
             />
           </TabsContent>
 
-          <TabsContent value="projeto" className="space-y-6">
+          <TabsContent value="projeto" className="space-y-6 mt-6">
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium text-muted-foreground">Categoria:</span>
+              <CategoryDropdown 
+                categories={subcategories} 
+                value={selectedCategory} 
+                onValueChange={(v) => { setSelectedCategory(v); setCurrentStep(1); }}
+              />
+            </div>
             {/* Progress Bar */}
             <Card className="glass-card">
               <CardContent className="pt-6">

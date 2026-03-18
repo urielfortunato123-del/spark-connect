@@ -499,6 +499,14 @@ Considere legislação brasileira: Lei 9.074/95, Lei 10.848/04, Resoluções ANE
           </TabsContent>
 
           <TabsContent value="projeto" className="space-y-6 mt-6">
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium text-muted-foreground">Categoria:</span>
+              <CategoryDropdown 
+                categories={subcategories} 
+                value={selectedCategory} 
+                onValueChange={(v) => { setSelectedCategory(v); setCurrentStep(1); }}
+              />
+            </div>
             {/* Progress Bar */}
             <Card className="glass-card">
               <CardContent className="py-4">
